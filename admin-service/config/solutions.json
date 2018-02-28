@@ -1,0 +1,33 @@
+[
+	{
+		"id":"aaaa-atg6-ffgt-15gt",
+ 		"name":"AdminTool",
+ 		"state":false,
+ 		"description":"This is the AdminTool"
+	},{
+		"id":"bbbb-atg6-ffgt-15gt",
+ 		"name":"AARTool",
+ 		"state":false,
+ 		"description":"This is the AfterActionReview Tool"
+	},{
+		"id":"cccc-atg6-ffgt-15gt",
+ 		"name":"TrialManager",
+ 		"state":false,
+ 		"description":"This is the Trial Manager"
+	},{
+		"id":"1234-atg6-ffgt-15gt",
+ 		"name":"Solution 1",
+ 		"state":false,
+ 		"description":"This is the Solution 1"
+	},{
+		"id":"2234-atg6-ffgt-15gt",
+ 		"name":"Solution 2",
+ 		"state":false,
+ 		"description":"This is the Solution 2"
+	},{
+		"id":"3234-atg6-ffgt-15gt",
+ 		"name":"Solution 3",
+ 		"state":false,
+ 		"description":"This is the Solution 3"
+	}
+]

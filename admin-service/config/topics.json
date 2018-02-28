@@ -1,0 +1,19 @@
+[
+	{
+		"id":"1234-atg6-ffgt-15gt",
+		"type":"core.topic",
+ 		"name":"heartbeat.topic",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["aaaa-atg6-ffgt-15gt"],
+ 		"description":"This is the topic where every solution published the heartbeat indicating that the solution is up and alive."
+	},{
+		"id":"2234-atg6-ffgt-15gt",
+		"type":"core.topic",
+ 		"name":"admin.heartbeat.topic",
+ 		"state": false,
+ 		"publishSolutionIDs":["aaaa-atg6-ffgt-15gt"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the topic where the admin tool publishes his heartbeat, indicating that the admin tool is up"
+	}
+]

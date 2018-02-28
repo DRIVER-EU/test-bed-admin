@@ -1,0 +1,9 @@
+[
+	{
+		"id":"1234-atg6-ffgt-15gt",
+ 		"name":"gateway 1",
+ 		"state": false,
+ 		"managingTypes":["CAP"],
+ 		"description":"This is the Gateway Nr 1, managing the CAP messages"
+	}
+]
