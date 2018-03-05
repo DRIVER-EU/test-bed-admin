@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class WSHeartbeatRequest {
 	private String requestId;
-	private String action = "HBREQUEST";
+	private String mutation = "HBREQUEST";
 	private Date sendTime;
 	
 	public WSHeartbeatRequest() {
@@ -19,12 +19,12 @@ public class WSHeartbeatRequest {
 		this.requestId = requestId;
 	}
 
-	public String getAction() {
-		return action;
+	public String getMutation() {
+		return mutation;
 	}
 
-	public void setAction(String action) {
-		this.action = action;
+	public void setAction(String mutation) {
+		this.mutation = mutation;
 	}
 
 	public Date getSendTime() {

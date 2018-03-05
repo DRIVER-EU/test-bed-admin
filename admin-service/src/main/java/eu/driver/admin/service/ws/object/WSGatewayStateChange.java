@@ -1,7 +1,7 @@
 package eu.driver.admin.service.ws.object;
 
 public class WSGatewayStateChange {
-	private String action = "GATEWAY";
+	private String mutation = "UPDATE_GATEWAY";
 	private String id = null;
 	private Boolean state = false;
 	
@@ -14,12 +14,12 @@ public class WSGatewayStateChange {
 		this.state = state;
 	}
 
-	public String getAction() {
-		return action;
+	public String getMutation() {
+		return mutation;
 	}
 
-	public void setAction(String action) {
-		this.action = action;
+	public void setMutation(String mutation) {
+		this.mutation = mutation;
 	}
 
 	public String getId() {

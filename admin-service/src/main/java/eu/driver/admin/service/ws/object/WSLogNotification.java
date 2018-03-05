@@ -3,32 +3,28 @@ package eu.driver.admin.service.ws.object;
 import java.util.Date;
 
 public class WSLogNotification {
-	private String action = "ONLOG";
+	private String mutation = "LOG_NOTIFICATION";
 	private Long id = 0L;
 	private String level = null;
 	private String clientID = null;
 	private Date date = null;
 	private String message = null;
-	
-	public WSLogNotification(	Long id,
-								String level,
-								String clientID,
-								Date date,
-								String message) {
+
+	public WSLogNotification(Long id, String level, String clientID, Date date, String message) {
 		this.id = id;
 		this.level = level;
 		this.clientID = clientID;
 		this.date = date;
 		this.message = message;
-		
+
 	}
 
-	public String getAction() {
-		return action;
+	public String getMutation() {
+		return mutation;
 	}
 
-	public void setAction(String action) {
-		this.action = action;
+	public void setMutation(String mutation) {
+		this.mutation = mutation;
 	}
 
 	public Long getId() {
