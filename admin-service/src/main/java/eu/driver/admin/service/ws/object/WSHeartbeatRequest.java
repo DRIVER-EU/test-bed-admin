@@ -23,7 +23,7 @@ public class WSHeartbeatRequest {
 		return mutation;
 	}
 
-	public void setAction(String mutation) {
+	public void setMutation(String mutation) {
 		this.mutation = mutation;
 	}
 

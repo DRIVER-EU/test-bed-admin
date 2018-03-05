@@ -25,9 +25,9 @@ public class WSController {
 	}
 	
 	public void setWSSession(WebSocketSession session) {
-		log.info("setWSSession");
+		log.info("--> setWSSession");
 		this.session = session;
-		log.info("setWSSession");
+		log.info("setWSSession -->");
 	}
 	
 	public void sendMessage(String msg) {

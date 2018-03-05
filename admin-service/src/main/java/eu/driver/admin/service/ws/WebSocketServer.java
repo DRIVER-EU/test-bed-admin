@@ -1,7 +1,5 @@
 package eu.driver.admin.service.ws;
 
-import java.util.Timer;
-
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -16,7 +14,6 @@ import eu.driver.admin.service.ws.object.WSHeartbeatRequest;
 public class WebSocketServer extends TextWebSocketHandler {
 	
 	private Logger log = Logger.getLogger(this.getClass());
-	private Timer timer = null;
 	private StringJSONMapper mapper = new StringJSONMapper();
 	
 	public WebSocketServer() {
@@ -26,8 +23,10 @@ public class WebSocketServer extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
     	log.info("The WebSocket has been closed!");
-    	this.timer.cancel();
-    	this.timer = null;
+    	log.info("Socket closed: " + status.getCode());
+    	session.close();
+    	WSController.getInstance().setWSSession(null)
+    	;
     }
  
     @Override
@@ -41,7 +40,7 @@ public class WebSocketServer extends TextWebSocketHandler {
     	log.info("Message received: " + textMessage.getPayload());
     	
     	String message = textMessage.getPayload();
-    	if (message.indexOf("eu.driver.adaptor.ws.request.heartbeat") != -1) {
+    	if (message.indexOf("HBREQUEST") != -1) {
     		WSHeartbeatRequest hbRequest = mapper.stringToHBRequestMessage(textMessage.getPayload());
     		
     		TextMessage responseMsg = new TextMessage(mapper.objectToJSONString(hbRequest.createResponse()));
