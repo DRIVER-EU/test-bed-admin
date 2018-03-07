@@ -2,7 +2,7 @@ package eu.driver.admin.service.ws.object;
 
 public class WSTopicCreationNotification {
 	
-	private String action = "TOPIC";
+	private String mutation = "UPDATE_TOPIC";
 	private String id = null;
 	private Boolean state = false;
 	
@@ -15,12 +15,12 @@ public class WSTopicCreationNotification {
 		this.state = state;
 	}
 	
-	public String getAction() {
-		return action;
+	public String getMutation() {
+		return mutation;
 	}
 
-	public void setAction(String action) {
-		this.action = action;
+	public void setMutation(String mutation) {
+		this.mutation = mutation;
 	}
 
 	public String getId() {
