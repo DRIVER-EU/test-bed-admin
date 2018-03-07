@@ -23,6 +23,7 @@ public class AdminServiceApplication {
 	
 	public AdminServiceApplication() throws Exception {
 		log.info("Init. AdminServiceApplication");
+			
 	}
 	
 	public static void main(String[] args) throws Exception {
