@@ -17,6 +17,8 @@ import org.I0Itec.zkclient.serialize.ZkSerializer;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.log4j.Logger;
 
+import eu.driver.adapter.properties.ClientProperties;
+
 public class KafkaAdminController {
 	
 	private Logger log = Logger.getLogger(this.getClass());
@@ -26,6 +28,9 @@ public class KafkaAdminController {
 	
 	public KafkaAdminController() {
 		log.info("KafkaAdminController");
+		schemaRest = ClientProperties.getInstance().getProperty("schema.registry.url", "http://localhost:3502");
+		zookeeperHost = ClientProperties.getInstance().getProperty("zookeeper.host", "localhost");
+		zookeeperPort = Integer.parseInt(ClientProperties.getInstance().getProperty("zookeeper.port", "3500"));
 	}
 	
 	public void createTopic(String topicName, IndexedRecord key, IndexedRecord value) throws Exception {

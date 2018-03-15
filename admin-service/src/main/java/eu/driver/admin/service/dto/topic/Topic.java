@@ -8,6 +8,8 @@ public class Topic {
 	private String type = null;
 	private String name = null;
 	private Boolean state = false;
+	private String msgType = null;
+	private String msgTypeVersion = null;
 	private String description = null;
 	private List<String> publishSolutionIDs = new ArrayList<String>();
 	private List<String> subscribedSolutionIDs = new ArrayList<String>();
@@ -46,6 +48,22 @@ public class Topic {
 
 	public void setState(Boolean state) {
 		this.state = state;
+	}
+
+	public String getMsgType() {
+		return msgType;
+	}
+
+	public void setMsgType(String msgType) {
+		this.msgType = msgType;
+	}
+
+	public String getMsgTypeVersion() {
+		return msgTypeVersion;
+	}
+
+	public void setMsgTypeVersion(String msgTypeVersion) {
+		this.msgTypeVersion = msgTypeVersion;
 	}
 
 	public String getDescription() {

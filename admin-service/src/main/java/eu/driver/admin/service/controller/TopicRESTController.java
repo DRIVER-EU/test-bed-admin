@@ -26,6 +26,9 @@ public class TopicRESTController {
 	private String configJson = "config/topics.json";
 	private Logger log = Logger.getLogger(this.getClass());
 	private FileReader fileReader = new FileReader();
+	
+	private List<Topic> coreTopics = new ArrayList<Topic>();
+	private List<Topic> trialTopics = new ArrayList<Topic>();
 
 	public TopicRESTController() {
 
@@ -54,6 +57,8 @@ public class TopicRESTController {
 					topic.setId(jsonobject.getString("id"));
 					topic.setType(jsonobject.getString("type"));
 					topic.setName(jsonobject.getString("name"));
+					topic.setMsgType(jsonobject.getString("msgType"));
+					topic.setMsgTypeVersion(jsonobject.getString("msgTypeVersion"));
 					topic.setState(jsonobject.getBoolean("state"));
 					topic.setDescription(jsonobject.getString("description"));
 
@@ -76,6 +81,12 @@ public class TopicRESTController {
 					topic.setSubscribedSolutionIDs(subscriber);
 					
 					topics.add(topic);
+					
+					if (topic.getType().equalsIgnoreCase("core.topic")) {
+						this.coreTopics.add(topic);
+					} else {
+						this.trialTopics.add(topic);
+					}
 				}
 			} catch (JSONException e) {
 				log.error("Error parsind the JSON topic response", e);
@@ -87,4 +98,13 @@ public class TopicRESTController {
 		log.info("getAllTrialTopics -->");
 		return new ResponseEntity<TopicList>(topicList, HttpStatus.OK);
 	}
+	
+	public List<Topic> getAllTrialTopic() {
+		log.info("--> getAllTrialTopics");
+		
+		
+		log.info("getAllTrialTopics -->");
+		return this.trialTopics;
+	}
+	
 }
