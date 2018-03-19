@@ -20,7 +20,7 @@ public class HeartbeatTimerTask extends TimerTask {
 	}
 	
 	public void run() {
-		log.info("HeartbeatTimerTask -- run");
+		log.debug("HeartbeatTimerTask -- run");
 		List<Solution> solutionList = this.solutionController.getSolutionList();
 		long currentTime = (new Date()).getTime();
 		
@@ -35,6 +35,6 @@ public class HeartbeatTimerTask extends TimerTask {
 				}	
 			}
 		}
-		log.info("HeartbeatTimerTask -- run end");
+		log.debug("HeartbeatTimerTask -- run end");
 	}
 }

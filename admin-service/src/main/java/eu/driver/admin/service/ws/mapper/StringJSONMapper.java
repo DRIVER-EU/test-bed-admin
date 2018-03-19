@@ -23,7 +23,7 @@ public class StringJSONMapper {
 	}
 	
 	public String objectToJSONString(Object object) {
-		log.info("--> objectToJSONString");
+		log.debug("--> objectToJSONString");
     	String jsonInString = null;
     	
     	if (this.mapper != null) {
@@ -42,7 +42,7 @@ public class StringJSONMapper {
     }
 	
 	public WSHeartbeatResponse stringToHBResponseMessage(String message) {
-		log.info("--> stringToHBResponseMessage");
+		log.debug("--> stringToHBResponseMessage");
 		WSHeartbeatResponse response = null;
 		try {
 			response = mapper.readValue(message, WSHeartbeatResponse.class);
@@ -58,7 +58,7 @@ public class StringJSONMapper {
 	}
 	
 	public WSHeartbeatRequest stringToHBRequestMessage(String message) {
-		log.info("--> stringToHBRequestMessage");
+		log.debug("--> stringToHBRequestMessage");
 		WSHeartbeatRequest request = null;
 		try {
 			request = mapper.readValue(message, WSHeartbeatRequest.class);

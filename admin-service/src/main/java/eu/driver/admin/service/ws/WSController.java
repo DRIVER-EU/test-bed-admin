@@ -25,13 +25,13 @@ public class WSController {
 	}
 	
 	public void setWSSession(WebSocketSession session) {
-		log.info("--> setWSSession");
+		log.debug("--> setWSSession");
 		this.session = session;
-		log.info("setWSSession -->");
+		log.debug("setWSSession -->");
 	}
 	
 	public void sendMessage(String msg) {
-		log.info("--> sendMessage");
+		log.debug("--> sendMessage");
 		log.debug(msg);
 		TextMessage responseMsg = new TextMessage(msg);
 		try {
@@ -41,7 +41,7 @@ public class WSController {
 		} catch (IOException e) {
 			log.error("Error sending the notification!");
 		}
-		log.info("sendMessage -->");
+		log.debug("sendMessage -->");
 	}
 
 }

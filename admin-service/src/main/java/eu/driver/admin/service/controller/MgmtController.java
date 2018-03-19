@@ -73,12 +73,12 @@ public class MgmtController {
 			adminAdapter.addCallback(logController, TopicConstants.LOGGING_TOPIC);
 		} catch (Exception e) {
 			log.error("Error creating the Core Topics!", e);
-			logController.addLog(LogLevels.LOG_LEVEL_SEVER, "The Testbed wasn't initialized successful: " + e.getMessage());
+			logController.addLog(LogLevels.LOG_LEVEL_SEVER, "The Testbed wasn't initialized successful: " + e.getMessage(), true);
 			return new ResponseEntity<Boolean>(false, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "The Testbed was initialized successful!");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "The Testbed was initialized successful!", true);
 		log.info("initTestbed -->");
 	    return new ResponseEntity<Boolean>(send, HttpStatus.OK);
 	}
@@ -91,7 +91,7 @@ public class MgmtController {
             @ApiResponse(code = 500, message = "Failure", response = Boolean.class)})
 	public ResponseEntity<Boolean> startTrialConfig() {
 		log.info("--> startTrialConfig");
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Trial start called!");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Trial start called!", true);
 		Boolean send = true;
 		
 		try {
@@ -106,27 +106,27 @@ public class MgmtController {
 	}
 	
 	private void createAllCoreTopics() throws Exception {
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!", true);
 		adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat());
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + "created.");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + "created.", true);
 		
 		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat());
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + "created.");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + "created.", true);
 		
 		adminController.createTopic(TopicConstants.LOGGING_TOPIC, new EDXLDistribution(), new Log());
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LOGGING_TOPIC + "created.");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LOGGING_TOPIC + "created.", true);
 		
 		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing());
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + "created.");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + "created.", true);
 		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite());
 		
 		adminController.createTopic(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, new EDXLDistribution(), new TopicCreate());
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + "created.");
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + "created.", true);
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!", true);
 	}
 	
 	private void createTrialTopics() throws Exception {
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating Trial specific Topics!");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating Trial specific Topics!", true);
 		
 		List<Solution> solutionList = solutionController.getSolutionList();
 		List<Topic> topics = topicController.getAllTrialTopic();
@@ -140,7 +140,7 @@ public class MgmtController {
 			
 			if (schema != null) {
 				adminController.createTopic(topic.getName(), new EDXLDistribution(), schema);
-				logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + "created.");
+				logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + "created.", true);
 				// send invite message
 				
 				boolean allSolutionsPublish = false;
@@ -242,18 +242,18 @@ public class MgmtController {
 				}
 				for (TopicInvite inviteMsg : inviteMsgs) {
 					try {
-						logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg);
+						logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg, true);
 						AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
 					} catch (CommunicationException cEx) {
-						logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString());
+						logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString(), true);
 					}
 				}
 			} else {
-				logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Trial specific Topic: " + topic.getName() + " could not be created, unknown schema: " + topic.getMsgType());
+				logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Trial specific Topic: " + topic.getName() + " could not be created, unknown schema: " + topic.getMsgType(), true);
 			}
 		}
 		
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Trial specific Topics created!");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Trial specific Topics created!", true);
 	}
 
 	public LogRESTController getLogController() {

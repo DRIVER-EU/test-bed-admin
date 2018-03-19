@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
+import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.controller.LogRESTController;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -23,9 +24,15 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class AdminServiceApplication {
 
 	private Logger log = Logger.getLogger(this.getClass());
+	private Boolean initAuto = false;
 	
 	public AdminServiceApplication() throws Exception {
 		log.info("Init. AdminServiceApplication");
+		initAuto = Boolean.parseBoolean(ClientProperties.getInstance().getProperty("init.auto"));
+	}
+	
+	public Boolean getAutoInit() {
+		return this.initAuto;
 	}
 	
 	public static void main(String[] args) throws Exception {

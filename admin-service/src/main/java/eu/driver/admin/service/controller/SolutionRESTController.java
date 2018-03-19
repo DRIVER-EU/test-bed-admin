@@ -58,7 +58,7 @@ public class SolutionRESTController implements IAdaptorCallback {
 	
 	@Override
 	public void messageReceived(IndexedRecord receivedMessage) {
-		log.info("SolutionRESTController-->");
+		log.debug("SolutionRESTController-->");
 		
 		if (receivedMessage.getSchema().getName().equalsIgnoreCase("Heartbeat")) {
 			try {
@@ -75,11 +75,11 @@ public class SolutionRESTController implements IAdaptorCallback {
 				log.error("Error updating the solution!" , e);
 			}
 		}
-		log.info("heartbeat message received-->");
+		log.debug("heartbeat message received-->");
 	}
 	
 	public void updateSolutionState(String clientID, Boolean state) {
-		log.info("-->updateSolutionState");
+		log.debug("-->updateSolutionState");
 		try {
 			for (Solution solution : solutions) {
 				if (solution.getId().equalsIgnoreCase(clientID)) {
@@ -93,7 +93,7 @@ public class SolutionRESTController implements IAdaptorCallback {
 		} catch (Exception e) {
 			log.error("Error updating the solution!" , e);
 		}
-		log.info("updateSolutionState-->");	
+		log.debug("updateSolutionState-->");	
 	}
 
 	@ApiOperation(value = "getAllTrialSolutions", nickname = "getAllTrialSolutions")
@@ -123,9 +123,9 @@ public class SolutionRESTController implements IAdaptorCallback {
 	}
 	
 	public List<Solution> getSolutionList() {
-		log.info("--> getSolutionList");
+		log.debug("--> getSolutionList");
 		
-		log.info("getSolutionList -->");
+		log.debug("getSolutionList -->");
 		return this.solutions;
 	}
 	

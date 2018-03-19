@@ -65,11 +65,7 @@ public class LogRESTController implements IAdaptorCallback {
 					dbLog = logRepo.saveAndFlush(dbLog);
 				}
 	
-				// send the log message via the ws connection
-				WSLogNotification logNotification = new WSLogNotification(dbLog.getId(),
-						dbLog.getLevel(), dbLog.getClientId(),dbLog.getSendDate(), dbLog.getMessage());
-				WSController.getInstance().sendMessage(
-						mapper.objectToJSONString(logNotification));
+				sendWSNotification(dbLog);
 			} catch (Exception e) {
 				log.error("Error processing the Log message received!", e);
 			}
@@ -115,14 +111,26 @@ public class LogRESTController implements IAdaptorCallback {
 		return new ResponseEntity<LogList>(result, HttpStatus.OK);
 	}
 	
-	public void addLog(String level, String message) {
+	public void addLog(String level, String message, Boolean sendNotification) {
 		Log log = new Log();
 		log.setClientId(clientId);
 		log.setLevel(level);
 		log.setSendDate(new Date());
 		log.setMessage(message);
 		
-		logRepo.saveAndFlush(log);
+		Log dbLog	= logRepo.saveAndFlush(log);
+		
+		if (sendNotification) {
+			sendWSNotification(dbLog);
+		}
+	}
+	
+	private void sendWSNotification(Log dbLog) {
+		// send the log message via the ws connection
+		WSLogNotification logNotification = new WSLogNotification(dbLog.getId(),
+				dbLog.getLevel(), dbLog.getClientId(),dbLog.getSendDate(), dbLog.getMessage());
+		WSController.getInstance().sendMessage(
+				mapper.objectToJSONString(logNotification));
 	}
 
 	public LogRepository getLogRepo() {
