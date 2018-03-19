@@ -1,7 +1,6 @@
 package eu.driver.admin.service.ws.mapper;
 
 import java.io.IOException;
-
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonGenerationException;

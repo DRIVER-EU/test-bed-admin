@@ -2,6 +2,8 @@ package eu.driver.admin.service;
 
 import static springfox.documentation.builders.PathSelectors.regex;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -12,6 +14,7 @@ import org.springframework.context.annotation.ComponentScan;
 import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.controller.LogRESTController;
+import eu.driver.admin.service.controller.MgmtController;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
@@ -24,20 +27,24 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class AdminServiceApplication {
 
 	private Logger log = Logger.getLogger(this.getClass());
-	private Boolean initAuto = false;
+	
+	@Autowired
+	MgmtController mgmtController;
 	
 	public AdminServiceApplication() throws Exception {
 		log.info("Init. AdminServiceApplication");
-		initAuto = Boolean.parseBoolean(ClientProperties.getInstance().getProperty("init.auto"));
-	}
-	
-	public Boolean getAutoInit() {
-		return this.initAuto;
 	}
 	
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(AdminServiceApplication.class, args);
     }
+	
+	@PostConstruct
+	public void init() {
+		if(Boolean.parseBoolean(ClientProperties.getInstance().getProperty("init.auto"))) {
+			mgmtController.initTestbed();
+		}
+	}
 	
 	@Bean
     public Docket newsApi() {
@@ -57,4 +64,11 @@ public class AdminServiceApplication {
                 .build();
     }
 
+	public MgmtController getMgmtController() {
+		return mgmtController;
+	}
+
+	public void setMgmtController(MgmtController mgmtController) {
+		this.mgmtController = mgmtController;
+	}
 }

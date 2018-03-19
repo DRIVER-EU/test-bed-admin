@@ -2,11 +2,15 @@ package eu.driver.admin.service.ws.object;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class WSLogNotification {
 	private String mutation = "LOG_NOTIFICATION";
 	private Long id = 0L;
 	private String level = null;
 	private String clientID = null;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
 	private Date date = null;
 	private String message = null;
 
