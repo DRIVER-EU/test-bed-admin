@@ -3,11 +3,14 @@ package eu.driver.admin.service;
 import static springfox.documentation.builders.PathSelectors.regex;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
+import eu.driver.admin.service.constants.LogLevels;
+import eu.driver.admin.service.controller.LogRESTController;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
@@ -23,7 +26,6 @@ public class AdminServiceApplication {
 	
 	public AdminServiceApplication() throws Exception {
 		log.info("Init. AdminServiceApplication");
-			
 	}
 	
 	public static void main(String[] args) throws Exception {

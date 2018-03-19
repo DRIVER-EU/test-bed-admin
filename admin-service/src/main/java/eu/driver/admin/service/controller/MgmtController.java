@@ -18,12 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import scala.Array;
 import eu.driver.adapter.constants.TopicConstants;
 import eu.driver.adapter.core.AdminAdapter;
 import eu.driver.adapter.excpetion.CommunicationException;
 import eu.driver.admin.service.constants.LogLevels;
-import eu.driver.admin.service.dto.SolutionList;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.dto.topic.Topic;
 import eu.driver.admin.service.kafka.KafkaAdminController;
@@ -71,6 +69,7 @@ public class MgmtController {
 		try {
 			createAllCoreTopics();
 			adminAdapter = AdminAdapter.getInstance();
+			adminAdapter.addCallback(solutionController, TopicConstants.HEARTBEAT_TOPIC);
 			adminAdapter.addCallback(logController, TopicConstants.LOGGING_TOPIC);
 		} catch (Exception e) {
 			log.error("Error creating the Core Topics!", e);
@@ -109,11 +108,20 @@ public class MgmtController {
 	private void createAllCoreTopics() throws Exception {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!");
 		adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + "created.");
+		
 		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + "created.");
+		
 		adminController.createTopic(TopicConstants.LOGGING_TOPIC, new EDXLDistribution(), new Log());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LOGGING_TOPIC + "created.");
+		
 		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + "created.");
 		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite());
+		
 		adminController.createTopic(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, new EDXLDistribution(), new TopicCreate());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + "created.");
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!");
 	}
 	
@@ -132,6 +140,7 @@ public class MgmtController {
 			
 			if (schema != null) {
 				adminController.createTopic(topic.getName(), new EDXLDistribution(), schema);
+				logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + "created.");
 				// send invite message
 				
 				boolean allSolutionsPublish = false;
@@ -156,45 +165,51 @@ public class MgmtController {
 
 				if (allSolutionsPublish && allSolutionsSubscribe) {
 					for (Solution solution: solutionList) {
-						TopicInvite inviteMsg = new TopicInvite();
-						inviteMsg.setId(solution.getId());
-						inviteMsg.setTopicName(topic.getName());
-						inviteMsg.setPublishAllowed(true);
-						inviteMsg.setSubscribeAllowed(true);
-						
-						inviteMsgs.add(inviteMsg);
+						if (!solution.getIsAdmin()) {
+							TopicInvite inviteMsg = new TopicInvite();
+							inviteMsg.setId(solution.getId());
+							inviteMsg.setTopicName(topic.getName());
+							inviteMsg.setPublishAllowed(true);
+							inviteMsg.setSubscribeAllowed(true);
+							
+							inviteMsgs.add(inviteMsg);
+						}
 					}
 				} else if (allSolutionsPublish) {
 					for (Solution solution: solutionList) {
-						TopicInvite inviteMsg = new TopicInvite();
-						inviteMsg.setId(solution.getId());
-						inviteMsg.setTopicName(topic.getName());
-						inviteMsg.setPublishAllowed(true);
-						
-						// find the client ID in the list of subribers
-						for (String clientID : subscribeClientIDs) {
-							if (clientID.equalsIgnoreCase(solution.getId())) {
-								inviteMsg.setSubscribeAllowed(true);
-								return;	
+						if (!solution.getIsAdmin()) {
+							TopicInvite inviteMsg = new TopicInvite();
+							inviteMsg.setId(solution.getId());
+							inviteMsg.setTopicName(topic.getName());
+							inviteMsg.setPublishAllowed(true);
+							
+							// find the client ID in the list of subribers
+							for (String clientID : subscribeClientIDs) {
+								if (clientID.equalsIgnoreCase(solution.getId())) {
+									inviteMsg.setSubscribeAllowed(true);
+									return;	
+								}
 							}
+							
+							inviteMsgs.add(inviteMsg);
 						}
-						
-						inviteMsgs.add(inviteMsg);
 					}
 				} else if (allSolutionsSubscribe) {
 					for (Solution solution: solutionList) {
-						TopicInvite inviteMsg = new TopicInvite();
-						inviteMsg.setId(solution.getId());
-						inviteMsg.setTopicName(topic.getName());
-						inviteMsg.setSubscribeAllowed(true);
-						// find the client ID in the list of subribers
-						for (String clientID : publishClientIDs) {
-							if (clientID.equalsIgnoreCase(solution.getId())) {
-								inviteMsg.setPublishAllowed(true);
-								return;	
+						if (!solution.getIsAdmin()) {
+							TopicInvite inviteMsg = new TopicInvite();
+							inviteMsg.setId(solution.getId());
+							inviteMsg.setTopicName(topic.getName());
+							inviteMsg.setSubscribeAllowed(true);
+							// find the client ID in the list of subribers
+							for (String clientID : publishClientIDs) {
+								if (clientID.equalsIgnoreCase(solution.getId())) {
+									inviteMsg.setPublishAllowed(true);
+									return;	
+								}
 							}
+							inviteMsgs.add(inviteMsg);
 						}
-						inviteMsgs.add(inviteMsg);
 					}
 				} else {
 					Map<String, List<Boolean>> solutionMap = new HashMap<String, List<Boolean>>();
@@ -227,6 +242,7 @@ public class MgmtController {
 				}
 				for (TopicInvite inviteMsg : inviteMsgs) {
 					try {
+						logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg);
 						AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
 					} catch (CommunicationException cEx) {
 						logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString());

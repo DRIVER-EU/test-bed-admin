@@ -1,32 +1,38 @@
 [
 	{
-		"id":"aaaa-atg6-ffgt-15gt",
+		"id":"TB-AdminTool",
  		"name":"AdminTool",
+ 		"isTestbed":true,
  		"state":false,
  		"description":"This is the AdminTool"
 	},{
-		"id":"bbbb-atg6-ffgt-15gt",
+		"id":"TB-AARTool",
  		"name":"AARTool",
+ 		"isTestbed":false,
  		"state":false,
  		"description":"This is the AfterActionReview Tool"
 	},{
-		"id":"cccc-atg6-ffgt-15gt",
+		"id":"TB-TrialMgmt",
  		"name":"TrialManager",
+ 		"isTestbed":false,
  		"state":false,
  		"description":"This is the Trial Manager"
 	},{
-		"id":"1234-atg6-ffgt-15gt",
- 		"name":"Solution 1",
+		"id":"FRQ_LifeX_COP",
+ 		"name":"FRQ_LifeX_COP",
+ 		"isTestbed":false,
  		"state":false,
- 		"description":"This is the Solution 1"
+ 		"description":"This is the FRQ_LifeX_COP"
 	},{
-		"id":"2234-atg6-ffgt-15gu",
+		"id":"TB-Solution-2",
  		"name":"Solution 2",
+ 		"isTestbed":false,
  		"state":false,
  		"description":"This is the Solution 2"
 	},{
-		"id":"3234-atg6-ffgt-15gt",
+		"id":"TB-Solution-3",
  		"name":"Solution 3",
+ 		"isTestbed":false,
  		"state":false,
  		"description":"This is the Solution 3"
 	}

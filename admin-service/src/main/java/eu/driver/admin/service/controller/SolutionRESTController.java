@@ -44,19 +44,27 @@ public class SolutionRESTController implements IAdaptorCallback {
 	private List<Solution> solutions = new ArrayList<Solution>();
 
 	public SolutionRESTController() {
+		log.info("-->SolutionRESTController");
+		try {
+			loadSolutions();
+		} catch (Exception e) {
+			log.error("Error loading the solutions!");
+		}
 		hbTimerTask = new HeartbeatTimerTask(this);
 		hbTimer = new Timer();
 		hbTimer.schedule(hbTimerTask, 3000, 3000);
+		log.info("-->heartbeat message received!");
 	}
 	
 	@Override
 	public void messageReceived(IndexedRecord receivedMessage) {
-		log.info("-->heartbeat message received!");
+		log.info("SolutionRESTController-->");
 		
 		if (receivedMessage.getSchema().getName().equalsIgnoreCase("Heartbeat")) {
 			try {
 				eu.driver.model.core.Heartbeat hbMsg = (eu.driver.model.core.Heartbeat) SpecificData.get().deepCopy(eu.driver.model.core.Heartbeat.SCHEMA$, receivedMessage);
 				String clientID = hbMsg.getId().toString();
+				log.debug("HB From client received: " + clientID);
 				for (Solution solution : solutions) {
 					if (solution.getId().equalsIgnoreCase(clientID)) {
 						solution.setLastHeartBeatReceived(new Date(hbMsg.getAlive()));
@@ -101,26 +109,11 @@ public class SolutionRESTController implements IAdaptorCallback {
 		if (solutions.size() > 0) {
 			solutionList.setSolutions(solutions);
 		} else {
-			String solutionJson = fileReader.readFile(this.configJson);
-			if (solutionJson != null) {
-				try {
-					JSONArray jsonarray = new JSONArray(solutionJson);
-					for (int i = 0; i < jsonarray.length(); i++) {
-						JSONObject jsonobject;
-						Solution solution = new Solution();
-						jsonobject = jsonarray.getJSONObject(i);
-
-						solution.setId(jsonobject.getString("id"));
-						solution.setName(jsonobject.getString("name"));
-						solution.setState(jsonobject.getBoolean("state"));
-						solution.setDescription(jsonobject.getString("description"));
-						
-						solutions.add(solution);
-					}
-				} catch (JSONException e) {
-					log.error("Error parsind the JSON solution response", e);
-					return new ResponseEntity<SolutionList>(solutionList, HttpStatus.INTERNAL_SERVER_ERROR);
-				}
+			try {
+				loadSolutions();
+				solutionList.setSolutions(this.solutions);
+			} catch (Exception e) {
+				return new ResponseEntity<SolutionList>(solutionList, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 
@@ -134,5 +127,33 @@ public class SolutionRESTController implements IAdaptorCallback {
 		
 		log.info("getSolutionList -->");
 		return this.solutions;
+	}
+	
+	private void loadSolutions() throws Exception {
+		log.info("--> loadSolutions");
+		String solutionJson = fileReader.readFile(this.configJson);
+		if (solutionJson != null) {
+			try {
+				JSONArray jsonarray = new JSONArray(solutionJson);
+				for (int i = 0; i < jsonarray.length(); i++) {
+					JSONObject jsonobject;
+					Solution solution = new Solution();
+					jsonobject = jsonarray.getJSONObject(i);
+
+					solution.setId(jsonobject.getString("id"));
+					solution.setName(jsonobject.getString("name"));
+					solution.setIsAdmin(jsonobject.getBoolean("isTestbed"));
+					solution.setState(jsonobject.getBoolean("state"));
+					solution.setDescription(jsonobject.getString("description"));
+					
+					this.solutions.add(solution);
+					log.debug("add solution: " + solution.getName());
+				}
+			} catch (JSONException e) {
+				log.error("Error parsind the JSON solution response", e);
+				throw e;
+			}
+		}
+		log.info("loadSolutions -->");
 	}
 }

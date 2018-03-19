@@ -5,6 +5,7 @@ import java.util.Date;
 public class Solution {
 	private String id = null;
 	private String name = null;
+	private Boolean isAdmin = false;
 	private Boolean state = false;
 	private String description = null;
 	private Date lastHeartBeatReceived = null;
@@ -27,6 +28,14 @@ public class Solution {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Boolean getIsAdmin() {
+		return isAdmin;
+	}
+
+	public void setIsAdmin(Boolean isAdmin) {
+		this.isAdmin = isAdmin;
 	}
 
 	public Boolean getState() {

@@ -27,11 +27,18 @@ public class TopicRESTController {
 	private Logger log = Logger.getLogger(this.getClass());
 	private FileReader fileReader = new FileReader();
 	
+	private List<Topic> tesbedTopics = new ArrayList<Topic>();
 	private List<Topic> coreTopics = new ArrayList<Topic>();
 	private List<Topic> trialTopics = new ArrayList<Topic>();
 
 	public TopicRESTController() {
-
+		log.info("--> TopicRESTController");
+		try {
+			loadTopics();
+		} catch (Exception e) {
+			log.error("Error loading testbed topics!");
+		}
+		log.info("TopicRESTController -->");
 	}
 	
 	@ApiOperation(value = "getAllTrialTopics", nickname = "getAllTrialTopics")
@@ -43,68 +50,76 @@ public class TopicRESTController {
 	public ResponseEntity<TopicList> getAllTrialTopics() {
 		log.info("--> getAllTrialTopics");
 		TopicList topicList = new TopicList();
-		List<Topic> topics = new ArrayList<Topic>();
 
-		String topicJson = fileReader.readFile(this.configJson);
-		if (topicJson != null) {
-			try {
-				JSONArray jsonarray = new JSONArray(topicJson);
-				for (int i = 0; i < jsonarray.length(); i++) {
-					JSONObject jsonobject;
-					Topic topic = new Topic();
-					jsonobject = jsonarray.getJSONObject(i);
+		topicList.setTopics(this.tesbedTopics);
 
-					topic.setId(jsonobject.getString("id"));
-					topic.setType(jsonobject.getString("type"));
-					topic.setName(jsonobject.getString("name"));
-					topic.setMsgType(jsonobject.getString("msgType"));
-					topic.setMsgTypeVersion(jsonobject.getString("msgTypeVersion"));
-					topic.setState(jsonobject.getBoolean("state"));
-					topic.setDescription(jsonobject.getString("description"));
-
-					ArrayList<String> publisher = new ArrayList<String>();     
-					JSONArray jArray = jsonobject.getJSONArray("publishSolutionIDs");
-					if (jArray != null) { 
-					   for (int a=0;a<jArray.length();a++){ 
-						   publisher.add(jArray.getString(a));
-					   } 
-					} 
-					topic.setPublishSolutionIDs(publisher);
-					
-					ArrayList<String> subscriber = new ArrayList<String>();     
-					jArray = jsonobject.getJSONArray("subscribedSolutionIDs");
-					if (jArray != null) { 
-					   for (int a=0;a<jArray.length();a++){ 
-						   subscriber.add(jArray.getString(a));
-					   } 
-					} 
-					topic.setSubscribedSolutionIDs(subscriber);
-					
-					topics.add(topic);
-					
-					if (topic.getType().equalsIgnoreCase("core.topic")) {
-						this.coreTopics.add(topic);
-					} else {
-						this.trialTopics.add(topic);
-					}
-				}
-			} catch (JSONException e) {
-				log.error("Error parsind the JSON topic response", e);
-				return new ResponseEntity<TopicList>(topicList, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-		}
-
-		topicList.setTopics(topics);
 		log.info("getAllTrialTopics -->");
 		return new ResponseEntity<TopicList>(topicList, HttpStatus.OK);
+	}
+	
+	public List<Topic> getAllCoreTopic() {
+		log.info("--> getAllCoreTopic");
+		
+		log.info("getAllCoreTopic -->");
+		return this.coreTopics;
 	}
 	
 	public List<Topic> getAllTrialTopic() {
 		log.info("--> getAllTrialTopics");
 		
-		
 		log.info("getAllTrialTopics -->");
 		return this.trialTopics;
 	}
 	
+	public void loadTopics() throws Exception {
+		try {
+			String topicJson = fileReader.readFile(this.configJson);
+			JSONArray jsonarray = new JSONArray(topicJson);
+			for (int i = 0; i < jsonarray.length(); i++) {
+				JSONObject jsonobject;
+				Topic topic = new Topic();
+				jsonobject = jsonarray.getJSONObject(i);
+
+				topic.setId(jsonobject.getString("id"));
+				topic.setType(jsonobject.getString("type"));
+				topic.setName(jsonobject.getString("name"));
+				
+				if (jsonobject.has("msgType")) {
+					topic.setMsgType(jsonobject.getString("msgType"));
+					topic.setMsgTypeVersion(jsonobject.getString("msgTypeVersion"));
+				}
+				topic.setState(jsonobject.getBoolean("state"));
+				topic.setDescription(jsonobject.getString("description"));
+
+				ArrayList<String> publisher = new ArrayList<String>();     
+				JSONArray jArray = jsonobject.getJSONArray("publishSolutionIDs");
+				if (jArray != null) { 
+				   for (int a=0;a<jArray.length();a++){ 
+					   publisher.add(jArray.getString(a));
+				   } 
+				} 
+				topic.setPublishSolutionIDs(publisher);
+				
+				ArrayList<String> subscriber = new ArrayList<String>();     
+				jArray = jsonobject.getJSONArray("subscribedSolutionIDs");
+				if (jArray != null) { 
+				   for (int a=0;a<jArray.length();a++){ 
+					   subscriber.add(jArray.getString(a));
+				   } 
+				} 
+				topic.setSubscribedSolutionIDs(subscriber);
+				
+				tesbedTopics.add(topic);
+				
+				if (topic.getType().equalsIgnoreCase("core.topic")) {
+					this.coreTopics.add(topic);
+				} else {
+					this.trialTopics.add(topic);
+				}
+			}
+		} catch (JSONException e) {
+			log.error("Error parsind the JSON topic response", e);
+			throw e;
+		}
+	}
 }

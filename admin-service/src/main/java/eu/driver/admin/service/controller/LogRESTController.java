@@ -20,12 +20,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.driver.adapter.properties.ClientProperties;
+import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.dto.LogList;
-import eu.driver.admin.service.dto.TopicList;
 import eu.driver.admin.service.dto.log.Log;
 import eu.driver.admin.service.repository.LogRepository;
 import eu.driver.admin.service.ws.WSController;

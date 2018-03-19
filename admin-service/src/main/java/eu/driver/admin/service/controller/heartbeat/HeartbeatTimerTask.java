@@ -25,9 +25,11 @@ public class HeartbeatTimerTask extends TimerTask {
 		long currentTime = (new Date()).getTime();
 		
 		for (Solution solution : solutionList) {
+			log.debug("Check HB from solution: " + solution.getName());
 			if (solution.getLastHeartBeatReceived() != null) {
 				long lastHBTime = solution.getLastHeartBeatReceived().getTime();
 				if (currentTime > (lastHBTime + 6000)) {
+					log.debug("No HB revceived from solution: " + solution.getName());
 					solution.setState(false);
 					this.solutionController.updateSolutionState(solution.getId(), solution.getState());
 				}	
