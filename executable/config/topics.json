@@ -1,0 +1,71 @@
+[
+	{
+		"id":"core.topic.admin.hb",
+		"type":"core.topic",
+ 		"name":"system_admin_heartbeat",
+ 		"state": false,
+ 		"publishSolutionIDs":["testbed_admin"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the topic where the admin tool publishes his heartbeat, indicating that the admin tool is up."
+	},{
+		"id":"core.topic.hb",
+		"type":"core.topic",
+ 		"name":"system_heartbeat",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["testbed_admin"],
+ 		"description":"This is the topic where every solution published the heartbeat indicating that the solution is up and alive."
+	},{
+		"id":"core.topic.log",
+		"type":"core.topic",
+ 		"name":"system_logging",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["testbed_admin"],
+ 		"description":"This is the topic where every solution published the logs to be stored in the admin tool log table."
+	},{
+		"id":"core.topic.access.invite",
+		"type":"core.topic",
+ 		"name":"system_topic_access_invite",
+ 		"state": false,
+ 		"publishSolutionIDs":["testbed_admin"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the topic where every solution gets his information to which topics he is invited to join."
+	},{
+		"id":"core.topic.create.request",
+		"type":"core.topic",
+ 		"name":"system_topic_create_request",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["testbed_admin"],
+ 		"description":"This is the topic where every solution can request topic creation and sending invite message."
+	},{
+		"id":"core.topic.time",
+		"type":"core.topic",
+ 		"name":"system_timing",
+ 		"state": false,
+ 		"publishSolutionIDs":["testbed_time"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the topic where every solution gets the actual testbed time."
+	},{
+		"id":"standart.topic.cap",
+		"type":"standard.topic",
+ 		"name":"standard_cap",
+ 		"msgType": "cap",
+ 		"msgTypeVersion": "1.2",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the standard CAP topic."
+	},{
+		"id":"standart.topic.emsi",
+		"type":"standard.topic",
+ 		"name":"standard_emsi",
+ 		"msgType": "emsi",
+ 		"msgTypeVersion": "1.0",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the standard EMSI topic."
+	}
+]
