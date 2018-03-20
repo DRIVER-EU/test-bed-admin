@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -23,11 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.driver.adapter.constants.TopicConstants;
 import eu.driver.adapter.core.AdminAdapter;
 import eu.driver.adapter.excpetion.CommunicationException;
-import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.dto.topic.Topic;
 import eu.driver.admin.service.kafka.KafkaAdminController;
+import eu.driver.admin.service.ws.WSController;
+import eu.driver.admin.service.ws.mapper.StringJSONMapper;
+import eu.driver.admin.service.ws.object.WSTopicCreationNotification;
 import eu.driver.model.cap.Alert;
 import eu.driver.model.core.AdminHeartbeat;
 import eu.driver.model.core.Heartbeat;
@@ -43,6 +43,7 @@ public class MgmtController {
 	private Logger log = Logger.getLogger(this.getClass());
 	private KafkaAdminController adminController = new KafkaAdminController();
 	private AdminAdapter adminAdapter = null;
+	private StringJSONMapper mapper = new StringJSONMapper();
 	
 	@Autowired
 	LogRESTController logController;
@@ -112,19 +113,28 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!", true);
 		adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + " created.", true);
+		sendTopicStateChange("core.topic.admin.hb", true);
 		
 		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + " created.", true);
+		sendTopicStateChange("core.topic.hb", true);
 		
 		adminController.createTopic(TopicConstants.LOGGING_TOPIC, new EDXLDistribution(), new Log());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LOGGING_TOPIC + " created.", true);
+		sendTopicStateChange("core.topic.log", true);
 		
 		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + " created.", true);
+		sendTopicStateChange("core.topic.time", true);
+		
 		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_INVITE_TOPIC + " created.", true);
+		sendTopicStateChange("core.topic.access.invite", true);
 		
 		adminController.createTopic(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, new EDXLDistribution(), new TopicCreate());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + " created.", true);
+		sendTopicStateChange("core.topic.create.request", true);
+		
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!", true);
 	}
 	
@@ -144,6 +154,7 @@ public class MgmtController {
 			if (schema != null) {
 				adminController.createTopic(topic.getName(), new EDXLDistribution(), schema);
 				logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
+				sendTopicStateChange(topic.getId(), true);
 				// send invite message
 				
 				boolean allSolutionsPublish = false;
@@ -257,6 +268,13 @@ public class MgmtController {
 		}
 		
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Trial specific Topics created!", true);
+	}
+	
+	private void sendTopicStateChange(String id, Boolean state) {
+		// send the log message via the ws connection
+		WSTopicCreationNotification notifyMsg = new WSTopicCreationNotification(id, state);
+		WSController.getInstance().sendMessage(
+				mapper.objectToJSONString(notifyMsg));
 	}
 
 	public LogRESTController getLogController() {
