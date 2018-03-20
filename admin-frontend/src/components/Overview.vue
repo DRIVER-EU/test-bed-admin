@@ -1,6 +1,6 @@
 <template>
   <v-container fluid grid-list-xl class="mt-0">
-    <v-layout row wrap justify-space-around style="height: 400px"
+    <v-layout row wrap justify-space-around style="height: 55vh"
               class="scroll-y">
       <v-flex xs4>
         <h3 class="text-xs-center primary--text">Tools</h3>
@@ -15,9 +15,9 @@
         <list-component :data=gateways></list-component>
       </v-flex>
     </v-layout>
-    <v-layout column style="max-height: 300px; min-height: 300px" class="scroll-y">
+    <v-layout column style="height: 30vh" class="scroll-y">
       <v-flex>
-      <v-card class="">
+      <v-card>
         <logs-table></logs-table>
       </v-card>
       </v-flex>
