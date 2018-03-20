@@ -159,6 +159,7 @@ export const store = new Vuex.Store({
       this.axios.post('startTrialConfig').then(function () {
         var alert = new Alert(_.uniqueId(), 'success', 'Trial was successfully started.', true)
         context.commit('ADD_ALERT', (alert));
+        context.commit('TRIAL_STATE_CHANGE', true);
       }).catch(function(){
         var alert = new Alert(_.uniqueId(), 'error', 'Trial could not be started.', true)
         context.commit('ADD_ALERT', (alert));
@@ -168,6 +169,7 @@ export const store = new Vuex.Store({
       this.axios.post('initTestbed').then(function () {
         var alert = new Alert(_.uniqueId(), 'success', 'Testbed was successfully initialized.', true)
         context.commit('ADD_ALERT', (alert));
+        context.commit('TESTBED_STATE_CHANGE', true)
         context.commit('LOADING', false)
       }).catch(function(){
         var alert = new Alert(_.uniqueId(), 'error', 'Testbed could not be initialized.', true)
@@ -182,6 +184,7 @@ export const store = new Vuex.Store({
     },
     isTestbedInitialized(context) {
       this.axios.get('isTestbedInitialized').then(response => {
+        console.log(response.data)
         context.commit('TESTBED_STATE_CHANGE', (response.data));
       }).catch();
     }
