@@ -1,20 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>admin-service</artifactId>
-	<packaging>jar</packaging>
+	<groupId>driver.eu</groupId>
+	<artifactId>admin-tool</artifactId>
+	<version>0.0.1</version>
+	<packaging>pom</packaging>
+	
+	<name>DRIVER+ AdminTool</name>
+	<description>This is the DRIVER+ AdminTool</description>
 
 	<parent>
-		<groupId>driver.eu</groupId>
-		<artifactId>admin-tool</artifactId>
-		<version>0.0.1</version>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.9.RELEASE</version>
 	</parent>
-
-	<name>DRIVER Admin Tool REST Backend</name>
-	<url>http://www.driverproject.eu</url>
-
+	
 	<repositories>
+	<repository>
+         <id>localrepository</id>
+         <url>file://C:/Users/TObritzh/.m2/repository</url>
+      </repository>
 		<repository>
 			<id>apache-repo</id>
 			<name>Apache Repository</name>
@@ -26,7 +33,11 @@
 		</repository>
 	</repositories>
 
-	<properties>
+    <properties>
+        <main.basedir>${project.basedir}</main.basedir>
+		<!-- Analysis Tools for CI -->
+		<build-plugin.jacoco.version>0.7.9</build-plugin.jacoco.version>
+		<build-plugin.coveralls.version>4.3.0</build-plugin.coveralls.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<testbed.adaptor.version>0.0.1</testbed.adaptor.version>
 		<maven.shade.version>3.1.0</maven.shade.version>
@@ -34,7 +45,12 @@
 		<docker.image.prefix>springio</docker.image.prefix>
 		<project.build.finalName>AdminTool</project.build.finalName>
 		<project.build.directory>target/docker</project.build.directory>
-	</properties>
+    </properties>
+	
+	<modules>
+        <module>admin-frontend</module>
+        <module>admin-service</module>
+    </modules>
 
 	<dependencies>
 		<dependency>
@@ -166,75 +182,36 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<configuration>
-						<archive>
-							<manifest>
-								<addClasspath>true</addClasspath>
-								<mainClass>eu.driver.admin.service.AdminServiceApplication</mainClass>
-							</manifest>
-						</archive>
-					</configuration>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${build-plugin.jacoco.version}</version>
 				<executions>
+					<!-- Prepares the property pointing to the JaCoCo
+                    runtime agent which is passed as VM argument when Maven the Surefire plugin
+                    is executed. -->
 					<execution>
+						<id>pre-unit-test</id>
 						<goals>
-							<goal>repackage</goal>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<!-- Ensures that the code coverage report for
+                    unit tests is created after unit tests have been run. -->
+					<execution>
+						<id>post-unit-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
 			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy Vue.js frontend content</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>src/main/resources/public</outputDirectory>
-							<overwrite>true</overwrite>
-							<resources>
-								<resource>
-									<directory>${project.parent.basedir}/admin-frontend/target/dist</directory>
-									<includes>
-										<include>static/</include>
-										<include>index.html</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-				<version>1.0.0</version>
-				<configuration>
-					<imageName>admintool</imageName>
-					<baseImage>java</baseImage>
-					<forceTags>true</forceTags>
-					<entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
-					<!-- copy the service's jar file from target into the root directory 
-						of the image -->
-					<resources>
-						<resource>
-							<targetPath>/</targetPath>
-							<directory>${project.build.directory}</directory>
-							<include>${project.build.finalName}.jar</include>
-						</resource>
-					</resources>
-				</configuration>
+				<groupId>org.eluder.coveralls</groupId>
+				<artifactId>coveralls-maven-plugin</artifactId>
+				<version>${build-plugin.coveralls.version}</version>
 			</plugin>
 		</plugins>
 	</build>
+
 </project>

@@ -24,3 +24,7 @@ hs_err_pid*
 .project
 .settings
 classes
+dist
+node
+maven-archiver
+/admin-frontend/package-lock.json
