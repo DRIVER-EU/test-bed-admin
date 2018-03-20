@@ -10,8 +10,8 @@ The current version (v 1.0.0) of the Admin tool provides an overview of:
 Furthermore, the Admin tool 
 * creates the necessary topics, assigns schemas to topics and handles topic invitations.
 * provides the possibility to initialize the testbed
-•	provides the possibility to start the trial once the testbed was initialized
-•	provides a section where log entries are displayed
+*	provides the possibility to start the trial once the testbed was initialized
+*	provides a section where log entries are displayed
 
 # Installation
 
