@@ -8,17 +8,14 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
-    {path: '/overview',
+    {
+      path: '/',
+      redirect: '/overview'
+    },
+    {
+      path: '/overview',
       name: 'Overview',
       component: Overview
-    },
-    {path: '/tools',
-      name: 'Tools',
-      component: Tools
-    },
-    {path: '/configureGateways',
-      name: 'ConfigureGateways',
-      component: ConfigureGateways
     }
   ]
 })
