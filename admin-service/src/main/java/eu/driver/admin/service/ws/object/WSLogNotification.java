@@ -8,17 +8,17 @@ public class WSLogNotification {
 	private String mutation = "LOG_NOTIFICATION";
 	private Long id = 0L;
 	private String level = null;
-	private String clientID = null;
+	private String clientId = null;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-	private Date date = null;
+	private Date sendDate = null;
 	private String message = null;
 
-	public WSLogNotification(Long id, String level, String clientID, Date date, String message) {
+	public WSLogNotification(Long id, String level, String clientId, Date sendDate, String message) {
 		this.id = id;
 		this.level = level;
-		this.clientID = clientID;
-		this.date = date;
+		this.clientId = clientId;
+		this.sendDate = sendDate;
 		this.message = message;
 
 	}
@@ -47,20 +47,20 @@ public class WSLogNotification {
 		this.level = level;
 	}
 
-	public String getClientID() {
-		return clientID;
+	public String getClientId() {
+		return clientId;
 	}
 
-	public void setClientID(String clientID) {
-		this.clientID = clientID;
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getSendDate() {
+		return sendDate;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setSendDate(Date sendDate) {
+		this.sendDate = sendDate;
 	}
 
 	public String getMessage() {

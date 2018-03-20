@@ -37,7 +37,7 @@ public class WebSocketServer extends TextWebSocketHandler {
     
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws Exception {
-    	log.info("Message received: " + textMessage.getPayload());
+    	log.debug("Message received: " + textMessage.getPayload());
     	
     	String message = textMessage.getPayload();
     	if (message.indexOf("HBREQUEST") != -1) {
