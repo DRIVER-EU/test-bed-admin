@@ -27,7 +27,8 @@ export const store = new Vuex.Store({
     logEntries: [],
     alerts: [],
     loading: false,
-    testbedAvailable: false
+    isTestbedInitialized: false,
+    isTrialStarted: false
   },
   getters: {
     solutions(state) {
@@ -45,11 +46,14 @@ export const store = new Vuex.Store({
     alerts(state) {
       return state.alerts
     },
-    testbedAvailable(state) {
-      return state.testbedAvailable
-    },
     loading(state) {
       return state.loading
+    },
+    isTestbedInitialized(state) {
+      return state.isTestbedInitialized
+    },
+    isTrialStarted(state) {
+      return state.isTrialStarted
     }
   }
   ,
@@ -107,8 +111,11 @@ export const store = new Vuex.Store({
     ADD_ALERT(state, alert) {
       state.alerts.push(alert)
     },
-    TESTBED_AVAILABLE(state, isAvailable) {
-      state.testbedAvailable = isAvailable
+    TRIAL_STATE_CHANGE(state, isStarted) {
+      state.isTrialStarted = isStarted
+    },
+    TESTBED_STATE_CHANGE(state, isInitialized) {
+      state.isTestbedInitialized = isInitialized
     },
     LOADING(state, isTrue) {
       state.loading = isTrue
@@ -159,15 +166,24 @@ export const store = new Vuex.Store({
     },
     initTestbed(context) {
       this.axios.post('initTestbed').then(function () {
-        var alert = new Alert(_.uniqueId(), 'succes', 'Testbed was successfully initialized.', true)
+        var alert = new Alert(_.uniqueId(), 'success', 'Testbed was successfully initialized.', true)
         context.commit('ADD_ALERT', (alert));
-        context.commit('TESTBED_AVAILABLE', true)
         context.commit('LOADING', false)
       }).catch(function(){
         var alert = new Alert(_.uniqueId(), 'error', 'Testbed could not be initialized.', true)
         context.commit('ADD_ALERT', (alert));
         context.commit('LOADING', false)
       });
+    },
+    isTrialStarted(context) {
+      this.axios.get('isTrialStarted').then(response => {
+        context.commit('TRIAL_STATE_CHANGE', (response.data));
+      }).catch();
+    },
+    isTestbedInitialized(context) {
+      this.axios.get('isTestbedInitialized').then(response => {
+        context.commit('TESTBED_STATE_CHANGE', (response.data));
+      }).catch();
     }
   }
 })

@@ -8,8 +8,8 @@
         {{alert.text}}
       </v-alert>
       <v-spacer></v-spacer>
-      <v-btn v-on:click="initTestbed">Initialize testbed</v-btn>
-      <v-btn :disabled="!testbedAvailable" v-on:click="startTrial">Start trial</v-btn>
+      <v-btn :disabled="isTestbedInitialized" v-on:click="initTestbed">Initialize testbed</v-btn>
+      <v-btn :disabled="!isTestbedInitialized || isTrialStarted" v-on:click="startTrial">Start trial</v-btn>
     </v-toolbar>
     <main>
       <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
@@ -17,7 +17,6 @@
     </main>
   </v-app>
 </template>
-
 <script>
   import {mapGetters} from 'vuex'
 
@@ -38,7 +37,7 @@
       }
     ,
     computed:
-      mapGetters(['alerts', 'testbedAvailable', 'loading'])
+      mapGetters(['alerts', 'isTestbedInitialized', 'isTrialStarted', 'loading'])
   }
 </script>
 <style lang="stylus">

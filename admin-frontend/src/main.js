@@ -51,6 +51,8 @@ new Vue({
     this.$store.dispatch('getSolutions'),
       this.$store.dispatch('getTopics'),
       this.$store.dispatch('getGateways'),
-      this.$store.dispatch('getAllLogs')
+      this.$store.dispatch('getAllLogs'),
+      this.$store.dispatch('isTestbedInitialized'),
+      this.$store.dispatch('isTrialStarted')
   }
 })
