@@ -1,7 +1,7 @@
 <template>
   <v-data-table :items=logEntries :headers="headers">
     <template slot="items" slot-scope="props">
-      <tr :class="{logError: props.item.level === 'ERROR' || props.item.level === 'SEVER', logWarning: props.item.level === 'WARNING'}">
+      <tr :class="{logError: props.item.level === 'ERROR' || props.item.level === 'SEVERE', logWarning: props.item.level === 'WARNING'}">
         <td>{{props.item.id}}</td>
         <td>{{props.item.sendDate}}</td>
         <td>{{props.item.level}}</td>
@@ -56,7 +56,7 @@
       logEntries() {
         var logEntries = this.$store.getters.logEntries
         return logEntries.sort(( a, b) => {
-          return a.date < b.date;
+          return a.sendDate < b.sendDate;
         })
       }
     }

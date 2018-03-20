@@ -5,7 +5,6 @@
       <v-toolbar-title class="title">Admin tool</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-alert v-for="alert in alerts" :key="alert.id" :type="alert.type" dismissible v-model="alert.isVisible">
-        <v-badge left>1</v-badge>
         {{alert.text}}
       </v-alert>
       <v-spacer></v-spacer>
@@ -13,6 +12,7 @@
       <v-btn :disabled="!testbedAvailable" v-on:click="startTrial">Start trial</v-btn>
     </v-toolbar>
     <main>
+      <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
       <router-view></router-view>
     </main>
   </v-app>
@@ -28,6 +28,7 @@
         initTestbed: function () {
           console.log('initTestbed')
           this.$store.dispatch('initTestbed')
+          this.$store.commit('LOADING', true)
         }
         ,
         startTrial: function () {
@@ -37,7 +38,7 @@
       }
     ,
     computed:
-      mapGetters(['alerts','testbedAvailable'])
+      mapGetters(['alerts', 'testbedAvailable', 'loading'])
   }
 </script>
 <style lang="stylus">

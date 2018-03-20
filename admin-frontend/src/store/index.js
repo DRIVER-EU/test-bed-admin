@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {_} from 'vue-underscore'
+import moment from 'moment'
 import {heartbeatController} from '../heartbeatController'
 import {LogEntry} from '../objects/logEntry'
 import {Solution} from '../objects/solution'
@@ -25,6 +26,7 @@ export const store = new Vuex.Store({
     gateways: [],
     logEntries: [],
     alerts: [],
+    loading: false,
     testbedAvailable: false
   },
   getters: {
@@ -45,8 +47,12 @@ export const store = new Vuex.Store({
     },
     testbedAvailable(state) {
       return state.testbedAvailable
+    },
+    loading(state) {
+      return state.loading
     }
-  },
+  }
+  ,
   mutations: {
     SOCKET_ONOPEN(state) {
       console.log('connection open')
@@ -59,8 +65,6 @@ export const store = new Vuex.Store({
       clearInterval(state.socket.pingTimer);
       clearInterval(state.socket.pingTimeOutTimer);
     },
-    SOCKET_ONERROR(state) {
-    },
     SOCKET_RECONNECT() {
       console.log('reconnect')
     },
@@ -68,7 +72,6 @@ export const store = new Vuex.Store({
       state.socket.messageAccepted = true
     },
     LOG_NOTIFICATION(state, log) {
-      log.date = new Date(log.date).toUTCString()
       state.logEntries.push(new LogEntry(log))
     },
     UPDATE_SOLUTION(state, payload) {
@@ -99,13 +102,16 @@ export const store = new Vuex.Store({
       data.gateways.forEach(gateway => state.gateways.push(new Gateway(gateway)))
     },
     GET_LOGS(state, data) {
-      data.logs.forEach(logEntry => state.logEntries.push(new LogEntry(logEntry)))
+      data.logs.forEach(logEntry => {logEntry.sendDate = moment.utc(logEntry.sendDate).format('YYYY-MM-DD HH:mm:ss.SSS');state.logEntries.push(new LogEntry(logEntry))})
     },
     ADD_ALERT(state, alert) {
       state.alerts.push(alert)
     },
     TESTBED_AVAILABLE(state, isAvailable) {
       state.testbedAvailable = isAvailable
+    },
+    LOADING(state, isTrue) {
+      state.loading = isTrue
     }
   }
   ,
@@ -137,7 +143,6 @@ export const store = new Vuex.Store({
     getAllLogs(context) {
       this.axios.get('getAllLogs').then(response => {
         context.commit('GET_LOGS', (response.data));
-        console.log(response.data)
       }).catch(function(){
         var alert = new Alert(_.uniqueId(), 'error', 'Logs could not be loaded. Check if the backend is available.', true)
         context.commit('ADD_ALERT', (alert));
@@ -157,9 +162,11 @@ export const store = new Vuex.Store({
         var alert = new Alert(_.uniqueId(), 'succes', 'Testbed was successfully initialized.', true)
         context.commit('ADD_ALERT', (alert));
         context.commit('TESTBED_AVAILABLE', true)
+        context.commit('LOADING', false)
       }).catch(function(){
         var alert = new Alert(_.uniqueId(), 'error', 'Testbed could not be initialized.', true)
         context.commit('ADD_ALERT', (alert));
+        context.commit('LOADING', false)
       });
     }
   }
