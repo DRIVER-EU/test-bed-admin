@@ -53,7 +53,9 @@ public class MgmtController {
 	
 	@Autowired
 	SolutionRESTController solutionController;
-
+	
+	private Boolean initDone = false;
+	private Boolean startDone = false;
 	
 	public MgmtController() {
 
@@ -75,6 +77,7 @@ public class MgmtController {
 			adminAdapter = AdminAdapter.getInstance();
 			adminAdapter.addCallback(solutionController, TopicConstants.HEARTBEAT_TOPIC);
 			adminAdapter.addCallback(logController, TopicConstants.LOGGING_TOPIC);
+			initDone = true;
 		} catch (Exception e) {
 			log.error("Error creating the Core Topics!", e);
 			logController.addLog(LogLevels.LOG_LEVEL_SEVER, "The Testbed wasn't initialized successful: " + e.getMessage(), true);
@@ -100,6 +103,7 @@ public class MgmtController {
 		
 		try {
 			createTrialTopics();
+			startDone = true;
 		} catch (Exception e) {
 			log.error("Error creating the Trial Topics!", e);
 			return new ResponseEntity<Boolean>(false, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -109,30 +113,62 @@ public class MgmtController {
 	    return new ResponseEntity<Boolean>(send, HttpStatus.OK);
 	}
 	
+	@ApiOperation(value = "isTestbedInitialized", nickname = "isTestbedInitialized")
+	@RequestMapping(value = "/AdminService/isTestbedInitialized", method = RequestMethod.GET )
+	@ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Success", response = Boolean.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Boolean.class),
+            @ApiResponse(code = 500, message = "Failure", response = Boolean.class)})
+	public ResponseEntity<Boolean> isTestbedInitialized() {
+		log.info("--> isTestbedInitialized");
+		
+		log.info("isTestbedInitialized -->");
+	    return new ResponseEntity<Boolean>(initDone, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "isTrialStarted", nickname = "isTrialStarted")
+	@RequestMapping(value = "/AdminService/isTrialStarted", method = RequestMethod.GET )
+	@ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Success", response = Boolean.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Boolean.class),
+            @ApiResponse(code = 500, message = "Failure", response = Boolean.class)})
+	public ResponseEntity<Boolean> isTrialStarted() {
+		log.info("--> isTrialStarted");
+		
+		log.info("isTrialStarted -->");
+	    return new ResponseEntity<Boolean>(startDone, HttpStatus.OK);
+	}
+	
 	private void createAllCoreTopics() throws Exception {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!", true);
 		adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.ADMIN_HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.admin.hb", true);
 		
 		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.hb", true);
 		
 		adminController.createTopic(TopicConstants.LOGGING_TOPIC, new EDXLDistribution(), new Log());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LOGGING_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.LOGGING_TOPIC, true);
 		sendTopicStateChange("core.topic.log", true);
 		
 		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.TIMING_TOPIC, true);
 		sendTopicStateChange("core.topic.time", true);
 		
 		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_INVITE_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.TOPIC_INVITE_TOPIC, true);
 		sendTopicStateChange("core.topic.access.invite", true);
 		
 		adminController.createTopic(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, new EDXLDistribution(), new TopicCreate());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, true);
 		sendTopicStateChange("core.topic.create.request", true);
 		
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!", true);
@@ -154,6 +190,7 @@ public class MgmtController {
 			if (schema != null) {
 				adminController.createTopic(topic.getName(), new EDXLDistribution(), schema);
 				logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
+				topicController.updateTopicState(topic.getName(), true);
 				sendTopicStateChange(topic.getId(), true);
 				// send invite message
 				

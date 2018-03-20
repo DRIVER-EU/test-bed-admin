@@ -71,6 +71,15 @@ public class TopicRESTController {
 		return this.trialTopics;
 	}
 	
+	public void updateTopicState(String topicName, Boolean state) {
+		for (Topic topic: this.tesbedTopics) {
+			if (topic.getName().equalsIgnoreCase(topicName)) {
+				topic.setState(state);
+				return;
+			}
+		}
+	}
+	
 	public void loadTopics() throws Exception {
 		try {
 			String topicJson = fileReader.readFile(this.configJson);
