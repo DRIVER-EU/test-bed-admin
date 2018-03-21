@@ -4,5 +4,6 @@ export function Topic(topic) {
     this.name= topic.name,
     this.state = topic.state || false,
     this.description = topic.description,
-    this.publishSolutionIDs = topic.publishSolutionIDs
+    this.publishSolutionIDs = topic.publishSolutionIDs,
+    this.showDescription = false
 }

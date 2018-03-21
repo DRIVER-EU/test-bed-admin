@@ -3,7 +3,7 @@
     <v-layout row wrap justify-space-around style="height: 55vh"
               class="scroll-y">
       <v-flex xs4>
-        <h3 class="text-xs-center primary--text">Tools</h3>
+        <h3 class="text-xs-center primary--text">Solutions</h3>
         <list-component :data=solutions></list-component>
       </v-flex>
       <v-flex xs4>

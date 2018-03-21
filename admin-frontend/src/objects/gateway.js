@@ -3,5 +3,6 @@ export function Gateway(gateway) {
     this.name = gateway.name,
     this.state = gateway.state || false,
     this.description = gateway.description,
-    this.managingType = gateway.managingType
+    this.managingType = gateway.managingType,
+    this.showDescription = false
 }

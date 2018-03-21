@@ -3,5 +3,6 @@ export function Solution(solution) {
     this.name= solution.name,
     this.state = solution.state || false,
     this.description = solution.description
+    this.showDescription = false
 
 }

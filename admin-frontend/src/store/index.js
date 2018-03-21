@@ -184,7 +184,6 @@ export const store = new Vuex.Store({
     },
     isTestbedInitialized(context) {
       this.axios.get('isTestbedInitialized').then(response => {
-        console.log(response.data)
         context.commit('TESTBED_STATE_CHANGE', (response.data));
       }).catch();
     }
