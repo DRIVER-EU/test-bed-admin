@@ -1,9 +1,9 @@
 [
 	{
-		"id":"1234-atg6-ffgt-15gk",
- 		"name":"gateway 1",
+		"id":"sim_cap_gateway",
+ 		"name":"cap gateway",
  		"state": false,
  		"managingTypes":["CAP"],
- 		"description":"This is the Gateway Nr 1, managing the CAP messages"
+ 		"description":"This is the SIM Gateway, managing the CAP messages"
 	}
 ]

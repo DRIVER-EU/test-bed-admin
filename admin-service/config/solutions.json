@@ -23,17 +23,5 @@
  		"isTestbed":false,
  		"state":false,
  		"description":"This is the FRQ_LifeX_COP"
-	},{
-		"id":"TB-Solution-2",
- 		"name":"Solution 2",
- 		"isTestbed":false,
- 		"state":false,
- 		"description":"This is the Solution 2"
-	},{
-		"id":"TB-Solution-3",
- 		"name":"Solution 3",
- 		"isTestbed":false,
- 		"state":false,
- 		"description":"This is the Solution 3"
 	}
 ]

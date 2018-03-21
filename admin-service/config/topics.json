@@ -57,15 +57,5 @@
  		"publishSolutionIDs":["all"],
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the standard CAP topic."
-	},{
-		"id":"standart.topic.emsi",
-		"type":"standard.topic",
- 		"name":"standard_emsi",
- 		"msgType": "emsi",
- 		"msgTypeVersion": "1.0",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the standard EMSI topic."
 	}
 ]
