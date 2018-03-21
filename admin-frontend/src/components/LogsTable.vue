@@ -52,11 +52,11 @@
         ]
       }
     },
-    computed: {
+   computed: {
       logEntries() {
         var logEntries = this.$store.getters.logEntries
         return logEntries.sort(( a, b) => {
-          return a.sendDate < b.sendDate;
+          return a.id < b.id;
         })
       }
     }

@@ -2,7 +2,8 @@
   <v-flex>
     <v-layout column>
       <v-card v-for="d in data" :key="d.id" class="mb-3 tertiary">
-        <v-card-title>
+        <v-card-title style="padding-top: 0;
+    padding-bottom: 0;">
           {{ d.name}}
           <v-spacer></v-spacer>
           <v-icon v-if="d.hasOwnProperty('state')" :class="{'unavailable': !d.state, 'available': d.state}">lens
