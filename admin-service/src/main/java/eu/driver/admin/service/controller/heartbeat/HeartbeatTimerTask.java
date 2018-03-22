@@ -30,8 +30,7 @@ public class HeartbeatTimerTask extends TimerTask {
 				long lastHBTime = solution.getLastHeartBeatReceived().getTime();
 				if (currentTime > (lastHBTime + 6000)) {
 					log.debug("No HB revceived from solution: " + solution.getName());
-					solution.setState(false);
-					this.solutionController.updateSolutionState(solution.getId(), solution.getState());
+					this.solutionController.updateSolutionState(solution.getId(), false);
 				}	
 			}
 		}

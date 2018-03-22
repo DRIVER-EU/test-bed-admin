@@ -52,7 +52,7 @@ public class LogRESTController implements IAdaptorCallback {
 		log.info("log message received!");
 		if (receivedMessage.getSchema().getName().equalsIgnoreCase("Log")) {
 			try {
-				eu.driver.model.system.Log logMsg = (eu.driver.model.system.Log) SpecificData.get().deepCopy(eu.driver.model.system.Log.SCHEMA$, receivedMessage); 
+				eu.driver.model.core.Log logMsg = (eu.driver.model.core.Log) SpecificData.get().deepCopy(eu.driver.model.core.Log.SCHEMA$, receivedMessage); 
 				// store the log message
 				
 				Log dbLog = new Log();

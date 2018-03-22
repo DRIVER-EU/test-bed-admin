@@ -33,9 +33,11 @@ import eu.driver.model.core.AdminHeartbeat;
 import eu.driver.model.core.Heartbeat;
 import eu.driver.model.core.Timing;
 import eu.driver.model.edxl.EDXLDistribution;
-import eu.driver.model.system.Log;
-import eu.driver.model.system.TopicCreate;
-import eu.driver.model.system.TopicInvite;
+import eu.driver.model.geojson.FeatureCollection;
+import eu.driver.model.mlp.SlRep;
+import eu.driver.model.core.Log;
+import eu.driver.model.core.TopicCreate;
+import eu.driver.model.core.TopicInvite;
 
 @RestController
 public class MgmtController {
@@ -185,6 +187,10 @@ public class MgmtController {
 			
 			if (topic.getMsgType().equalsIgnoreCase("cap")) {
 				schema = new Alert();
+			} else if (topic.getMsgType().equalsIgnoreCase("geojson")) {
+				schema = new FeatureCollection();
+			} else if (topic.getMsgType().equalsIgnoreCase("mlp")) {
+				schema = new SlRep();
 			}
 			
 			if (schema != null) {

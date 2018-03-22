@@ -57,5 +57,25 @@
  		"publishSolutionIDs":["all"],
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the standard CAP topic."
+	},{
+		"id":"standart.topic.geo.json",
+		"type":"standard.topic",
+ 		"name":"standard_geojson",
+ 		"msgType": "geojson",
+ 		"msgTypeVersion": "1.0",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the standard GeoJSON topic."
+	},{
+		"id":"standart.topic.mlp",
+		"type":"standard.topic",
+ 		"name":"standard_mlp",
+ 		"msgType": "mlp",
+ 		"msgTypeVersion": "1.0",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the standard MLP topic."
 	}
 ]

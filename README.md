@@ -56,6 +56,11 @@ they handle. e.g.:
  	"description":"This is the standard CAP topic."
 }
 
+### possible msgTypes:
+Corrently the AdminTool supports following msgTypes:
+* cap
+* mlp
+* geojson
 
 ## Gateway configuration
 Gateways are more or less solutions in the testbed but they have additional configuration properties and therefor they are handled seperately. Like solutions gateways send heartbeat messages and are marked as up or down in the Admin tool.
