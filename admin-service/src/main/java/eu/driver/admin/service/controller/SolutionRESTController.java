@@ -143,6 +143,7 @@ public class SolutionRESTController implements IAdaptorCallback {
 					solution.setId(jsonobject.getString("id"));
 					solution.setName(jsonobject.getString("name"));
 					solution.setIsAdmin(jsonobject.getBoolean("isTestbed"));
+					solution.setIsService(jsonobject.getBoolean("isService"));
 					if (solution.getId().equalsIgnoreCase("TB-AdminTool")) {
 						solution.setState(true);
 					} else {

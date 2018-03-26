@@ -1,9 +1,9 @@
 [
 	{
-		"id":"sim_cap_gateway",
- 		"name":"cap gateway",
+		"id":"sim_pos_gateway",
+ 		"name":"resource gateway",
  		"state": false,
- 		"managingTypes":["CAP"],
- 		"description":"This is the SIM Gateway, managing the CAP messages"
+ 		"managingTypes":["EMSI","MLP","GEOJSON"],
+ 		"description":"This is the SIM Gateway, managing resource possition via EMSI, MLP, GEOJSON"
 	}
 ]

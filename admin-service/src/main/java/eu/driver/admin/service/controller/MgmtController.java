@@ -33,6 +33,7 @@ import eu.driver.model.core.AdminHeartbeat;
 import eu.driver.model.core.Heartbeat;
 import eu.driver.model.core.Timing;
 import eu.driver.model.edxl.EDXLDistribution;
+import eu.driver.model.emsi.TSO_2_0;
 import eu.driver.model.geojson.FeatureCollection;
 import eu.driver.model.mlp.SlRep;
 import eu.driver.model.core.Log;
@@ -191,6 +192,8 @@ public class MgmtController {
 				schema = new FeatureCollection();
 			} else if (topic.getMsgType().equalsIgnoreCase("mlp")) {
 				schema = new SlRep();
+			} else if (topic.getMsgType().equalsIgnoreCase("emsi")) {
+				schema = new TSO_2_0();
 			}
 			
 			if (schema != null) {

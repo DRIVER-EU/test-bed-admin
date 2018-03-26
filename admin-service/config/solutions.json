@@ -3,25 +3,43 @@
 		"id":"TB-AdminTool",
  		"name":"AdminTool",
  		"isTestbed":true,
+ 		"isService":true,
  		"state":false,
  		"description":"This is the AdminTool"
 	},{
 		"id":"TB-AARTool",
  		"name":"AARTool",
  		"isTestbed":false,
+ 		"isService":true,
  		"state":false,
  		"description":"This is the AfterActionReview Tool"
 	},{
 		"id":"TB-TrialMgmt",
  		"name":"TrialManager",
  		"isTestbed":false,
+ 		"isService":true,
  		"state":false,
  		"description":"This is the Trial Manager"
 	},{
-		"id":"FRQ_LifeX_COP",
- 		"name":"FRQ_LifeX_COP",
+		"id":"3di_solution",
+ 		"name":"3DI Solution",
  		"isTestbed":false,
+ 		"isService":false,
  		"state":false,
- 		"description":"This is the FRQ_LifeX_COP"
+ 		"description":"Flooding modelling and simulation solution"
+	},{
+		"id":"drm_solution",
+ 		"name":"drm Solution",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"Drone Rapid map"
+	},{
+		"id":"soc_oc_solution",
+ 		"name":"SOCRATES OC",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"SOCRATES COP solution which is able to handle also tasking and management of resources"
 	}
 ]

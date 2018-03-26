@@ -6,6 +6,7 @@ public class Solution {
 	private String id = null;
 	private String name = null;
 	private Boolean isAdmin = false;
+	private Boolean isService = false;
 	private Boolean state = false;
 	private String description = null;
 	private Date lastHeartBeatReceived = null;
@@ -36,6 +37,14 @@ public class Solution {
 
 	public void setIsAdmin(Boolean isAdmin) {
 		this.isAdmin = isAdmin;
+	}
+	
+	public Boolean getIsService() {
+		return isService;
+	}
+
+	public void setIsService(Boolean isService) {
+		this.isService = isService;
 	}
 
 	public Boolean getState() {
