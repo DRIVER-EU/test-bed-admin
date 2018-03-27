@@ -1,1 +1,1 @@
-"%JAVA_HOME%\bin\java" -jar admin-service-1.0.3.jar
+"%JAVA_HOME%\bin\java" -jar admin-service-1.0.4.jar

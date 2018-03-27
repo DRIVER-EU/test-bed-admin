@@ -48,7 +48,7 @@ public class LogRESTController implements IAdaptorCallback {
 	}
 	
 	@Override
-	public void messageReceived(IndexedRecord receivedMessage) {
+	public void messageReceived(IndexedRecord key, IndexedRecord receivedMessage) {
 		log.info("log message received!");
 		if (receivedMessage.getSchema().getName().equalsIgnoreCase("Log")) {
 			try {

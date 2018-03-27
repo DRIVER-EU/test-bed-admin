@@ -57,7 +57,7 @@ public class SolutionRESTController implements IAdaptorCallback {
 	}
 	
 	@Override
-	public void messageReceived(IndexedRecord receivedMessage) {
+	public void messageReceived(IndexedRecord key, IndexedRecord receivedMessage) {
 		log.debug("SolutionRESTController-->");
 		
 		if (receivedMessage.getSchema().getName().equalsIgnoreCase("Heartbeat")) {
