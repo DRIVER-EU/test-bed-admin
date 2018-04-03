@@ -41,9 +41,8 @@ export const store = new Vuex.Store({
       return state.gateways
     },
     logEntries(state) {
-      return state.logEntries.sort((a, b) => {
-        return a.id < b.id;
-      })
+      var copy = state.logEntries.slice(0);
+      return copy.reverse()
     },
     alerts(state) {
       return state.alerts
@@ -78,6 +77,7 @@ export const store = new Vuex.Store({
       state.socket.messageAccepted = true
     },
     LOG_NOTIFICATION(state, log) {
+      log.id = Number(log.id);
       state.logEntries.push(new LogEntry(log))
     },
     UPDATE_SOLUTION(state, payload) {
@@ -108,7 +108,11 @@ export const store = new Vuex.Store({
       data.gateways.forEach(gateway => state.gateways.push(new Gateway(gateway)))
     },
     GET_LOGS(state, data) {
-      data.logs.forEach(logEntry => {logEntry.sendDate = moment.utc(logEntry.sendDate).format('YYYY-MM-DD HH:mm:ss.SSS');state.logEntries.push(new LogEntry(logEntry))})
+      data.logs.forEach(logEntry => {
+        logEntry.sendDate = moment.utc(logEntry.sendDate).format('YYYY-MM-DD HH:mm:ss.SSS');
+        state.logEntries.push(new LogEntry(logEntry));
+      })
+
     },
     ADD_ALERT(state, alert) {
       state.alerts.push(alert)
@@ -128,7 +132,7 @@ export const store = new Vuex.Store({
     getSolutions(context) {
       this.axios.get('getAllTrialSolutions').then(response => {
         context.commit('GET_SOLUTIONS', (response.data));
-      }).catch(function(){
+      }).catch(function () {
         var alert = new Alert(_.uniqueId(), 'error', 'Solutions could not be loaded. Check that backend is available.', true)
         context.commit('ADD_ALERT', (alert));
       });
@@ -136,7 +140,7 @@ export const store = new Vuex.Store({
     getTopics(context) {
       this.axios.get('getAllTrialTopics').then(response => {
         context.commit('GET_TOPICS', (response.data));
-      }).catch(function(){
+      }).catch(function () {
         var alert = new Alert(_.uniqueId(), 'error', 'Topics could not be loaded. Check if the backend is available.', true)
         context.commit('ADD_ALERT', (alert));
       });
@@ -144,7 +148,7 @@ export const store = new Vuex.Store({
     getGateways(context) {
       this.axios.get('getAllTrialGateways').then(response => {
         context.commit('GET_GATEWAYS', (response.data));
-      }).catch(function(){
+      }).catch(function () {
         var alert = new Alert(_.uniqueId(), 'error', 'Gateways could not be loaded. Check if the backend is available.', true)
         context.commit('ADD_ALERT', (alert));
       });
@@ -152,7 +156,7 @@ export const store = new Vuex.Store({
     getAllLogs(context) {
       this.axios.get('getAllLogs').then(response => {
         context.commit('GET_LOGS', (response.data));
-      }).catch(function(){
+      }).catch(function () {
         var alert = new Alert(_.uniqueId(), 'error', 'Logs could not be loaded. Check if the backend is available.', true)
         context.commit('ADD_ALERT', (alert));
       });
@@ -162,7 +166,7 @@ export const store = new Vuex.Store({
         var alert = new Alert(_.uniqueId(), 'success', 'Trial was successfully started.', true)
         context.commit('ADD_ALERT', (alert));
         context.commit('TRIAL_STATE_CHANGE', true);
-      }).catch(function(){
+      }).catch(function () {
         var alert = new Alert(_.uniqueId(), 'error', 'Trial could not be started.', true)
         context.commit('ADD_ALERT', (alert));
       });
@@ -173,7 +177,7 @@ export const store = new Vuex.Store({
         context.commit('ADD_ALERT', (alert));
         context.commit('TESTBED_STATE_CHANGE', true)
         context.commit('LOADING', false)
-      }).catch(function(){
+      }).catch(function () {
         var alert = new Alert(_.uniqueId(), 'error', 'Testbed could not be initialized.', true)
         context.commit('ADD_ALERT', (alert));
         context.commit('LOADING', false)
