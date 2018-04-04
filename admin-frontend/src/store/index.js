@@ -41,8 +41,7 @@ export const store = new Vuex.Store({
       return state.gateways
     },
     logEntries(state) {
-      var copy = state.logEntries.slice(0);
-      return copy.reverse()
+      return state.logEntries.sort((a,b) => {return b.id - a.id})
     },
     alerts(state) {
       return state.alerts
