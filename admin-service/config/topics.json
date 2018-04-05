@@ -48,6 +48,14 @@
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the topic where every solution gets the actual testbed time."
 	},{
+		"id":"core.topic.large.data",
+		"type":"core.topic",
+ 		"name":"large_data",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the topic where large data notification is distributed."
+	},{
 		"id":"standart.topic.cap",
 		"type":"standard.topic",
  		"name":"standard_cap",

@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiResponses;
 
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.log4j.Logger;
+import org.postgresql.largeobject.LargeObjectManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ import eu.driver.admin.service.ws.object.WSTopicCreationNotification;
 import eu.driver.model.cap.Alert;
 import eu.driver.model.core.AdminHeartbeat;
 import eu.driver.model.core.Heartbeat;
+import eu.driver.model.core.LargeDataUpdate;
 import eu.driver.model.core.Timing;
 import eu.driver.model.edxl.EDXLDistribution;
 import eu.driver.model.emsi.TSO_2_0;
@@ -173,6 +175,11 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, true);
 		sendTopicStateChange("core.topic.create.request", true);
+		
+		adminController.createTopic(TopicConstants.LARGE_DATA_UPDTAE, new EDXLDistribution(), new LargeDataUpdate());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LARGE_DATA_UPDTAE + " created.", true);
+		topicController.updateTopicState(TopicConstants.LARGE_DATA_UPDTAE, true);
+		sendTopicStateChange("core.topic.large.data", true);
 		
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!", true);
 	}
