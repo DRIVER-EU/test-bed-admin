@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.driver.adapter.core.CISAdapter;
 import eu.driver.adapter.properties.ClientProperties;
-import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.dto.LogList;
 import eu.driver.admin.service.dto.log.Log;
 import eu.driver.admin.service.repository.LogRepository;
@@ -31,6 +31,7 @@ import eu.driver.admin.service.ws.WSController;
 import eu.driver.admin.service.ws.mapper.StringJSONMapper;
 import eu.driver.admin.service.ws.object.WSLogNotification;
 import eu.driver.api.IAdaptorCallback;
+import eu.driver.model.core.Level;
 
 @RestController
 public class LogRESTController implements IAdaptorCallback {
@@ -49,7 +50,7 @@ public class LogRESTController implements IAdaptorCallback {
 	
 	@Override
 	public void messageReceived(IndexedRecord key, IndexedRecord receivedMessage) {
-		log.info("log message received!");
+		log.debug("log message received!");
 		if (receivedMessage.getSchema().getName().equalsIgnoreCase("Log")) {
 			try {
 				eu.driver.model.core.Log logMsg = (eu.driver.model.core.Log) SpecificData.get().deepCopy(eu.driver.model.core.Log.SCHEMA$, receivedMessage); 
@@ -80,37 +81,15 @@ public class LogRESTController implements IAdaptorCallback {
 			@ApiResponse(code = 400, message = "Bad Request", response = LogList.class),
 			@ApiResponse(code = 500, message = "Failure", response = LogList.class) })
 	public ResponseEntity<LogList> getAllLogs() {
-		log.info("-->getAllLogs");
+		log.debug("-->getAllLogs");
 		LogList result = new LogList();
 		List<Log> logs = logRepo.findAll();
 		
-		log.info("getAllLogs-->");
+		log.debug("getAllLogs-->");
 		result.setLogs(logs);
 		return new ResponseEntity<LogList>(result, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "getPagedLogs", nickname = "getPagedLogs")
-	@RequestMapping(value = "/AdminService/getPagedLogs", method = RequestMethod.GET)
-	@ApiImplicitParams({
-        @ApiImplicitParam(name = "page", value = "the page of the log entries", required = true, dataType = "int", paramType = "query"),
-        @ApiImplicitParam(name = "size", value = "the size of the log entries", required = true, dataType = "int", paramType = "query")
-      })
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Success", response = LogList.class),
-			@ApiResponse(code = 400, message = "Bad Request", response = LogList.class),
-			@ApiResponse(code = 500, message = "Failure", response = LogList.class) })
-	public ResponseEntity<LogList> getPagedLogs(@QueryParam("page") int page, @QueryParam("size") int size) {
-		log.info("-->getPagedLogs: " + page + ", " + size);
-		LogList result = new LogList();
-		List<Log> logs = new ArrayList<Log>();
-
-		// todo, get the logs and return them
-		
-		log.info("getPagedLogs-->");
-		result.setLogs(logs);
-		return new ResponseEntity<LogList>(result, HttpStatus.OK);
-	}
-	
 	public void addLog(String level, String message, Boolean sendNotification) {
 		Log log = new Log();
 		log.setClientId(clientId);

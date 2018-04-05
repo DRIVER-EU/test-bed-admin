@@ -15,6 +15,7 @@ import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.controller.LogRESTController;
 import eu.driver.admin.service.controller.MgmtController;
+import eu.driver.model.core.Level;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
@@ -29,6 +30,9 @@ public class AdminServiceApplication {
 	private Logger log = Logger.getLogger(this.getClass());
 	
 	@Autowired
+	LogRESTController logController;
+	
+	@Autowired
 	MgmtController mgmtController;
 	
 	public AdminServiceApplication() throws Exception {
@@ -41,9 +45,12 @@ public class AdminServiceApplication {
 	
 	@PostConstruct
 	public void init() {
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "The AdminService is up!", true);
 		if(Boolean.parseBoolean(ClientProperties.getInstance().getProperty("init.auto"))) {
 			mgmtController.initTestbed();
 		}
+		
+		
 	}
 	
 	@Bean
@@ -70,5 +77,13 @@ public class AdminServiceApplication {
 
 	public void setMgmtController(MgmtController mgmtController) {
 		this.mgmtController = mgmtController;
+	}
+
+	public LogRESTController getLogController() {
+		return logController;
+	}
+
+	public void setLogController(LogRESTController logController) {
+		this.logController = logController;
 	}
 }
