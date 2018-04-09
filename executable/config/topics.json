@@ -1,3 +1,4 @@
+
 [
 	{
 		"id":"core.topic.admin.hb",
@@ -48,13 +49,25 @@
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the topic where every solution gets the actual testbed time."
 	},{
-		"id":"core.topic.large.data",
-		"type":"core.topic",
- 		"name":"large_data",
+		"id":"standart.topic.large.data",
+		"type":"standard.topic",
+ 		"name":"large_data_update",
+ 		"msgType": "largedata",
+ 		"msgTypeVersion": "1.0",
  		"state": false,
  		"publishSolutionIDs":["all"],
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the topic where large data notification is distributed."
+	},{
+		"id":"standart.topic.map.layer",
+		"type":"standard.topic",
+ 		"name":"map_layer_update",
+ 		"msgType": "maplayer",
+ 		"msgTypeVersion": "1.0",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the topic where map layer updates are distributed."
 	},{
 		"id":"standart.topic.cap",
 		"type":"standard.topic",

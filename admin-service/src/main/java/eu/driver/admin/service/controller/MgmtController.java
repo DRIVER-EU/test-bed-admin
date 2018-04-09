@@ -33,6 +33,7 @@ import eu.driver.model.cap.Alert;
 import eu.driver.model.core.AdminHeartbeat;
 import eu.driver.model.core.Heartbeat;
 import eu.driver.model.core.LargeDataUpdate;
+import eu.driver.model.core.MapLayerUpdate;
 import eu.driver.model.core.Timing;
 import eu.driver.model.edxl.EDXLDistribution;
 import eu.driver.model.emsi.TSO_2_0;
@@ -201,6 +202,10 @@ public class MgmtController {
 				schema = new SlRep();
 			} else if (topic.getMsgType().equalsIgnoreCase("emsi")) {
 				schema = new TSO_2_0();
+			} else if (topic.getMsgType().equalsIgnoreCase("largedata")) {
+				schema = new LargeDataUpdate();
+			} else if (topic.getMsgType().equalsIgnoreCase("maplayer")) {
+				schema = new MapLayerUpdate();
 			}
 			
 			if (schema != null) {
