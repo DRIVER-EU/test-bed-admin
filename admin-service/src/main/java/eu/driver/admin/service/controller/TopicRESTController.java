@@ -11,12 +11,14 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.dto.TopicList;
 import eu.driver.admin.service.dto.topic.Topic;
 import eu.driver.admin.service.helper.FileReader;
@@ -30,6 +32,10 @@ public class TopicRESTController {
 	private List<Topic> tesbedTopics = new ArrayList<Topic>();
 	private List<Topic> coreTopics = new ArrayList<Topic>();
 	private List<Topic> trialTopics = new ArrayList<Topic>();
+	
+	@Autowired
+	LogRESTController logController;
+	
 
 	public TopicRESTController() {
 		log.info("--> TopicRESTController");
@@ -130,5 +136,13 @@ public class TopicRESTController {
 			log.error("Error parsind the JSON topic response", e);
 			throw e;
 		}
+	}
+
+	public LogRESTController getLogController() {
+		return logController;
+	}
+
+	public void setLogController(LogRESTController logController) {
+		this.logController = logController;
 	}
 }

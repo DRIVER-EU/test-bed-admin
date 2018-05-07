@@ -5,7 +5,7 @@
 
 	<groupId>driver.eu</groupId>
 	<artifactId>admin-tool</artifactId>
-	<version>1.0.6</version>
+	<version>1.0.8</version>
 	<packaging>pom</packaging>
 	
 	<name>DRIVER+ AdminTool</name>
@@ -39,7 +39,7 @@
 		<build-plugin.jacoco.version>0.7.9</build-plugin.jacoco.version>
 		<build-plugin.coveralls.version>4.3.0</build-plugin.coveralls.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<testbed.adaptor.version>1.0.6</testbed.adaptor.version>
+		<testbed.adaptor.version>1.0.7</testbed.adaptor.version>
 		<maven.shade.version>3.1.0</maven.shade.version>
 		<maven.compiler.version>3.7.0</maven.compiler.version>
 		<docker.image.prefix>springio</docker.image.prefix>

@@ -12,6 +12,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Size;
 
 
 /**
@@ -30,16 +31,18 @@ public class Log implements Serializable {
 	@Column(unique=true, nullable=false)
 	private Long id;
 	
-	@Column(name="clientId", length=25)
+	@Column(name="clientId", length=255)
+	@Size(min = 4, max = 255)
 	private String clientId = null;
 	
 	@Column(name="level", length=25)
+	@Size(min = 4, max = 25)
 	private String level = null;
 	
 	@Column(name="sendDate")
 	private Date sendDate = null;
 	
-	@Column(name="message", length=2048)
+	@Column(name="message", columnDefinition="text")
 	private String message = null;
 	
 	public Log() {

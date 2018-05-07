@@ -15,12 +15,14 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.controller.heartbeat.HeartbeatTimerTask;
 import eu.driver.admin.service.dto.SolutionList;
 import eu.driver.admin.service.dto.solution.Solution;
@@ -42,6 +44,9 @@ public class SolutionRESTController implements IAdaptorCallback {
 	private StringJSONMapper mapper = new StringJSONMapper();
 	
 	private List<Solution> solutions = new ArrayList<Solution>();
+	
+	@Autowired
+	LogRESTController logController;
 
 	public SolutionRESTController() {
 		log.info("-->SolutionRESTController");
@@ -85,6 +90,11 @@ public class SolutionRESTController implements IAdaptorCallback {
 				if (solution.getId().equalsIgnoreCase(clientID)) {
 					if (solution.getState() != state) {
 						solution.setState(state);
+						if (logController != null) {
+							logController.addLog(LogLevels.LOG_LEVEL_INFO,
+								"The Solution: " + solution.getName() + " changed its state to: " + solution.getState(),
+								true);
+						}
 						WSSolutionStateChange notification = new WSSolutionStateChange(solution.getId(), solution.getState());
 						WSController.getInstance().sendMessage(mapper.objectToJSONString(notification));
 					}
@@ -160,5 +170,13 @@ public class SolutionRESTController implements IAdaptorCallback {
 			}
 		}
 		log.info("loadSolutions -->");
+	}
+	
+	public LogRESTController getLogController() {
+		return logController;
+	}
+
+	public void setLogController(LogRESTController logController) {
+		this.logController = logController;
 	}
 }

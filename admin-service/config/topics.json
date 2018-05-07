@@ -1,4 +1,3 @@
-
 [
 	{
 		"id":"core.topic.admin.hb",
@@ -48,6 +47,14 @@
  		"publishSolutionIDs":["testbed_time"],
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the topic where every solution gets the actual testbed time."
+	},{
+		"id":"core.topic.time.control",
+		"type":"core.topic",
+ 		"name":"system_timing_control",
+ 		"state": false,
+ 		"publishSolutionIDs":["testbed_time"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the topic where every solution gets the actual testbed trial time control."
 	},{
 		"id":"standart.topic.large.data",
 		"type":"standard.topic",

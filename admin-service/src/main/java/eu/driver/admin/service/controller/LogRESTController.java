@@ -1,16 +1,15 @@
 package eu.driver.admin.service.controller;
 
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.ws.rs.QueryParam;
+
+
+import javax.validation.ValidationException;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.specific.SpecificData;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.driver.adapter.core.CISAdapter;
 import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.dto.LogList;
 import eu.driver.admin.service.dto.log.Log;
@@ -31,7 +29,6 @@ import eu.driver.admin.service.ws.WSController;
 import eu.driver.admin.service.ws.mapper.StringJSONMapper;
 import eu.driver.admin.service.ws.object.WSLogNotification;
 import eu.driver.api.IAdaptorCallback;
-import eu.driver.model.core.Level;
 
 @RestController
 public class LogRESTController implements IAdaptorCallback {
@@ -67,6 +64,8 @@ public class LogRESTController implements IAdaptorCallback {
 				}
 	
 				sendWSNotification(dbLog);
+			} catch (ValidationException vEx) {
+				log.error("Error storing the log record into the DB!", vEx);
 			} catch (Exception e) {
 				log.error("Error processing the Log message received!", e);
 			}

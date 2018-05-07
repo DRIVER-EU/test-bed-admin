@@ -35,6 +35,7 @@ import eu.driver.model.core.Heartbeat;
 import eu.driver.model.core.LargeDataUpdate;
 import eu.driver.model.core.MapLayerUpdate;
 import eu.driver.model.core.Timing;
+import eu.driver.model.core.TimingControl;
 import eu.driver.model.edxl.EDXLDistribution;
 import eu.driver.model.emsi.TSO_2_0;
 import eu.driver.model.geojson.FeatureCollection;
@@ -166,6 +167,11 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TIMING_TOPIC, true);
 		sendTopicStateChange("core.topic.time", true);
+		
+		adminController.createTopic(TopicConstants.TIMING_CONTROL_TOPIC, new EDXLDistribution(), new TimingControl());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_CONTROL_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.TIMING_CONTROL_TOPIC, true);
+		sendTopicStateChange("core.topic.time.control", true);
 		
 		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_INVITE_TOPIC + " created.", true);
