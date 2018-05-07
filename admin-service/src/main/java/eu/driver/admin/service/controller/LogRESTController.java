@@ -54,7 +54,13 @@ public class LogRESTController implements IAdaptorCallback {
 				// store the log message
 				
 				Log dbLog = new Log();
-				dbLog.setClientId(logMsg.getId().toString());
+				String clientId = logMsg.getId().toString();
+				
+				if  (clientId.length() > 255) {
+					log.warn("Received client is longer than 255 char: " + clientId);
+					clientId = clientId.substring(0, 245);
+				}
+				dbLog.setClientId(clientId);
 				dbLog.setLevel(logMsg.getLevel().toString());
 				dbLog.setSendDate(new Date(logMsg.getDateTimeSent()));
 				dbLog.setMessage(logMsg.getLog().toString());
