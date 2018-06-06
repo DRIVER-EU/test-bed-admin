@@ -1,0 +1,21 @@
+[
+	{
+		"name":"cap",
+		"versions":["1.2"]
+	},{
+		"name":"largedata",
+		"versions":["1.0"]
+	},{
+		"name":"maplayer",
+		"versions":["1.0"]
+	},{
+		"name":"geojson",
+		"versions":["1.0"]
+	},{
+		"name":"mlp",
+		"versions":["1.0"]
+	},{
+		"name":"emsi",
+		"versions":["1.0"]
+	}
+]

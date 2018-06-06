@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 
 
 /**
- * The persistent class for the user database table.
+ * The persistent class for the log database table.
  * 
  */
 @Entity

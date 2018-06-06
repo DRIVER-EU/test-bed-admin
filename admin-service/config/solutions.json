@@ -21,25 +21,11 @@
  		"state":false,
  		"description":"This is the Trial Manager"
 	},{
-		"id":"3di_solution",
- 		"name":"3DI Solution",
+		"id":"TB-TimeService",
+ 		"name":"TimeService",
  		"isTestbed":false,
- 		"isService":false,
+ 		"isService":true,
  		"state":false,
- 		"description":"Flooding modelling and simulation solution"
-	},{
-		"id":"drm_solution",
- 		"name":"drm Solution",
- 		"isTestbed":false,
- 		"isService":false,
- 		"state":false,
- 		"description":"Drone Rapid map"
-	},{
-		"id":"soc_oc_solution",
- 		"name":"SOCRATES OC",
- 		"isTestbed":false,
- 		"isService":false,
- 		"state":false,
- 		"description":"SOCRATES COP solution which is able to handle also tasking and management of resources"
+ 		"description":"This is the Testbed TimeService"
 	}
 ]

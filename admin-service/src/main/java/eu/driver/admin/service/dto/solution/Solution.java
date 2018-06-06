@@ -2,25 +2,73 @@ package eu.driver.admin.service.dto.solution;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Size;
+
+/**
+ * The persistent class for the solution database table.
+ * 
+ */
+@Entity
+@Table(name="solution", schema = "admin_service", uniqueConstraints = {@UniqueConstraint(columnNames = {"id"})})
+@NamedQuery(name="Solution.findAll", query="SELECT u FROM Solution u")
 public class Solution {
-	private String id = null;
+	
+	@Id
+	@SequenceGenerator(sequenceName = "admin_service.solution_seq", name = "SolutionIdSequence", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SolutionIdSequence")
+	@Column(unique=true, nullable=false)
+	private Long id;
+	
+	@Column(name="clientId", length=255)
+	@Size(min = 4, max = 255)
+	private String clientId = null;
+	
+	@Column(name="name", length=255)
+	@Size(min = 4, max = 255)
 	private String name = null;
+	
+	@Column(name="isAdmin")
 	private Boolean isAdmin = false;
+	
+	@Column(name="isService")
 	private Boolean isService = false;
+	
+	@Column(name="state")
 	private Boolean state = false;
+	
+	@Column(name="description", columnDefinition="text")
 	private String description = null;
+	
+	@Column(name="lastHeartBeatReceived")
 	private Date lastHeartBeatReceived = null;
 	
 	public Solution() {
 		
 	}
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
 	}
 
 	public String getName() {

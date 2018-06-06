@@ -218,7 +218,7 @@ public class MgmtController {
 				adminController.createTopic(topic.getName(), new EDXLDistribution(), schema);
 				logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
 				topicController.updateTopicState(topic.getName(), true);
-				sendTopicStateChange(topic.getId(), true);
+				sendTopicStateChange(topic.getClientId(), true);
 				// send invite message
 				
 				boolean allSolutionsPublish = false;
@@ -245,7 +245,7 @@ public class MgmtController {
 					for (Solution solution: solutionList) {
 						if (!solution.getIsAdmin()) {
 							TopicInvite inviteMsg = new TopicInvite();
-							inviteMsg.setId(solution.getId());
+							inviteMsg.setId(solution.getClientId());
 							inviteMsg.setTopicName(topic.getName());
 							inviteMsg.setPublishAllowed(true);
 							inviteMsg.setSubscribeAllowed(true);
@@ -257,13 +257,13 @@ public class MgmtController {
 					for (Solution solution: solutionList) {
 						if (!solution.getIsAdmin()) {
 							TopicInvite inviteMsg = new TopicInvite();
-							inviteMsg.setId(solution.getId());
+							inviteMsg.setId(solution.getClientId());
 							inviteMsg.setTopicName(topic.getName());
 							inviteMsg.setPublishAllowed(true);
 							
 							// find the client ID in the list of subribers
 							for (String clientID : subscribeClientIDs) {
-								if (clientID.equalsIgnoreCase(solution.getId())) {
+								if (clientID.equalsIgnoreCase(solution.getClientId())) {
 									inviteMsg.setSubscribeAllowed(true);
 									return;	
 								}
@@ -276,12 +276,12 @@ public class MgmtController {
 					for (Solution solution: solutionList) {
 						if (!solution.getIsAdmin()) {
 							TopicInvite inviteMsg = new TopicInvite();
-							inviteMsg.setId(solution.getId());
+							inviteMsg.setId(solution.getClientId());
 							inviteMsg.setTopicName(topic.getName());
 							inviteMsg.setSubscribeAllowed(true);
 							// find the client ID in the list of subribers
 							for (String clientID : publishClientIDs) {
-								if (clientID.equalsIgnoreCase(solution.getId())) {
+								if (clientID.equalsIgnoreCase(solution.getClientId())) {
 									inviteMsg.setPublishAllowed(true);
 									return;	
 								}

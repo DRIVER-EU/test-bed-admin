@@ -1,5 +1,7 @@
 package eu.driver.admin.service.controller;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -8,43 +10,127 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.dto.TopicList;
+import eu.driver.admin.service.dto.solution.Solution;
+import eu.driver.admin.service.dto.standard.Standard;
 import eu.driver.admin.service.dto.topic.Topic;
-import eu.driver.admin.service.helper.FileReader;
+import eu.driver.admin.service.repository.StandardRepository;
+import eu.driver.admin.service.repository.TopicRepository;
 
 @RestController
 public class TopicRESTController {
-	private String configJson = "config/topics.json";
 	private Logger log = Logger.getLogger(this.getClass());
-	private FileReader fileReader = new FileReader();
-	
-	private List<Topic> tesbedTopics = new ArrayList<Topic>();
-	private List<Topic> coreTopics = new ArrayList<Topic>();
-	private List<Topic> trialTopics = new ArrayList<Topic>();
 	
 	@Autowired
 	LogRESTController logController;
 	
+	@Autowired
+	TopicRepository topicRepo;
+	
+	@Autowired
+	StandardRepository standardRepo;
+	
 
 	public TopicRESTController() {
 		log.info("--> TopicRESTController");
-		try {
-			loadTopics();
-		} catch (Exception e) {
-			log.error("Error loading testbed topics!");
-		}
+		
 		log.info("TopicRESTController -->");
+	}
+	
+	@ApiOperation(value = "addTopic", nickname = "addTopic")
+	@RequestMapping(value = "/AdminService/addTopic", method = RequestMethod.POST)
+	@ApiImplicitParams({
+        @ApiImplicitParam(name = "topic", value = "the topic that should be saved", required = true, dataType = "application/json", paramType = "body")
+      })
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = Solution.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = Solution.class),
+			@ApiResponse(code = 500, message = "Failure", response = Solution.class) })
+	public ResponseEntity<Topic> addTopic(@RequestBody Topic topic) {
+		log.debug("--> addTopic");
+		Topic savedTopic = null;
+		
+		try {
+			savedTopic = topicRepo.saveAndFlush(topic);
+		} catch (Exception e) {
+			return new ResponseEntity<Topic>(savedTopic, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		// ToDo: send the invites
+		
+		log.debug("--> addTopic");
+		return new ResponseEntity<Topic>(savedTopic, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "updateTopic", nickname = "updateTopic")
+	@RequestMapping(value = "/AdminService/updateTopic", method = RequestMethod.PUT)
+	@ApiImplicitParams({
+        @ApiImplicitParam(name = "topic", value = "the topic that should be saved", required = true, dataType = "application/json", paramType = "body")
+      })
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = Solution.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = Solution.class),
+			@ApiResponse(code = 500, message = "Failure", response = Solution.class) })
+	public ResponseEntity<Topic> updateTopic(@RequestBody Topic topic) {
+		log.debug("--> updateTopic");
+		Topic savedTopic = null;
+		
+		savedTopic = topicRepo.findObjectById(topic.getId());
+		
+		try {
+			if (savedTopic != null) {
+				savedTopic.setType(topic.getType());
+				savedTopic.setName(topic.getName());
+				savedTopic.setState(topic.getState());
+				savedTopic.setMsgType(topic.getMsgType());
+				savedTopic.setMsgTypeVersion(topic.getMsgTypeVersion());
+				savedTopic.setDescription(topic.getDescription());
+				savedTopic.setPublishSolutionIDs(topic.getPublishSolutionIDs());
+				savedTopic.setSubscribedSolutionIDs(topic.getSubscribedSolutionIDs());
+				
+				savedTopic = topicRepo.saveAndFlush(savedTopic);
+			} else {
+				savedTopic = topicRepo.saveAndFlush(topic);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<Topic>(savedTopic, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		// ToDo: send the invites
+		
+		log.debug("--> updateGateway");
+		return new ResponseEntity<Topic>(savedTopic, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "removeTopic", nickname = "removeTopic")
+	@RequestMapping(value = "/AdminService/removeTopic/{id}", method = RequestMethod.DELETE)
+	@ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "the topic id that should be removed", required = true, dataType = "Long", paramType = "path")
+      })
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = Solution.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = Solution.class),
+			@ApiResponse(code = 500, message = "Failure", response = Solution.class) })
+	public ResponseEntity<String> removeTopic(@PathVariable Long id) {
+		log.debug("--> removeTopic");
+		
+		try {
+			topicRepo.delete(id);
+		} catch (Exception e) {
+			return new ResponseEntity<String>("Error deleting the Topic from the DB!", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		log.debug("--> removeTopic");
+		return new ResponseEntity<String>("Topic removed!", HttpStatus.OK);
 	}
 	
 	@ApiOperation(value = "getAllTrialTopics", nickname = "getAllTrialTopics")
@@ -56,93 +142,87 @@ public class TopicRESTController {
 	public ResponseEntity<TopicList> getAllTrialTopics() {
 		log.info("--> getAllTrialTopics");
 		TopicList topicList = new TopicList();
-
-		topicList.setTopics(this.tesbedTopics);
+		
+		try {
+			topicList.setTopics(this.topicRepo.findAll());
+		} catch (Exception e) {
+			return new ResponseEntity<TopicList>(topicList, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
 		log.info("getAllTrialTopics -->");
 		return new ResponseEntity<TopicList>(topicList, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "getAllTopicTypes", nickname = "getAllTopicTypes")
+	@RequestMapping(value = "/AdminService/getAllTopicTypes", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = List.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = List.class),
+			@ApiResponse(code = 500, message = "Failure", response = List.class) })
+	public List<String> getAllTopicTypes() {
+		log.debug("getAllTopicTypes");
+		List<String> typeList = new ArrayList<String>();
+		typeList.add("core.topic");
+		typeList.add("standard.topic");
+		
+		return typeList;
+	}
+	
+	@ApiOperation(value = "getAllStandards", nickname = "getAllStandards")
+	@RequestMapping(value = "/AdminService/getAllStandards", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = List.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = List.class),
+			@ApiResponse(code = 500, message = "Failure", response = List.class) })
+	public List<Standard> getAllStandards() {
+		log.debug("getAllStandards");
+		
+		return this.standardRepo.findAll();
 	}
 	
 	public List<Topic> getAllCoreTopic() {
 		log.info("--> getAllCoreTopic");
 		
 		log.info("getAllCoreTopic -->");
-		return this.coreTopics;
+		return this.topicRepo.findObjectByType("core.topic");
 	}
 	
 	public List<Topic> getAllTrialTopic() {
 		log.info("--> getAllTrialTopics");
 		
 		log.info("getAllTrialTopics -->");
-		return this.trialTopics;
+		return this.topicRepo.findObjectByType("standard.topic");
 	}
 	
 	public void updateTopicState(String topicName, Boolean state) {
-		for (Topic topic: this.tesbedTopics) {
-			if (topic.getName().equalsIgnoreCase(topicName)) {
-				topic.setState(state);
-				return;
-			}
-		}
+		Topic topic = this.topicRepo.findObjectByName(topicName);
+		topic.setState(state);
+		
+		this.topicRepo.saveAndFlush(topic);
+		
 	}
 	
-	public void loadTopics() throws Exception {
-		try {
-			String topicJson = fileReader.readFile(this.configJson);
-			JSONArray jsonarray = new JSONArray(topicJson);
-			for (int i = 0; i < jsonarray.length(); i++) {
-				JSONObject jsonobject;
-				Topic topic = new Topic();
-				jsonobject = jsonarray.getJSONObject(i);
-
-				topic.setId(jsonobject.getString("id"));
-				topic.setType(jsonobject.getString("type"));
-				topic.setName(jsonobject.getString("name"));
-				
-				if (jsonobject.has("msgType")) {
-					topic.setMsgType(jsonobject.getString("msgType"));
-					topic.setMsgTypeVersion(jsonobject.getString("msgTypeVersion"));
-				}
-				topic.setState(jsonobject.getBoolean("state"));
-				topic.setDescription(jsonobject.getString("description"));
-
-				ArrayList<String> publisher = new ArrayList<String>();     
-				JSONArray jArray = jsonobject.getJSONArray("publishSolutionIDs");
-				if (jArray != null) { 
-				   for (int a=0;a<jArray.length();a++){ 
-					   publisher.add(jArray.getString(a));
-				   } 
-				} 
-				topic.setPublishSolutionIDs(publisher);
-				
-				ArrayList<String> subscriber = new ArrayList<String>();     
-				jArray = jsonobject.getJSONArray("subscribedSolutionIDs");
-				if (jArray != null) { 
-				   for (int a=0;a<jArray.length();a++){ 
-					   subscriber.add(jArray.getString(a));
-				   } 
-				} 
-				topic.setSubscribedSolutionIDs(subscriber);
-				
-				tesbedTopics.add(topic);
-				
-				if (topic.getType().equalsIgnoreCase("core.topic")) {
-					this.coreTopics.add(topic);
-				} else {
-					this.trialTopics.add(topic);
-				}
-			}
-		} catch (JSONException e) {
-			log.error("Error parsind the JSON topic response", e);
-			throw e;
-		}
-	}
-
 	public LogRESTController getLogController() {
 		return logController;
 	}
 
 	public void setLogController(LogRESTController logController) {
 		this.logController = logController;
+	}
+
+	public TopicRepository getTopicRepo() {
+		return topicRepo;
+	}
+
+	public void setTopicRepo(TopicRepository topicRepo) {
+		this.topicRepo = topicRepo;
+	}
+
+	public StandardRepository getStandardRepo() {
+		return standardRepo;
+	}
+
+	public void setStandardRepo(StandardRepository standardRepo) {
+		this.standardRepo = standardRepo;
 	}
 }
