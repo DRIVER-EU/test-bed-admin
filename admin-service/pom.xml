@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -24,11 +25,19 @@
 			<id>confluent</id>
 			<url>http://packages.confluent.io/maven/</url>
 		</repository>
+		<repository>
+			<id>driver-mvn-repo</id>
+			<url>https://raw.github.com/DRIVER-EU/maven-repo/master/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<testbed.adaptor.version>1.0.7</testbed.adaptor.version>
+		<testbed.adaptor.version>1.0.8</testbed.adaptor.version>
 		<maven.shade.version>3.1.0</maven.shade.version>
 		<maven.compiler.version>3.7.0</maven.compiler.version>
 		<docker.image.prefix>springio</docker.image.prefix>
@@ -111,12 +120,6 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.6.3</version>
-		</dependency>
-		<dependency>
-			<groupId>driver.eu</groupId>
-			<artifactId>xml-json-to-avro-mapper</artifactId>
-			<version>0.0.1</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.101tec</groupId>
@@ -214,26 +217,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-				<version>1.0.0</version>
-				<configuration>
-					<imageName>admintool</imageName>
-					<baseImage>java</baseImage>
-					<forceTags>true</forceTags>
-					<entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
-					<!-- copy the service's jar file from target into the root directory 
-						of the image -->
-					<resources>
-						<resource>
-							<targetPath>/</targetPath>
-							<directory>${project.build.directory}</directory>
-							<include>${project.build.finalName}.jar</include>
-						</resource>
-					</resources>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
