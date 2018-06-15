@@ -12,6 +12,7 @@ env:
 install: mvn install
 
 deploy:
+  skip_cleanup: true
   provider: script
   script:
   - docker build -t drivereu/test-bed-admin:latest -t drivereu/test-bed-admin:$VERSION .
