@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -7,7 +8,7 @@
 	<artifactId>admin-tool</artifactId>
 	<version>1.1.0</version>
 	<packaging>pom</packaging>
-	
+
 	<name>DRIVER+ AdminTool</name>
 	<description>This is the DRIVER+ AdminTool</description>
 
@@ -16,7 +17,7 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.5.9.RELEASE</version>
 	</parent>
-	
+
 	<repositories>
 		<repository>
 			<id>apache-repo</id>
@@ -27,10 +28,18 @@
 			<id>confluent</id>
 			<url>http://packages.confluent.io/maven/</url>
 		</repository>
+		<repository>
+			<id>driver-mvn-repo</id>
+			<url>https://raw.github.com/DRIVER-EU/maven-repo/master/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
 	</repositories>
 
-    <properties>
-        <main.basedir>${project.basedir}</main.basedir>
+	<properties>
+		<main.basedir>${project.basedir}</main.basedir>
 		<!-- Analysis Tools for CI -->
 		<build-plugin.jacoco.version>0.7.9</build-plugin.jacoco.version>
 		<build-plugin.coveralls.version>4.3.0</build-plugin.coveralls.version>
@@ -41,12 +50,12 @@
 		<docker.image.prefix>springio</docker.image.prefix>
 		<project.build.finalName>AdminTool</project.build.finalName>
 		<project.build.directory>target/docker</project.build.directory>
-    </properties>
-	
+	</properties>
+
 	<modules>
-        <module>admin-frontend</module>
-        <module>admin-service</module>
-    </modules>
+		<module>admin-frontend</module>
+		<module>admin-service</module>
+	</modules>
 
 	<dependencies>
 		<dependency>
@@ -182,17 +191,16 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>${build-plugin.jacoco.version}</version>
 				<executions>
-					<!-- Prepares the property pointing to the JaCoCo
-                    runtime agent which is passed as VM argument when Maven the Surefire plugin
-                    is executed. -->
+					<!-- Prepares the property pointing to the JaCoCo runtime agent which 
+						is passed as VM argument when Maven the Surefire plugin is executed. -->
 					<execution>
 						<id>pre-unit-test</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
-					<!-- Ensures that the code coverage report for
-                    unit tests is created after unit tests have been run. -->
+					<!-- Ensures that the code coverage report for unit tests is created 
+						after unit tests have been run. -->
 					<execution>
 						<id>post-unit-test</id>
 						<phase>test</phase>

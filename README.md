@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/DRIVER-EU/test-bed-admin.svg?branch=master)](https://travis-ci.org/DRIVER-EU/test-bed-admin)
+
 # Admin tool
 Single Page Application to help you manage your personalized DRIVER+ test-bed and prepare the trial. It uses Apache Kafka as well as an Embedded Tomcat environment. The frontend is built with Vuejs.
 
