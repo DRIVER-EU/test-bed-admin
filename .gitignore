@@ -28,3 +28,4 @@ dist
 node
 maven-archiver
 /admin-frontend/package-lock.json
+js
