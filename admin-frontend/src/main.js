@@ -10,6 +10,11 @@ import VueAxios from 'vue-axios'
 import underscore from 'vue-underscore'
 import ListComponent from './components/ListComponent'
 import LogsTable from './components/LogsTable'
+import ConfigureSolutionForm from './components/configurationForms/ConfigureSolutionForm'
+import ConfigureTopicForm from './components/configurationForms/ConfigureTopicForm'
+import ConfigureGatewayForm from './components/configurationForms/ConfigureGatewayForm'
+
+export const eventBus = new Vue()
 
 Vue.use(underscore)
 
@@ -38,6 +43,9 @@ Vue.use(Vuetify, {
 
 Vue.component('list-component', ListComponent)
 Vue.component('logs-table', LogsTable)
+Vue.component('configure-solution-form',ConfigureSolutionForm)
+Vue.component('configure-topic-form',ConfigureTopicForm)
+Vue.component('configure-gateway-form',ConfigureGatewayForm)
 
 Vue.config.productionTip = false
 
@@ -53,6 +61,8 @@ new Vue({
       this.$store.dispatch('getGateways'),
       this.$store.dispatch('getAllLogs'),
       this.$store.dispatch('isTestbedInitialized'),
-      this.$store.dispatch('isTrialStarted')
+      this.$store.dispatch('isTrialStarted'),
+      this.$store.dispatch('getAllStandards'),
+      this.$store.dispatch('getAllTopicTypes')
   }
 })

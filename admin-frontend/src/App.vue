@@ -4,10 +4,6 @@
       <img src="https://avatars2.githubusercontent.com/u/16935616?s=200&v=4" class="project-logo">
       <v-toolbar-title class="title">Admin tool</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-alert v-for="alert in alerts" :key="alert.id" :type="alert.type" dismissible v-model="alert.isVisible">
-        {{alert.text}}
-      </v-alert>
-      <v-spacer></v-spacer>
       <v-btn :disabled="isTestbedInitialized" v-on:click="initTestbed">Initialize testbed</v-btn>
       <v-btn :disabled="!isTestbedInitialized || isTrialStarted" v-on:click="startTrial">Start trial</v-btn>
     </v-toolbar>
@@ -37,7 +33,7 @@
       }
     ,
     computed:
-      mapGetters(['alerts', 'isTestbedInitialized', 'isTrialStarted', 'loading'])
+      mapGetters(['isTestbedInitialized', 'isTrialStarted', 'loading'])
   }
 </script>
 <style lang="stylus">

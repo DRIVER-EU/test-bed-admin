@@ -2,7 +2,7 @@
   <v-data-table :items=logEntries :headers="headers" hide-actions>
     <template slot="items" slot-scope="props">
       <tr
-        :class="{logError: props.item.level === 'ERROR' || props.item.level === 'SEVERE', logWarning: props.item.level === 'WARNING'}">
+        :class="{logError: props.item.level === 'ERROR' || props.item.level === 'SEVERE' || props.item.level === 'CRITICAL', logWarning: props.item.level === 'WARNING'}">
         <td>{{props.item.id}}</td>
         <td>{{props.item.sendDate}}</td>
         <td>{{props.item.level}}</td>
