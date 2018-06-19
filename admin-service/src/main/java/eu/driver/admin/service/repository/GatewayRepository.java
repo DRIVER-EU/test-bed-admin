@@ -11,6 +11,11 @@ import eu.driver.admin.service.dto.gateway.Gateway;
 public interface GatewayRepository extends JpaRepository<Gateway, Long> {
 	public final static String ID_QUERY = "SELECT u FROM Gateway u where u.id=:objectId";
 	
+	public final static String CLIENT_ID_QUERY = "SELECT u FROM Gateway u where u.clientId=:clientId";
+	
 	@Query(ID_QUERY)
     public Gateway findObjectById(@Param("objectId") Long objectId);
+	
+	@Query(CLIENT_ID_QUERY)
+    public Gateway findObjectByClientId(@Param("clientId") String clientId);
 }

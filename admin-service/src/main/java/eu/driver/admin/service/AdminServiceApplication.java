@@ -130,8 +130,10 @@ public class AdminServiceApplication {
 					}
 					solution.setDescription(jsonobject.getString("description"));
 					
-					solutionRepo.saveAndFlush(solution);
-					log.debug("add solution: " + solution.getName());
+					if (this.solutionRepo.findObjectByClientId(solution.getClientId()) == null) {
+						this.solutionRepo.saveAndFlush(solution);
+						log.info("add solution: " + solution.getName());
+					}
 				}
 			} catch (JSONException e) {
 				log.error("Error parsind the JSON solution response", e);
@@ -179,7 +181,10 @@ public class AdminServiceApplication {
 				} 
 				topic.setSubscribedSolutionIDs(subscriber);
 				
-				topicRepo.saveAndFlush(topic);
+				if (this.topicRepo.findObjectByClientId(topic.getClientId()) == null) {
+					this.topicRepo.saveAndFlush(topic);
+					log.info("add topic: " + topic.getName());
+				}
 			}
 		} catch (JSONException e) {
 			log.error("Error parsind the JSON topic response", e);
@@ -212,7 +217,10 @@ public class AdminServiceApplication {
 					} 
 					gateway.setManagingType(mangTypes);
 					
-					this.gatewayRepo.saveAndFlush(gateway);
+					if (this.gatewayRepo.findObjectByClientId(gateway.getClientId()) == null) {
+						this.gatewayRepo.saveAndFlush(gateway);
+						log.info("add gateway: " + gateway.getName());
+					}
 				}
 			} catch (JSONException e) {
 				log.error("Error parsind the JSON Gateway response", e);
@@ -243,7 +251,10 @@ public class AdminServiceApplication {
 					} 
 					standard.setVersions(versions);
 					
-					this.standardRepo.saveAndFlush(standard);
+					if (this.standardRepo.findObjectByName(standard.getName()) == null) {
+						this.standardRepo.saveAndFlush(standard);
+						log.info("add standard: " + standard.getName());
+					}
 				}
 			} catch (JSONException e) {
 				log.error("Error parsind the JSON Standard response", e);

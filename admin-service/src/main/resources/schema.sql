@@ -1,2 +1,1 @@
-DROP SCHEMA IF EXISTS admin_service CASCADE;
-CREATE SCHEMA admin_service;
+CREATE SCHEMA IF NOT EXISTS admin_service;

@@ -14,12 +14,17 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
 	
 	public final static String ID_QUERY = "SELECT u FROM Topic u where u.id=:objectId";
 	
+	public final static String CLIENT_ID_QUERY = "SELECT u FROM Topic u where u.clientId=:clientId";
+	
 	public final static String NAME_QUERY = "SELECT u FROM Topic u where u.name=:name";
 	
 	public final static String TYPE_QUERY = "SELECT u FROM Topic u where u.type=:type";
 	
 	@Query(ID_QUERY)
     public Topic findObjectById(@Param("objectId") Long objectId);
+	
+	@Query(CLIENT_ID_QUERY)
+    public Topic findObjectByClientId(@Param("clientId") String clientId);
 	
 	@Query(NAME_QUERY)
     public Topic findObjectByName(@Param("name") String name);
