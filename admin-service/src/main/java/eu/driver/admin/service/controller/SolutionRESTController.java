@@ -115,6 +115,10 @@ public class SolutionRESTController implements IAdaptorCallback {
 		
 		try {
 			savedSolution = solutionRepo.saveAndFlush(solution);
+			if (logController != null) {
+				logController.addLog(LogLevels.LOG_LEVEL_INFO,
+					"The Solution: " + solution.getName() + " has been created!", true);
+			}
 		} catch (Exception e) {
 			return new ResponseEntity<Solution>(savedSolution, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -151,6 +155,10 @@ public class SolutionRESTController implements IAdaptorCallback {
 				savedSolution = solutionRepo.saveAndFlush(savedSolution);
 			} else {
 				savedSolution = solutionRepo.saveAndFlush(solution);
+			}
+			if (logController != null) {
+				logController.addLog(LogLevels.LOG_LEVEL_INFO,
+					"The Solution: " + solution.getName() + " has been updated!", true);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<Solution>(savedSolution, HttpStatus.INTERNAL_SERVER_ERROR);
