@@ -186,8 +186,20 @@ public class SolutionRESTController implements IAdaptorCallback {
 			return new ResponseEntity<String>("Error deleting the Solution from the DB!", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		log.debug("--> removeSolution");
+		log.debug("removeSolution -->");
 		return new ResponseEntity<String>("Solution removed!", HttpStatus.OK);
+	}
+	
+	public Boolean removeAllSolutions() {
+		log.debug("--> removeAllSolutions");
+		try {
+			solutionRepo.deleteAll();
+		} catch (Exception e) {
+			log.error("Error removing all Solutions!", e);
+			return false;
+		}
+		log.debug("removeSolution -->");
+		return true;
 	}
 
 	@ApiOperation(value = "getAllTrialSolutions", nickname = "getAllTrialSolutions")

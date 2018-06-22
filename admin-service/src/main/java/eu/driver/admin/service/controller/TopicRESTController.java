@@ -142,6 +142,18 @@ public class TopicRESTController {
 		return new ResponseEntity<String>("Topic removed!", HttpStatus.OK);
 	}
 	
+	public Boolean removeAllTopics() {
+		log.debug("--> removeAllTopics");
+		try {
+			topicRepo.deleteAll();
+		} catch (Exception e) {
+			log.error("Error removing all Topics!", e);
+			return false;
+		}
+		log.debug("removeAllTopics -->");
+		return true;
+	}
+	
 	@ApiOperation(value = "getAllTrialTopics", nickname = "getAllTrialTopics")
 	@RequestMapping(value = "/AdminService/getAllTrialTopics", method = RequestMethod.GET)
 	@ApiResponses(value = {
