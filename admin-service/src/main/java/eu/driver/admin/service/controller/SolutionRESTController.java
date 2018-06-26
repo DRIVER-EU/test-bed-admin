@@ -81,19 +81,21 @@ public class SolutionRESTController implements IAdaptorCallback {
 		log.debug("-->updateSolutionState");
 		try {
 			Solution solution = this.solutionRepo.findObjectByClientId(clientID);
-			solution.setLastHeartBeatReceived(isAliveDate);
-			
-			if (solution.getState() != state) {
-				solution.setState(state);
-				if (logController != null) {
-					logController.addLog(LogLevels.LOG_LEVEL_INFO,
-						"The Solution: " + solution.getName() + " changed its state to: " + solution.getState(),
-						true);
+			if (solution != null) {
+				solution.setLastHeartBeatReceived(isAliveDate);
+				
+				if (solution.getState() != state) {
+					solution.setState(state);
+					if (logController != null) {
+						logController.addLog(LogLevels.LOG_LEVEL_INFO,
+							"The Solution: " + solution.getName() + " changed its state to: " + solution.getState(),
+							true);
+					}
+					WSSolutionStateChange notification = new WSSolutionStateChange(solution.getClientId(), solution.getState());
+					WSController.getInstance().sendMessage(mapper.objectToJSONString(notification));
 				}
-				WSSolutionStateChange notification = new WSSolutionStateChange(solution.getClientId(), solution.getState());
-				WSController.getInstance().sendMessage(mapper.objectToJSONString(notification));
+				this.solutionRepo.saveAndFlush(solution);
 			}
-			this.solutionRepo.saveAndFlush(solution);
 		} catch (Exception e) {
 			log.error("Error updating the solution!" , e);
 		}
