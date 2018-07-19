@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.dto.TopicList;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.dto.standard.Standard;
@@ -61,6 +62,10 @@ public class TopicRESTController {
 		
 		try {
 			savedTopic = topicRepo.saveAndFlush(topic);
+			if (logController != null) {
+				logController.addLog(LogLevels.LOG_LEVEL_INFO,
+					"The Topic: " + topic.getName() + " has been created!", true);
+			}
 		} catch (Exception e) {
 			return new ResponseEntity<Topic>(savedTopic, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -101,13 +106,17 @@ public class TopicRESTController {
 			} else {
 				savedTopic = topicRepo.saveAndFlush(topic);
 			}
+			if (logController != null) {
+				logController.addLog(LogLevels.LOG_LEVEL_INFO,
+					"The Topic: " + topic.getName() + " has been updated!", true);
+			}
 		} catch (Exception e) {
 			return new ResponseEntity<Topic>(savedTopic, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		// ToDo: send the invites
 		
-		log.debug("--> updateGateway");
+		log.debug("--> updateTopic");
 		return new ResponseEntity<Topic>(savedTopic, HttpStatus.OK);
 	}
 	
