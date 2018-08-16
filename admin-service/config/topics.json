@@ -96,6 +96,16 @@
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the standard GeoJSON topic."
 	},{
+		"id":"standart.topic.geo.json.xvr",
+		"type":"standard.topic",
+ 		"name":"standard_geojson_xvr",
+ 		"msgType": "geojson-xvr",
+ 		"msgTypeVersion": "1.0",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the standard GeoJSON topic for XVR Simultaion."
+	},{
 		"id":"standart.topic.mlp",
 		"type":"standard.topic",
  		"name":"standard_mlp",
@@ -115,5 +125,45 @@
  		"publishSolutionIDs":["all"],
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the standard EMSI topic."
+	},{
+		"id":"standard.topic.geojson.sim.station",
+		"type":"standard.topic",
+ 		"name":"standard_geojson_sim_station",
+ 		"msgType": "geojson_sim",
+ 		"msgTypeVersion": "1.0",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the standard Simulation station exchange topic."
+	},{
+		"id":"standard.topic.geojson.sim.unit",
+		"type":"standard.topic",
+ 		"name":"standard_geojson_sim_unit",
+ 		"msgType": "geojson_sim",
+ 		"msgTypeVersion": "1.0",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the standard Simulation unit exchange topic."
+	},{
+		"id":"standard.topic.geojson.sim.item",
+		"type":"standard.topic",
+ 		"name":"standard_geojson_sim_item",
+ 		"msgType": "geojson_sim",
+ 		"msgTypeVersion": "1.0",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the standard Simulation item exchange topic."
+	},{
+		"id":"standard.topic.geojson.sim.unitgroup",
+		"type":"standard.topic",
+ 		"name":"standard_geojson_sim_unitgroup",
+ 		"msgType": "geojson_sim",
+ 		"msgTypeVersion": "1.0",
+ 		"state": false,
+ 		"publishSolutionIDs":["all"],
+ 		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the standard Simulation unitgroup exchange topic."
 	}
 ]
