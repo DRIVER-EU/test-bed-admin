@@ -204,6 +204,8 @@ public class MgmtController {
 				schema = new Alert();
 			} else if (topic.getMsgType().equalsIgnoreCase("geojson")) {
 				schema = new FeatureCollection();
+			} else if (topic.getMsgType().equalsIgnoreCase("geojson-sim")) {
+				schema = new FeatureCollection();
 			} else if (topic.getMsgType().equalsIgnoreCase("mlp")) {
 				schema = new SlRep();
 			} else if (topic.getMsgType().equalsIgnoreCase("emsi")) {

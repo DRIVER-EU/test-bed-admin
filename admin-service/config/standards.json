@@ -17,5 +17,11 @@
 	},{
 		"name":"emsi",
 		"versions":["1.0"]
+	},{
+		"name":"geojson",
+		"versions":["1.0"]
+	},{
+		"name":"geojson-sim",
+		"versions":["1.0"]
 	}
 ]
