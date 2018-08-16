@@ -90,12 +90,15 @@ export const store = new Vuex.Store({
       state.logEntries.push(new LogEntry(log))
     },
     UPDATE_SOLUTION(state, payload) {
+      console.log(payload.id)
       var obj = state.solutions.find(obj => {
+        console.log(obj.clientId)
         return obj.clientId === payload.id
       });
       obj.state = payload.state
     },
     UPDATE_TOPIC(state, payload) {
+      console.log(payload.id)
       var obj = state.topics.find(obj => {
         return obj.clientId === payload.id
       });
