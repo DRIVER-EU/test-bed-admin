@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-toolbar class="primary">
-      <img src="https://avatars2.githubusercontent.com/u/16935616?s=200&v=4" class="project-logo">
+      <img src="./assets/logo.png" class="project-logo">
       <v-toolbar-title class="title">Admin tool</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn :disabled="isTestbedInitialized" v-on:click="initTestbed">Initialize testbed</v-btn>

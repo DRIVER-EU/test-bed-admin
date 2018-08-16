@@ -3,7 +3,11 @@
     <v-layout row wrap justify-space-around style="height: 55vh"
               class="scroll-y">
       <v-flex xs4>
-        <h3 class="text-xs-center primary--text">Solutions</h3>
+        <h3 class="text-xs-center primary--text">Solutions
+          <img v-if="overallSolutionState===0" src="../assets/lens-red-green.png" style="float:right">
+          <img v-if="overallSolutionState===-1" src="../assets/lens-red.png" style="float:right">
+          <img v-if="overallSolutionState===1" src="../assets/lens-green.png" style="float:right">
+        </h3>
         <v-btn @click="openConfigureSolutionForm" flat small block class="mx-auto">
           Configure new solution
           <v-icon>create</v-icon>
@@ -16,7 +20,11 @@
         <list-component :data=solutionsToShow></list-component>
       </v-flex>
       <v-flex xs4>
-        <h3 class="text-xs-center primary--text">Topics</h3>
+        <h3 class="text-xs-center primary--text">Topics
+          <img v-if="overallTopicState===0" src="../assets/lens-red-green.png" style="float:right">
+          <img v-if="overallTopicState===-1" src="../assets/lens-red.png" style="float:right">
+          <img v-if="overallTopicState===1" src="../assets/lens-green.png" style="float:right">
+        </h3>
         <v-btn @click="openConfigureTopicForm" flat small block class="mx-auto">
           Configure new topic
           <v-icon>create</v-icon>
@@ -29,7 +37,11 @@
         <list-component :data=topicsToShow></list-component>
       </v-flex>
       <v-flex xs4>
-        <h3 class="text-xs-center primary--text">Gateways</h3>
+        <h3 class="text-xs-center primary--text">Gateways
+          <img v-if="overallGatewayState===0" src="../assets/lens-red-green.png" style="float:right">
+          <img v-if="overallGatewayState===-1" src="../assets/lens-red.png" style="float:right">
+          <img v-if="overallGatewayState===1" src="../assets/lens-green.png" style="float:right">
+        </h3>
         <v-btn @click="openConfigureGatewayForm" flat small block class="mx-auto">
           Configure new gateway
           <v-icon>create</v-icon>
@@ -65,7 +77,6 @@
 <script>
   import {mapGetters} from 'vuex'
   import {eventBus} from "../main"
-
   export default {
     name: "Overview",
     data: () => ({
@@ -74,8 +85,10 @@
         snackbarType: '',
         solutionTypes: ['All', 'Testbed services', 'Solutions'],
         topicTypes: ['All', 'Standard topics', 'Core topics'],
+        topicStates: [],
         solutionSelection: 'All',
         topicSelection: 'All',
+        gatewayStates: []
       }
     ),
     created() {
@@ -91,22 +104,62 @@
       solutionsToShow: function () {
         return this.solutions.filter((solution) => {
           let showSolution = true
-          // exclude solutions that don't meet the filter criteria
-          if ((this.solutionSelection === "Solutions" && solution.isService) || (this.solutionSelection === "Testbed services" && !solution.isService) ) {
+          if ((this.solutionSelection === "Solutions" && solution.isService) || (this.solutionSelection === "Testbed services" && !solution.isService)) {
             showSolution = false
           }
           return showSolution
         })
       },
-      topicsToShow: function() {
+      topicsToShow: function () {
         return this.topics.filter((topic) => {
           let showTopic = true
-          // exclude topics that don't meet the filter criteria
-          if ((this.topicSelection === "Standard topics" && topic.type.indexOf("core") != -1) || (this.solutionSelection === "Core topics" && topic.type.indexOf("standard") != -1) ) {
+          if ((this.topicSelection === "Standard topics" && topic.type.indexOf("core") != -1) || (this.solutionSelection === "Core topics" && topic.type.indexOf("standard") != -1)) {
             showTopic = false
           }
           return showTopic
         })
+      },
+      overallSolutionState: function () {
+        let solutionsStates = 0
+        this.solutions.forEach(solution => {
+          if (solution.state) solutionsStates++
+        })
+        switch (solutionsStates) {
+          case 0:
+            return -1
+          case this.solutions.length:
+            return 1
+          default:
+            return 0
+        }
+      },
+      overallTopicState: function () {
+        let topicsStates = 0
+        this.topics.forEach(topic => {
+          if (topic.state) topicsStates++
+        })
+        switch (topicsStates) {
+          case 0:
+            return -1
+          case this.topics.length:
+            return 1
+          default:
+            return 0
+        }
+      },
+      overallGatewayState: function () {
+        let gatewayStates = 0
+        this.gateways.forEach(gateway=> {
+          if (gateway.state) gatewaysStates++
+        })
+        switch (gatewayStates) {
+          case 0:
+            return -1
+          case this.gateways.length:
+            return 1
+          default:
+            return 0
+        }
       }
     }
     ,

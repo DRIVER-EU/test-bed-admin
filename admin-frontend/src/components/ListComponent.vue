@@ -6,8 +6,10 @@
     padding-bottom: 0;">
           {{ d.name}}
           <v-spacer></v-spacer>
-          <v-icon v-if="d.hasOwnProperty('state')" :class="{'unavailable': !d.state, 'available': d.state}">lens
-          </v-icon>
+          <div v-if="d.hasOwnProperty('state')">
+          <img v-if="!d.state" src="../assets/lens-red.png">
+          <img v-if="d.state" src="../assets/lens-green.png">
+          </div>
           <v-card-actions>
             <v-spacer></v-spacer>
               <v-btn icon @click.native="d.showDescription = !d.showDescription">
