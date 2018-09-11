@@ -11,7 +11,9 @@ import io.swagger.annotations.ApiResponses;
 
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.log4j.Logger;
-import org.postgresql.largeobject.LargeObjectManager;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +25,16 @@ import eu.driver.adapter.constants.TopicConstants;
 import eu.driver.adapter.core.AdminAdapter;
 import eu.driver.adapter.excpetion.CommunicationException;
 import eu.driver.admin.service.constants.LogLevels;
+import eu.driver.admin.service.dto.gateway.Gateway;
 import eu.driver.admin.service.dto.solution.Solution;
+import eu.driver.admin.service.dto.standard.Standard;
 import eu.driver.admin.service.dto.topic.Topic;
+import eu.driver.admin.service.helper.FileReader;
 import eu.driver.admin.service.kafka.KafkaAdminController;
+import eu.driver.admin.service.repository.GatewayRepository;
+import eu.driver.admin.service.repository.SolutionRepository;
+import eu.driver.admin.service.repository.StandardRepository;
+import eu.driver.admin.service.repository.TopicRepository;
 import eu.driver.admin.service.ws.WSController;
 import eu.driver.admin.service.ws.mapper.StringJSONMapper;
 import eu.driver.admin.service.ws.object.WSTopicCreationNotification;
@@ -51,6 +60,7 @@ public class MgmtController {
 	private KafkaAdminController adminController = new KafkaAdminController();
 	private AdminAdapter adminAdapter = null;
 	private StringJSONMapper mapper = new StringJSONMapper();
+	private FileReader fileReader = new FileReader();
 	
 	@Autowired
 	LogRESTController logController;
@@ -61,8 +71,28 @@ public class MgmtController {
 	@Autowired
 	SolutionRESTController solutionController;
 	
+	@Autowired
+	GatewayRESTController gatewayController;
+	
+	@Autowired
+	SolutionRepository solutionRepo;
+	
+	@Autowired
+	GatewayRepository gatewayRepo;
+	
+	@Autowired
+	TopicRepository topicRepo;
+	
+	@Autowired
+	StandardRepository standardRepo;
+	
 	private Boolean initDone = false;
 	private Boolean startDone = false;
+	
+	private String solConfigJson = "config/solutions.json";
+	private String topicConfigJson = "config/topics.json";
+	private String gwConfigJson = "config/gateways.json";
+	private String stConfigJson = "config/standards.json";
 	
 	public MgmtController() {
 
@@ -80,6 +110,10 @@ public class MgmtController {
 		Boolean send = true;
 		
 		try {
+			loadSolutions();
+			loadTopics();
+			loadGateways();
+			loadStandards();
 			createAllCoreTopics();
 			adminAdapter = AdminAdapter.getInstance();
 			adminAdapter.addCallback(solutionController, TopicConstants.HEARTBEAT_TOPIC);
@@ -144,6 +178,39 @@ public class MgmtController {
 		
 		log.info("isTrialStarted -->");
 	    return new ResponseEntity<Boolean>(startDone, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "resetTestbed", nickname = "resetTestbed")
+	@RequestMapping(value = "/AdminService/resetTestbed", method = RequestMethod.GET )
+	@ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Success", response = Boolean.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Boolean.class),
+            @ApiResponse(code = 500, message = "Failure", response = Boolean.class)})
+	public ResponseEntity<Boolean> resetTestbed() {
+		log.info("--> resetTestbed");
+		Boolean resetDone = false;
+		
+		this.initDone = false;
+		this.startDone = false;
+		
+		Boolean topicsRemoved = topicController.removeAllTopics();
+		Boolean solutionsRemoved = solutionController.removeAllSolutions();
+		Boolean gatewaysRemoved = gatewayController.removeAllGateways();
+		Boolean logsRemoved = logController.removeAllLogs();
+		
+		if (topicsRemoved && solutionsRemoved && gatewaysRemoved && logsRemoved) {
+			loadSolutions();
+			loadTopics();
+			loadGateways();
+			loadStandards();
+			resetDone = true;
+			logController.addLog(LogLevels.LOG_LEVEL_INFO, "The Testbed was re-initialized successful!", true);
+		} else {
+			logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The Testbed wasn't re-initialized successful!", true);
+		}
+		
+		log.info("resetTestbed -->");
+	    return new ResponseEntity<Boolean>(resetDone, HttpStatus.OK);
 	}
 	
 	private void createAllCoreTopics() throws Exception {
@@ -342,6 +409,162 @@ public class MgmtController {
 		WSController.getInstance().sendMessage(
 				mapper.objectToJSONString(notifyMsg));
 	}
+	
+	private void loadSolutions() {
+		log.info("--> loadSolutions");
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Initializing Testbed Services/Solutions!", true);
+		String solutionJson = fileReader.readFile(this.solConfigJson);
+		if (solutionJson != null) {
+			try {
+				JSONArray jsonarray = new JSONArray(solutionJson);
+				for (int i = 0; i < jsonarray.length(); i++) {
+					JSONObject jsonobject;
+					Solution solution = new Solution();
+					jsonobject = jsonarray.getJSONObject(i);
+
+					solution.setClientId(jsonobject.getString("id"));
+					solution.setName(jsonobject.getString("name"));
+					solution.setIsAdmin(jsonobject.getBoolean("isTestbed"));
+					solution.setIsService(jsonobject.getBoolean("isService"));
+					if (solution.getClientId().equalsIgnoreCase("TB-AdminTool")) {
+						solution.setState(true);
+					} else {
+						solution.setState(jsonobject.getBoolean("state"));
+					}
+					solution.setDescription(jsonobject.getString("description"));
+					
+					if (this.solutionRepo.findObjectByClientId(solution.getClientId()) == null) {
+						this.solutionRepo.saveAndFlush(solution);
+						log.info("add solution: " + solution.getName());
+					}
+				}
+			} catch (JSONException e) {
+				log.error("Error parsind the JSON solution response", e);
+			}
+		}
+		log.info("loadSolutions -->");
+	}
+	
+	private void loadTopics() {
+		log.info("--> loadTopics");
+		try {
+			String topicJson = fileReader.readFile(this.topicConfigJson);
+			JSONArray jsonarray = new JSONArray(topicJson);
+			for (int i = 0; i < jsonarray.length(); i++) {
+				JSONObject jsonobject;
+				Topic topic = new Topic();
+				jsonobject = jsonarray.getJSONObject(i);
+
+				topic.setClientId(jsonobject.getString("id"));
+				topic.setType(jsonobject.getString("type"));
+				topic.setName(jsonobject.getString("name"));
+				
+				if (jsonobject.has("msgType")) {
+					topic.setMsgType(jsonobject.getString("msgType"));
+					topic.setMsgTypeVersion(jsonobject.getString("msgTypeVersion"));
+				}
+				topic.setState(jsonobject.getBoolean("state"));
+				topic.setDescription(jsonobject.getString("description"));
+
+				ArrayList<String> publisher = new ArrayList<String>();     
+				JSONArray jArray = jsonobject.getJSONArray("publishSolutionIDs");
+				if (jArray != null) { 
+				   for (int a=0;a<jArray.length();a++){ 
+					   publisher.add(jArray.getString(a));
+				   } 
+				} 
+				topic.setPublishSolutionIDs(publisher);
+				
+				ArrayList<String> subscriber = new ArrayList<String>();     
+				jArray = jsonobject.getJSONArray("subscribedSolutionIDs");
+				if (jArray != null) { 
+				   for (int a=0;a<jArray.length();a++){ 
+					   subscriber.add(jArray.getString(a));
+				   } 
+				} 
+				topic.setSubscribedSolutionIDs(subscriber);
+				
+				if (this.topicRepo.findObjectByClientId(topic.getClientId()) == null) {
+					this.topicRepo.saveAndFlush(topic);
+					log.info("add topic: " + topic.getName());
+				}
+			}
+		} catch (JSONException e) {
+			log.error("Error parsind the JSON topic response", e);
+		}
+		log.info("loadTopics -->");
+	}
+	
+	private void loadGateways() {
+		log.info("--> loadGateways");
+		String gatewayJson = fileReader.readFile(this.gwConfigJson);
+		if (gatewayJson != null) {
+			try {
+				JSONArray jsonarray = new JSONArray(gatewayJson);
+				for (int i = 0; i < jsonarray.length(); i++) {
+					JSONObject jsonobject;
+					Gateway gateway = new Gateway();
+					jsonobject = jsonarray.getJSONObject(i);
+
+					gateway.setClientId(jsonobject.getString("id"));
+					gateway.setName(jsonobject.getString("name"));
+					gateway.setState(jsonobject.getBoolean("state"));
+					gateway.setDescription(jsonobject.getString("description"));
+
+					ArrayList<String> mangTypes = new ArrayList<String>();     
+					JSONArray jArray = jsonobject.getJSONArray("managingTypes");
+					if (jArray != null) { 
+					   for (int a=0;a<jArray.length();a++){ 
+						   mangTypes.add(jArray.getString(a));
+					   } 
+					} 
+					gateway.setManagingType(mangTypes);
+					
+					if (this.gatewayRepo.findObjectByClientId(gateway.getClientId()) == null) {
+						this.gatewayRepo.saveAndFlush(gateway);
+						log.info("add gateway: " + gateway.getName());
+					}
+				}
+			} catch (JSONException e) {
+				log.error("Error parsind the JSON Gateway response", e);
+			}
+		}
+		log.info("loadGateways -->");
+	}
+	
+	private void loadStandards() {
+		log.info("--> loadStandards");
+		String standardJson = fileReader.readFile(this.stConfigJson);
+		if (standardJson != null) {
+			try {
+				JSONArray jsonarray = new JSONArray(standardJson);
+				for (int i = 0; i < jsonarray.length(); i++) {
+					JSONObject jsonobject;
+					Standard standard = new Standard();
+					jsonobject = jsonarray.getJSONObject(i);
+
+					standard.setName(jsonobject.getString("name"));
+
+					ArrayList<String> versions = new ArrayList<String>();     
+					JSONArray jArray = jsonobject.getJSONArray("versions");
+					if (jArray != null) { 
+					   for (int a=0;a<jArray.length();a++){ 
+						   versions.add(jArray.getString(a));
+					   } 
+					} 
+					standard.setVersions(versions);
+					
+					if (this.standardRepo.findObjectByName(standard.getName()) == null) {
+						this.standardRepo.saveAndFlush(standard);
+						log.info("add standard: " + standard.getName());
+					}
+				}
+			} catch (JSONException e) {
+				log.error("Error parsind the JSON Standard response", e);
+			}
+		}
+		log.info("loadStandards -->");
+	}
 
 	public LogRESTController getLogController() {
 		return logController;
@@ -365,5 +588,13 @@ public class MgmtController {
 
 	public void setSolutionController(SolutionRESTController solutionController) {
 		this.solutionController = solutionController;
+	}
+
+	public GatewayRESTController getGatewayController() {
+		return gatewayController;
+	}
+
+	public void setGatewayController(GatewayRESTController gatewayController) {
+		this.gatewayController = gatewayController;
 	}
 }

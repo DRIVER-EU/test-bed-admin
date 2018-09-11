@@ -9,6 +9,7 @@ import java.util.List;
 
 
 
+
 import javax.validation.ValidationException;
 
 import org.apache.avro.generic.IndexedRecord;
@@ -107,6 +108,18 @@ public class LogRESTController implements IAdaptorCallback {
 		if (sendNotification) {
 			sendWSNotification(dbLog);
 		}
+	}
+	
+	public Boolean removeAllLogs() {
+		log.debug("--> removeAllLogs");
+		try {
+			logRepo.deleteAll();
+		} catch (Exception e) {
+			log.error("Error removing all Logs!", e);
+			return false;
+		}
+		log.debug("removeAllLogs -->");
+		return true;
 	}
 	
 	private void sendWSNotification(Log dbLog) {

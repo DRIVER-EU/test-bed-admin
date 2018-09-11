@@ -130,6 +130,18 @@ public class GatewayRESTController {
 		log.debug("--> removeGateway");
 		return new ResponseEntity<String>("Gateway removed!", HttpStatus.OK);
 	}
+	
+	public Boolean removeAllGateways() {
+		log.debug("--> removeAllGateways");
+		try {
+			gwRepo.deleteAll();
+		} catch (Exception e) {
+			log.error("Error removing all Gateways!", e);
+			return false;
+		}
+		log.debug("removeAllGateways -->");
+		return true;
+	}
 
 	@ApiOperation(value = "getAllTrialGateways", nickname = "getAllTrialGateways")
 	@RequestMapping(value = "/AdminService/getAllTrialGateways", method = RequestMethod.GET)
