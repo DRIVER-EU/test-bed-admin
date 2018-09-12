@@ -15,15 +15,18 @@ import ConfigureTopicForm from './components/configurationForms/ConfigureTopicFo
 import ConfigureGatewayForm from './components/configurationForms/ConfigureGatewayForm'
 
 export const eventBus = new Vue()
+const host = window.location.host
+const httpUrl = 'http://' + host + '/AdminService'
+const wsUrl = 'ws://'+ host + '/AdminServiceWSEndpoint'
 
 Vue.use(underscore)
 
 Vue.use(VueAxios, axios.create({
-  baseURL: 'http://localhost:8090/AdminService'
+  baseURL: httpUrl
 }))
 store.axios = Vue.prototype.axios
 
-Vue.use(VueNativeSock, 'ws://localhost:8090/AdminServiceWSEndpoint', {
+Vue.use(VueNativeSock, wsUrl, {
   store: store,
   format: 'json',
   reconnection: true, // (Boolean) whether to reconnect automatically (false)
