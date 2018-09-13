@@ -272,7 +272,7 @@ public class MgmtController {
 			} else if (topic.getMsgType().equalsIgnoreCase("geojson")) {
 				schema = new FeatureCollection();
 			} else if (topic.getMsgType().equalsIgnoreCase("geojson-sim")) {
-				schema = new FeatureCollection();
+				schema = new eu.driver.model.geojson.sim.FeatureCollection();
 			} else if (topic.getMsgType().equalsIgnoreCase("mlp")) {
 				schema = new SlRep();
 			} else if (topic.getMsgType().equalsIgnoreCase("emsi")) {
