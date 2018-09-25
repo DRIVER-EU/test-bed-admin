@@ -8,7 +8,6 @@
       <v-btn :disabled="!isTestbedInitialized || isTrialStarted" v-on:click="startTrial">Start trial</v-btn>
     </v-toolbar>
     <main>
-      <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
       <router-view></router-view>
     </main>
   </v-app>

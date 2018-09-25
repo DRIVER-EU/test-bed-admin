@@ -100,18 +100,20 @@
     computed: {
       ...mapGetters(['solutions', 'topics', 'gateways']),
       solutionsToShow: function () {
-        return this.solutions.filter((solution) => {
+        let self = this
+        return self.solutions.filter((solution) => {
           let showSolution = true
-          if ((this.solutionSelection === "Solutions" && solution.isService) || (this.solutionSelection === "Testbed services" && !solution.isService)) {
+          if ((self.solutionSelection === "Solutions" && solution.isService) || (self.solutionSelection === "Testbed services" && !solution.isService)) {
             showSolution = false
           }
           return showSolution
         })
       },
       topicsToShow: function () {
-        return this.topics.filter((topic) => {
+        let self = this
+        return self.topics.filter((topic) => {
           let showTopic = true
-          if ((this.topicSelection === "Standard topics" && topic.type.indexOf("core") != -1) || (this.solutionSelection === "Core topics" && topic.type.indexOf("standard") != -1)) {
+          if ((self.topicSelection === "Standard topics" && topic.type.indexOf("core") !== -1) || (self.topicSelection === "Core topics" && topic.type.indexOf("standard") !== -1)) {
             showTopic = false
           }
           return showTopic
@@ -119,7 +121,7 @@
       },
       overallSolutionState: function () {
         let solutionsStates = 0
-        this.solutions.forEach(solution => {
+       this.solutions.forEach(solution => {
           if (solution.state) solutionsStates++
         })
         switch (solutionsStates) {
