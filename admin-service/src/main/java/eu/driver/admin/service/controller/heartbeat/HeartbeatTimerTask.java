@@ -36,6 +36,8 @@ public class HeartbeatTimerTask extends TimerTask {
 					log.debug("No HB revceived from solution: " + solution.getName());
 					this.solutionController.updateSolutionState(solution.getClientId(), solution.getLastHeartBeatReceived(), false);
 				}	
+			} else {
+				this.solutionController.updateSolutionState(solution.getClientId(), solution.getLastHeartBeatReceived(), true);
 			}
 		}
 		log.debug("HeartbeatTimerTask -- run end");
