@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="open" max-width="700px" persistent>
     <v-card>
-      <v-card-title class="primary--text">Configure topic
+      <v-card-title class="primary--text">Configure gateway
       </v-card-title>
       <v-card-text>
         <v-form ref="form" lazy-validation v-model="valid">
