@@ -53,6 +53,7 @@ public class AdminServiceApplication {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		System.setProperty("javax.net.ssl.trustStore", "config/cert/truststore.jks");
 		SpringApplication.run(AdminServiceApplication.class, args);
     }
 	

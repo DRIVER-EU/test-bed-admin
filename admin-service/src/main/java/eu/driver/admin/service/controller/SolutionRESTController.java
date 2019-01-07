@@ -82,7 +82,7 @@ public class SolutionRESTController implements IAdaptorCallback {
 		try {
 			Solution solution = this.solutionRepo.findObjectByClientId(clientID);
 			if (solution != null) {
-				solution.setLastHeartBeatReceived(isAliveDate);
+				solution.setLastHeartBeatReceived(new Date());
 				
 				if (solution.getState() != state) {
 					solution.setState(state);

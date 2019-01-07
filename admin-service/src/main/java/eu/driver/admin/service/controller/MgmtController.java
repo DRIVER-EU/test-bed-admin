@@ -24,12 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.driver.adapter.constants.TopicConstants;
 import eu.driver.adapter.core.AdminAdapter;
 import eu.driver.adapter.excpetion.CommunicationException;
+import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.dto.gateway.Gateway;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.dto.standard.Standard;
 import eu.driver.admin.service.dto.topic.Topic;
 import eu.driver.admin.service.helper.FileReader;
+import eu.driver.admin.service.helper.HTTPUtils;
 import eu.driver.admin.service.kafka.KafkaAdminController;
 import eu.driver.admin.service.repository.GatewayRepository;
 import eu.driver.admin.service.repository.SolutionRepository;
@@ -61,6 +63,9 @@ public class MgmtController {
 	private AdminAdapter adminAdapter = null;
 	private StringJSONMapper mapper = new StringJSONMapper();
 	private FileReader fileReader = new FileReader();
+	private ClientProperties clientProp = ClientProperties.getInstance();
+	
+	private HTTPUtils httpUtils = new HTTPUtils();
 	
 	@Autowired
 	LogRESTController logController;
@@ -88,6 +93,7 @@ public class MgmtController {
 	
 	private Boolean initDone = false;
 	private Boolean startDone = false;
+	private Boolean secureMode = false;
 	
 	private String solConfigJson = "config/solutions.json";
 	private String topicConfigJson = "config/topics.json";
@@ -108,6 +114,7 @@ public class MgmtController {
 	public ResponseEntity<Boolean> initTestbed() {
 		log.info("--> initTestbed");
 		Boolean send = true;
+		secureMode = Boolean.parseBoolean(clientProp.getProperty("testbed.secure.mode", "FALSE")); 
 		
 		try {
 			loadSolutions();
@@ -144,7 +151,6 @@ public class MgmtController {
 		
 		try {
 			createTrialTopics();
-			startDone = true;
 		} catch (Exception e) {
 			log.error("Error creating the Trial Topics!", e);
 			return new ResponseEntity<Boolean>(false, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -390,7 +396,16 @@ public class MgmtController {
 				for (TopicInvite inviteMsg : inviteMsgs) {
 					try {
 						logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg, true);
-						AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
+						// grant the access to the topics vie the Security REST API
+						boolean sendInvite = true;
+						// check if adapter is in secure mode
+						if (secureMode) {
+							sendInvite = grantTopicAccess(inviteMsg);
+						}
+						
+						if (sendInvite) {
+							AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
+						}
 					} catch (CommunicationException cEx) {
 						logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString(), true);
 					}
@@ -564,6 +579,59 @@ public class MgmtController {
 			}
 		}
 		log.info("loadStandards -->");
+	}
+	
+	private boolean grantTopicAccess(TopicInvite inviteMessage) {
+		log.info("--> grantTopicAccess");
+		boolean granted = false;
+		
+		String clientID = inviteMessage.getId().toString();
+		String topicName = inviteMessage.getTopicName().toString();
+		boolean publishAllowed = inviteMessage.getPublishAllowed();
+		boolean subscribeAllowed = inviteMessage.getSubscribeAllowed();
+		
+		JSONObject rulesObject = new JSONObject();
+		
+		try {
+			
+			JSONObject permissionsObject = new JSONObject();
+			
+			JSONObject publishObject = new JSONObject();
+			publishObject.put("allow", publishAllowed);
+			publishObject.put("action", "PUBLISH");
+			
+			JSONObject subsribeObject = new JSONObject();
+			subsribeObject.put("allow", subscribeAllowed);
+			subsribeObject.put("action", "SUBSCRIBE");
+			
+			JSONArray permissions = new JSONArray();
+			permissions.put(publishObject);
+			permissions.put(subsribeObject);
+			
+			permissionsObject.put("permissions", permissions);
+			permissionsObject.put("subject", clientID);
+			
+			JSONArray rules = new JSONArray();
+			rules.put(permissionsObject);
+			
+			rulesObject.put("rules", rules);
+			
+		} catch (JSONException jEx) {
+			log.error("Error creating the JSON access grant structure!");
+		}
+		
+		String url = clientProp.getProperty("testbed.admin.security.rest.path");
+		url += topicName;
+		
+		try {
+			httpUtils.postHTTPRequest(url, "PUT", "application/json", rulesObject.toString());
+			granted = true;
+		} catch (CommunicationException cex) {
+			log.error("Error grantig the access: " + cex.getMessage());
+		}
+		
+		log.info("grantTopicAccess -->");
+		return granted;
 	}
 
 	public LogRESTController getLogController() {
