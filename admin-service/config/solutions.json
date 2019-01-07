@@ -1,6 +1,7 @@
 [
 	{
 		"id":"TB-AdminTool",
+		"subject.id":"Admin Tool",
  		"name":"AdminTool",
  		"isTestbed":true,
  		"isService":true,
@@ -8,6 +9,7 @@
  		"description":"This is the AdminTool"
 	},{
 		"id":"TB-AARTool",
+		"subject.id":"AAR Tool",
  		"name":"AARTool",
  		"isTestbed":false,
  		"isService":true,
@@ -15,6 +17,7 @@
  		"description":"This is the AfterActionReview Tool"
 	},{
 		"id":"TB-TrialMgmt",
+		"subject.id":"Trial Mgmt",
  		"name":"TrialManager",
  		"isTestbed":false,
  		"isService":true,
@@ -22,6 +25,7 @@
  		"description":"This is the Trial Manager"
 	},{
 		"id":"TB-TimeService",
+		"subject.id":"Time Service",
  		"name":"TimeService",
  		"isTestbed":false,
  		"isService":true,

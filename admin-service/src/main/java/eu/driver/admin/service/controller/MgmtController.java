@@ -221,10 +221,13 @@ public class MgmtController {
 	
 	private void createAllCoreTopics() throws Exception {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!", true);
+		
 		adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.ADMIN_HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.admin.hb", true);
+		
+		// grantGroupAccess for all clients/solutions
 		
 		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + " created.", true);
@@ -438,6 +441,7 @@ public class MgmtController {
 					jsonobject = jsonarray.getJSONObject(i);
 
 					solution.setClientId(jsonobject.getString("id"));
+					solution.setSubjectId(jsonobject.getString("subject.id"));
 					solution.setName(jsonobject.getString("name"));
 					solution.setIsAdmin(jsonobject.getBoolean("isTestbed"));
 					solution.setIsService(jsonobject.getBoolean("isService"));
@@ -581,11 +585,94 @@ public class MgmtController {
 		log.info("loadStandards -->");
 	}
 	
+	private boolean grantGroupAccess(String clientID, String topicName) {
+		log.info("--> grantGroupAccess");
+		boolean granted = false;
+		String subjectID = this.getSubjectIdForClientId(clientID);
+		JSONObject rulesObject = new JSONObject();
+		
+		try {
+			
+			JSONObject permissionsObject = new JSONObject();
+			
+			JSONObject publishObject = new JSONObject();
+			publishObject.put("allow", true);
+			publishObject.put("action", "READ");
+			
+			JSONArray permissions = new JSONArray();
+			permissions.put(publishObject);
+			
+			permissionsObject.put("permissions", permissions);
+			permissionsObject.put("subject.id", subjectID);
+			
+			JSONArray rules = new JSONArray();
+			rules.put(permissionsObject);
+			
+			rulesObject.put("rules", rules);
+			
+		} catch (JSONException jEx) {
+			log.error("Error creating the JSON access grant structure!");
+			return false;
+		}
+		
+		String url = clientProp.getProperty("testbed.admin.security.rest.path.group");
+		url += clientID;
+		
+		try {
+			httpUtils.postHTTPRequest(url, "PUT", "application/json", rulesObject.toString());
+			granted = true;
+		} catch (CommunicationException cex) {
+			log.error("Error grantig the access: " + cex.getMessage());
+			return false;
+		}
+		
+		if (granted) {
+			rulesObject = new JSONObject();
+			
+			try {
+				
+				JSONObject permissionsObject = new JSONObject();
+				
+				JSONObject publishObject = new JSONObject();
+				publishObject.put("allow", true);
+				publishObject.put("action", "READ");
+				
+				JSONArray permissions = new JSONArray();
+				permissions.put(publishObject);
+				
+				permissionsObject.put("permissions", permissions);
+				permissionsObject.put("subject.group", clientID);
+				
+				JSONArray rules = new JSONArray();
+				rules.put(permissionsObject);
+				
+				rulesObject.put("rules", rules);
+				
+			} catch (JSONException jEx) {
+				log.error("Error creating the JSON access grant structure!");
+			}
+			
+			url = clientProp.getProperty("testbed.admin.security.rest.path.topic");
+			url += topicName;
+			
+			try {
+				httpUtils.postHTTPRequest(url, "PUT", "application/json", rulesObject.toString());
+				granted = true;
+			} catch (CommunicationException cex) {
+				log.error("Error grantig the access: " + cex.getMessage());
+			}
+		}
+		
+		log.info("grantGroupAccess -->");
+		return granted;
+	}
+	
 	private boolean grantTopicAccess(TopicInvite inviteMessage) {
 		log.info("--> grantTopicAccess");
 		boolean granted = false;
 		
 		String clientID = inviteMessage.getId().toString();
+		String subjectID = this.getSubjectIdForClientId(clientID);
 		String topicName = inviteMessage.getTopicName().toString();
 		boolean publishAllowed = inviteMessage.getPublishAllowed();
 		boolean subscribeAllowed = inviteMessage.getSubscribeAllowed();
@@ -609,7 +696,7 @@ public class MgmtController {
 			permissions.put(subsribeObject);
 			
 			permissionsObject.put("permissions", permissions);
-			permissionsObject.put("subject", clientID);
+			permissionsObject.put("subject.id", subjectID);
 			
 			JSONArray rules = new JSONArray();
 			rules.put(permissionsObject);
@@ -620,18 +707,36 @@ public class MgmtController {
 			log.error("Error creating the JSON access grant structure!");
 		}
 		
-		String url = clientProp.getProperty("testbed.admin.security.rest.path");
+		String url = clientProp.getProperty("testbed.admin.security.rest.path.topic");
 		url += topicName;
 		
 		try {
 			httpUtils.postHTTPRequest(url, "PUT", "application/json", rulesObject.toString());
 			granted = true;
+			
+			if (subscribeAllowed) {
+				granted = this.grantGroupAccess(clientID, topicName);	
+			}
 		} catch (CommunicationException cex) {
 			log.error("Error grantig the access: " + cex.getMessage());
+			granted = false;
 		}
 		
 		log.info("grantTopicAccess -->");
 		return granted;
+	}
+	
+	private String getSubjectIdForClientId(String clientId) {
+		log.info("--> getSubjectIdForClientId");
+		String subjectId = null;
+		
+		Solution solution = this.solutionRepo.findObjectByClientId(clientId);
+		if (solution != null) {
+			subjectId = solution.getSubjectId();
+		}
+		
+		log.info("getSubjectIdForClientId -->");
+		return subjectId;
 	}
 
 	public LogRESTController getLogController() {
