@@ -1,7 +1,7 @@
 [
 	{
 		"id":"TB-AdminTool",
-		"subject.id":"Admin Tool",
+		"subject.id":"CN=Admin Tool,OU=Authz Service Dev Project,OU=WP923,O=DRIVER-PROJECT.EU",
  		"name":"AdminTool",
  		"isTestbed":true,
  		"isService":true,
@@ -9,7 +9,7 @@
  		"description":"This is the AdminTool"
 	},{
 		"id":"TB-AARTool",
-		"subject.id":"AAR Tool",
+		"subject.id":"O=DRIVER-PROJECT.EU,CN=AARTool",
  		"name":"AARTool",
  		"isTestbed":false,
  		"isService":true,
@@ -17,7 +17,7 @@
  		"description":"This is the AfterActionReview Tool"
 	},{
 		"id":"TB-TrialMgmt",
-		"subject.id":"Trial Mgmt",
+		"subject.id":"O=DRIVER-PROJECT.EU,CN=TrialMgmt",
  		"name":"TrialManager",
  		"isTestbed":false,
  		"isService":true,
@@ -25,11 +25,27 @@
  		"description":"This is the Trial Manager"
 	},{
 		"id":"TB-TimeService",
-		"subject.id":"Time Service",
+		"subject.id":"O=DRIVER-PROJECT.EU,CN=TimeService",
  		"name":"TimeService",
  		"isTestbed":false,
  		"isService":true,
  		"state":false,
  		"description":"This is the Testbed TimeService"
+	},{
+		"id":"TB-Ost",
+		"subject.id":"O=DRIVER-PROJECT.EU,CN=Ost",
+ 		"name":"ObserverTool",
+ 		"isTestbed":false,
+ 		"isService":true,
+ 		"state":false,
+ 		"description":"This is the Testbed ObserverTool"
+	},{
+		"id":"test_new",
+		"subject.id":"O=test org,CN=test_new",
+ 		"name":"ExampleApplication",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"This is an example App!"
 	}
 ]

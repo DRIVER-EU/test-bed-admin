@@ -1,6 +1,8 @@
 package eu.driver.admin.service.helper;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.KeyStore;
 
@@ -8,44 +10,33 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import eu.driver.adapter.excpetion.CommunicationException;
-import eu.driver.adapter.properties.ClientProperties;
 
-public class HTTPUtils {
+public class CertHTTPUtils {
 
 	private Logger log = Logger.getLogger(this.getClass());
 	private SSLContext sc = null;
 	
-	private ClientProperties clientProp = ClientProperties.getInstance();
-	
-	private String username = "admin";
-	private String password = "admin";
-	private String certFilePassword = "changeit";
-	
-	public HTTPUtils() {
-		
-		username = clientProp.getProperty("http.username", "admin");
-		password = clientProp.getProperty("http.password", "admin");
-		
-		certFilePassword = clientProp.getProperty("cert.file.password", "changeit");
-		
+	public CertHTTPUtils(String superUserPwd) {
+		log.info("--> CertHTTPUtils");
 		try {
 			KeyStore ks = KeyStore.getInstance("PKCS12");
-			FileInputStream fis = new FileInputStream(clientProp.getProperty("cert.file.path", "config/cert/admin-tool-client.p12"));
-			ks.load(fis, certFilePassword.toCharArray());
+			FileInputStream fis = new FileInputStream("config/cert/superadmin.p12");
+			ks.load(fis, superUserPwd.toCharArray());
 			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-			kmf.init(ks, certFilePassword.toCharArray());
+			kmf.init(ks, superUserPwd.toCharArray());
 			sc = SSLContext.getInstance("TLS");
 			sc.init(kmf.getKeyManagers(), null, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		log.info("CertHTTPUtils -->");
 	}
 	
 	public String postHTTPRequest(String url, String requestMethod, String contentType, String msgParam) throws CommunicationException {
+		log.info("--> postHTTPRequest");
 		String response = null;
 		log.info("url: " + url);
 		log.info("data: " + msgParam);
@@ -61,17 +52,6 @@ public class HTTPUtils {
 			connection.setRequestProperty("Accept", contentType);
 			connection.setRequestProperty( "Encoding", "UTF-8");
 			
-			String authorization = null;
-			
-			if (username != null && password != null) {
-	            authorization = username + ":" + password;
-	        }
-			
-			if (authorization != null) {
-	            String base64Authorization = "BASIC " + new String(Base64.encodeBase64(authorization.getBytes()));
-	            connection.setRequestProperty("Authorization", base64Authorization);
-	        }
-			
 			if (msgParam != null) {
 				String param = msgParam;
 				byte[] postDataBytes = param.getBytes("UTF-8");
@@ -85,19 +65,26 @@ public class HTTPUtils {
 			log.info("ResponeCode: " + code + ", " + connection.getResponseMessage());
 			if (code == 200 || code == 201 || code == 204) {
 				log.info("The message was distributed successfully!");
-				response = "The message was distributed successfully!";
+				BufferedReader br = new BufferedReader(new InputStreamReader((connection.getInputStream())));
+				StringBuilder sb = new StringBuilder();
+				String output;
+				while ((output = br.readLine()) != null) {
+				  sb.append(output);
+				}
+				response = sb.toString();
 			} else {
 				log.error("Error distributing the Message to: " + url);
 				throw new CommunicationException("Error distributing the message!");
 			}
 		} catch (CommunicationException ce) {
-			ce.printStackTrace();
+			log.error("Error distributing the Message to: " + url, ce);
 			throw ce;
 		} catch (Exception e) {
 			log.error("Error distributing the Message to: " + url, e);
 			throw new CommunicationException("Error distributing the message!", e);
 		}
 		
+		log.info("postHTTPRequest -->");
 		return response;
 		
 	}

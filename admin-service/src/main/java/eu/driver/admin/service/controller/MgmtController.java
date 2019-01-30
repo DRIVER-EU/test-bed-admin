@@ -45,6 +45,8 @@ import eu.driver.model.core.AdminHeartbeat;
 import eu.driver.model.core.Heartbeat;
 import eu.driver.model.core.LargeDataUpdate;
 import eu.driver.model.core.MapLayerUpdate;
+import eu.driver.model.core.ObserverToolAnswer;
+import eu.driver.model.core.RequestChangeOfTrialStage;
 import eu.driver.model.core.Timing;
 import eu.driver.model.core.TimingControl;
 import eu.driver.model.edxl.EDXLDistribution;
@@ -101,7 +103,23 @@ public class MgmtController {
 	private String stConfigJson = "config/standards.json";
 	
 	public MgmtController() {
-
+		secureMode = Boolean.parseBoolean(clientProp.getProperty("testbed.secure.mode", "FALSE")); 
+	}
+	
+	public void loadInitData() {
+		log.info("--> loadInitData");
+		
+		try {
+			loadSolutions();
+			loadTopics();
+			loadGateways();
+			loadStandards();
+		} catch (Exception e) {
+			log.error("Error initializing the AdminTool Database!", e);
+			logController.addLog(LogLevels.LOG_LEVEL_SEVER, "The Testbed wasn't initialized successful: " + e.getMessage(), true);
+		}
+		
+		log.info("loadInitData -->");
 	}
 	
 	@SuppressWarnings("static-access")
@@ -114,13 +132,12 @@ public class MgmtController {
 	public ResponseEntity<Boolean> initTestbed() {
 		log.info("--> initTestbed");
 		Boolean send = true;
-		secureMode = Boolean.parseBoolean(clientProp.getProperty("testbed.secure.mode", "FALSE")); 
 		
 		try {
-			loadSolutions();
+			/*loadSolutions();
 			loadTopics();
 			loadGateways();
-			loadStandards();
+			loadStandards();*/
 			createAllCoreTopics();
 			adminAdapter = AdminAdapter.getInstance();
 			adminAdapter.addCallback(solutionController, TopicConstants.HEARTBEAT_TOPIC);
@@ -147,7 +164,7 @@ public class MgmtController {
 	public ResponseEntity<Boolean> startTrialConfig() {
 		log.info("--> startTrialConfig");
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Trial start called!", true);
-		Boolean send = true;
+		Boolean send = false;
 		
 		try {
 			createTrialTopics();
@@ -226,43 +243,81 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.ADMIN_HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.admin.hb", true);
-		
-		// grantGroupAccess for all clients/solutions
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.ADMIN_HEARTBEAT_TOPIC);
+		}
 		
 		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.hb", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.HEARTBEAT_TOPIC);
+		}
 		
 		adminController.createTopic(TopicConstants.LOGGING_TOPIC, new EDXLDistribution(), new Log());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LOGGING_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.LOGGING_TOPIC, true);
 		sendTopicStateChange("core.topic.log", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.LOGGING_TOPIC);
+		}
 		
 		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TIMING_TOPIC, true);
 		sendTopicStateChange("core.topic.time", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.TIMING_TOPIC);
+		}
 		
 		adminController.createTopic(TopicConstants.TIMING_CONTROL_TOPIC, new EDXLDistribution(), new TimingControl());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_CONTROL_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TIMING_CONTROL_TOPIC, true);
 		sendTopicStateChange("core.topic.time.control", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.TIMING_CONTROL_TOPIC);
+		}
 		
 		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_INVITE_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TOPIC_INVITE_TOPIC, true);
 		sendTopicStateChange("core.topic.access.invite", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_INVITE_TOPIC);
+		}
 		
 		adminController.createTopic(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, new EDXLDistribution(), new TopicCreate());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, true);
 		sendTopicStateChange("core.topic.create.request", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC);
+		}
 		
 		adminController.createTopic(TopicConstants.LARGE_DATA_UPDTAE, new EDXLDistribution(), new LargeDataUpdate());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LARGE_DATA_UPDTAE + " created.", true);
 		topicController.updateTopicState(TopicConstants.LARGE_DATA_UPDTAE, true);
 		sendTopicStateChange("core.topic.large.data", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.LARGE_DATA_UPDTAE);
+		}
+		
+		adminController.createTopic(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, new EDXLDistribution(), new RequestChangeOfTrialStage());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TRIAL_STATE_CHANGE_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, true);
+		sendTopicStateChange("core.topic.trial.stage.change", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.TRIAL_STATE_CHANGE_TOPIC);
+		}
+		
+		adminController.createTopic(TopicConstants.OST_ANSWER_TOPIC, new EDXLDistribution(), new ObserverToolAnswer());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.OST_ANSWER_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.OST_ANSWER_TOPIC, true);
+		sendTopicStateChange("core.topic.ost.answer", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.OST_ANSWER_TOPIC);
+		}
 		
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!", true);
 	}
@@ -339,7 +394,7 @@ public class MgmtController {
 							inviteMsg.setTopicName(topic.getName());
 							inviteMsg.setPublishAllowed(true);
 							
-							// find the client ID in the list of subribers
+							// find the client ID in the list of subscribers
 							for (String clientID : subscribeClientIDs) {
 								if (clientID.equalsIgnoreCase(solution.getClientId())) {
 									inviteMsg.setSubscribeAllowed(true);
@@ -357,7 +412,7 @@ public class MgmtController {
 							inviteMsg.setId(solution.getClientId());
 							inviteMsg.setTopicName(topic.getName());
 							inviteMsg.setSubscribeAllowed(true);
-							// find the client ID in the list of subribers
+							// find the client ID in the list of subscribers
 							for (String clientID : publishClientIDs) {
 								if (clientID.equalsIgnoreCase(solution.getClientId())) {
 									inviteMsg.setPublishAllowed(true);
@@ -585,10 +640,12 @@ public class MgmtController {
 		log.info("loadStandards -->");
 	}
 	
-	private boolean grantGroupAccess(String clientID, String topicName) {
+	private boolean grantGroupAccess(String clientID, String subjectID, String topicName) {
 		log.info("--> grantGroupAccess");
 		boolean granted = false;
-		String subjectID = this.getSubjectIdForClientId(clientID);
+		if (subjectID == null) {
+			subjectID = this.getSubjectIdForClientId(clientID);	
+		}
 		JSONObject rulesObject = new JSONObject();
 		
 		try {
@@ -599,8 +656,13 @@ public class MgmtController {
 			publishObject.put("allow", true);
 			publishObject.put("action", "READ");
 			
+			JSONObject describeObject = new JSONObject();
+			describeObject.put("allow", true);
+			describeObject.put("action", "DESCRIBE");
+			
 			JSONArray permissions = new JSONArray();
 			permissions.put(publishObject);
+			permissions.put(describeObject);
 			
 			permissionsObject.put("permissions", permissions);
 			permissionsObject.put("subject.id", subjectID);
@@ -637,8 +699,13 @@ public class MgmtController {
 				publishObject.put("allow", true);
 				publishObject.put("action", "READ");
 				
+				JSONObject describeObject = new JSONObject();
+				describeObject.put("allow", true);
+				describeObject.put("action", "DESCRIBE");
+				
 				JSONArray permissions = new JSONArray();
 				permissions.put(publishObject);
+				permissions.put(describeObject);
 				
 				permissionsObject.put("permissions", permissions);
 				permissionsObject.put("subject.group", clientID);
@@ -715,7 +782,7 @@ public class MgmtController {
 			granted = true;
 			
 			if (subscribeAllowed) {
-				granted = this.grantGroupAccess(clientID, topicName);	
+				granted = this.grantGroupAccess(clientID, null, topicName);	
 			}
 		} catch (CommunicationException cex) {
 			log.error("Error grantig the access: " + cex.getMessage());
@@ -737,6 +804,18 @@ public class MgmtController {
 		
 		log.info("getSubjectIdForClientId -->");
 		return subjectId;
+	}
+	
+	private void grantCoreTopicGroupAccess(String topicName) {
+		log.info("--> grantCoreTopicGroupAccess");
+		
+		List<Solution> solutions = this.solutionController.getSolutionList();
+		
+		for (Solution solution : solutions) {
+			this.grantGroupAccess(solution.getClientId(), solution.getSubjectId(), topicName);
+		}
+		
+		log.info("grantCoreTopicGroupAccess -->");
 	}
 
 	public LogRESTController getLogController() {

@@ -4,7 +4,7 @@
 		"type":"core.topic",
  		"name":"system_admin_heartbeat",
  		"state": false,
- 		"publishSolutionIDs":["testbed_admin"],
+ 		"publishSolutionIDs":["TB-AdminTool"],
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the topic where the admin tool publishes his heartbeat, indicating that the admin tool is up."
 	},{
@@ -13,7 +13,7 @@
  		"name":"system_heartbeat",
  		"state": false,
  		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["testbed_admin"],
+ 		"subscribedSolutionIDs": ["TB-AdminTool"],
  		"description":"This is the topic where every solution published the heartbeat indicating that the solution is up and alive."
 	},{
 		"id":"core.topic.log",
@@ -21,14 +21,14 @@
  		"name":"system_logging",
  		"state": false,
  		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["testbed_admin"],
+ 		"subscribedSolutionIDs": ["TB-AdminTool"],
  		"description":"This is the topic where every solution published the logs to be stored in the admin tool log table."
 	},{
 		"id":"core.topic.access.invite",
 		"type":"core.topic",
  		"name":"system_topic_access_invite",
  		"state": false,
- 		"publishSolutionIDs":["testbed_admin"],
+ 		"publishSolutionIDs":["TB-AdminTool"],
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the topic where every solution gets his information to which topics he is invited to join."
 	},{
@@ -37,14 +37,14 @@
  		"name":"system_topic_create_request",
  		"state": false,
  		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["testbed_admin"],
+ 		"subscribedSolutionIDs": ["TB-AdminTool"],
  		"description":"This is the topic where every solution can request topic creation and sending invite message."
 	},{
 		"id":"core.topic.time",
 		"type":"core.topic",
  		"name":"system_timing",
  		"state": false,
- 		"publishSolutionIDs":["testbed_time"],
+ 		"publishSolutionIDs":["TB-TimeService"],
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the topic where every solution gets the actual testbed time."
 	},{
@@ -52,8 +52,24 @@
 		"type":"core.topic",
  		"name":"system_timing_control",
  		"state": false,
- 		"publishSolutionIDs":["testbed_time"],
+ 		"publishSolutionIDs":["TB-TimeService"],
  		"subscribedSolutionIDs": ["all"],
+ 		"description":"This is the topic where every solution gets the actual testbed trial time control."
+	},{
+		"id":"core.topic.ost.answer",
+		"type":"core.topic",
+ 		"name":"system_observer_tool_answer",
+ 		"state": false,
+ 		"publishSolutionIDs":["TB-Ost"],
+ 		"subscribedSolutionIDs": ["TB-AARTool"],
+ 		"description":"This is the topic where the OST sends the Observer answers to the AAR."
+	},{
+		"id":"core.topic.trial.stage.change",
+		"type":"core.topic",
+ 		"name":"system_request_change_of_trial_stage",
+ 		"state": false,
+ 		"publishSolutionIDs":["TB-TrialMgmt"],
+ 		"subscribedSolutionIDs": ["TB-Ost", "TB-AARTool"],
  		"description":"This is the topic where every solution gets the actual testbed trial time control."
 	},{
 		"id":"standart.topic.large.data",
@@ -99,7 +115,7 @@
 		"id":"standart.topic.geo.json.xvr",
 		"type":"standard.topic",
  		"name":"standard_geojson_xvr",
- 		"msgType": "geojson-xvr",
+ 		"msgType": "geojson",
  		"msgTypeVersion": "1.0",
  		"state": false,
  		"publishSolutionIDs":["all"],
