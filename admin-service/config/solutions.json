@@ -24,6 +24,14 @@
  		"state":false,
  		"description":"This is the Trial Manager"
 	},{
+		"id":"TB-TrialMgmtC2View",
+		"subject.id":"O=DRIVER-PROJECT.EU,CN=TrialMgmtC2View",
+ 		"name":"TrialManagerC2Viewer",
+ 		"isTestbed":false,
+ 		"isService":true,
+ 		"state":false,
+ 		"description":"This is the Trial Manager C2 Viewer"
+	},{
 		"id":"TB-TimeService",
 		"subject.id":"O=DRIVER-PROJECT.EU,CN=TimeService",
  		"name":"TimeService",
@@ -40,12 +48,76 @@
  		"state":false,
  		"description":"This is the Testbed ObserverTool"
 	},{
-		"id":"test_new",
-		"subject.id":"O=test org,CN=test_new",
- 		"name":"ExampleApplication",
+		"id":"sim-ci",
+		"subject.id":"O=SIM-CI,CN=SIM-CI",
+ 		"name":"SIM CI",
  		"isTestbed":false,
  		"isService":false,
  		"state":false,
- 		"description":"This is an example App!"
+ 		"description":"SIM CI application!"
+	},{
+		"id":"3di",
+		"subject.id":"O=Nelen & Schuurmans,CN=3Di",
+ 		"name":"3Di",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"3Di application!"
+	},{
+		"id":"crisis-suite",
+		"subject.id":"O=Merlin,CN=CrisisSuite",
+ 		"name":"CrisisSuite",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"CrisisSuite application!"
+	},{
+		"id":"zki",
+		"subject.id":"O=DLR,CN=ZKI",
+ 		"name":"ZKI",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"ZKI application!"
+	},{
+		"id":"keep-operational",
+		"subject.id":"O=DLR,CN=Keep Operational",
+ 		"name":"Keep Operational",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"Keep Operational application!"
+	},{
+		"id":"humlog-sim",
+		"subject.id":"O=WWU,CN=HumLog Sim",
+ 		"name":"HumLog Sim",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"HumLog Sim application!"
+	},{
+		"id":"lcms-plotter",
+		"subject.id":"O=IVF/TNO,CN=LCMS",
+ 		"name":"LCMS",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"LCMS Plotter application!"
+	},{
+		"id":"lcms-logger",
+		"subject.id":"O=IVF/TNO,CN=LCMS",
+ 		"name":"LCMS",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"LCMS Logger application!"
+	},{
+		"id":"geojson-wms-gateway",
+		"subject.id":"O=TNO,CN=GeoJSON-WMS",
+ 		"name":"GeoJSON-WMS converter",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"Test-bed GeoJSON-WMS converter (used by LCMS)!"
 	}
 ]
