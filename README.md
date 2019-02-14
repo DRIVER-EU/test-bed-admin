@@ -4,7 +4,7 @@
 Single Page Application to help you manage your personalized DRIVER+ test-bed and prepare the trial. It uses Apache Kafka as well as an Embedded Tomcat environment. The frontend is built with Vuejs.
 
 # Introduction
-The current version (v 0.0.1) of the Admin tool provides an overview of:
+The current version (v 1.2.2) of the Admin tool provides an overview of:
 * the solutions connected to the Testbed, including their availability
 * the available Kafka topics
 * the gateways for message exchange
@@ -61,6 +61,7 @@ they handle. e.g.:
 ### possible msgTypes:
 Corrently the AdminTool supports following msgTypes:
 * cap
+* emsi
 * mlp
 * geojson
 
