@@ -21,6 +21,7 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.annotation.PostConstruct;
@@ -77,6 +78,38 @@ public class AdminServiceApplication {
 	
 	public AdminServiceApplication() throws Exception {
 		log.info("Init. AdminServiceApplication");
+		secureMode = Boolean.parseBoolean(clientProp.getProperty("testbed.secure.mode", "FALSE"));
+		managementCAPath = clientProp.getProperty("management.ca.cert.path");
+		if (System.getenv().get("testbed_secure_mode") != null) {
+			secureMode = Boolean.parseBoolean(System.getenv().get("testbed_secure_mode"));
+		}
+		
+		Map<String, String> env = System.getenv();
+        for (String envName : env.keySet()) {
+        	if (envName.equalsIgnoreCase("zookeeper_host")) {
+        		log.info(envName + ": " + env.get(envName));
+        	} else if (envName.equalsIgnoreCase("zookeeper_port")) {
+        		log.info(envName + ": " + env.get(envName));
+        	} else if (envName.equalsIgnoreCase("schema_registry_url")) {
+        		log.info(envName + ": " + env.get(envName));
+        	} else if (envName.equalsIgnoreCase("testbed_secure_mode")) {
+        		log.info(envName + ": " + env.get(envName));
+        		secureMode = Boolean.parseBoolean(env.get(envName));
+        	} else if (envName.equalsIgnoreCase("testbed_init_auto")) {
+        		log.info(envName + ": " + env.get(envName));
+        	} else if (envName.equalsIgnoreCase("management_ca_cert_path")) {
+        		log.info(envName + ": " + env.get(envName));
+        		managementCAPath = managementCAPath.replace("http://localhost:9090", env.get(envName));
+        	} else if (envName.equalsIgnoreCase("cert_handler_url")) {
+        		log.info(envName + ": " + env.get(envName));
+        	} else if (envName.equalsIgnoreCase("cert_pem_handler_url")) {
+        		log.info(envName + ": " + env.get(envName));
+        	} else if (envName.equalsIgnoreCase("security_rest_path_group")) {
+        		log.info(envName + ": " + env.get(envName));
+        	} else if (envName.equalsIgnoreCase("security_rest_path_topic")) {
+        		log.info(envName + ": " + env.get(envName));
+        	}
+        }
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -86,8 +119,6 @@ public class AdminServiceApplication {
 	
 	@PostConstruct
 	public void init() {
-		secureMode = Boolean.parseBoolean(clientProp.getProperty("testbed.secure.mode", "FALSE"));
-		managementCAPath = clientProp.getProperty("management.ca.cert.path");
 		if (secureMode && managementCAPath != null) {
 			this.getManagementCA();
 			this.getAdminToolCertificate();
@@ -95,7 +126,11 @@ public class AdminServiceApplication {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "The AdminService is up!", true);
 		mgmtController.loadInitData();
 		
-		if(Boolean.parseBoolean(ClientProperties.getInstance().getProperty("init.auto"))) {
+		boolean initAuto = Boolean.parseBoolean(ClientProperties.getInstance().getProperty("init.auto"));
+		if (System.getenv().get("testbed_init_auto") != null) {
+			initAuto = Boolean.parseBoolean(System.getenv().get("testbed_init_auto"));
+		} 
+		if(initAuto) {
 			mgmtController.initTestbed();
 		}
 	}

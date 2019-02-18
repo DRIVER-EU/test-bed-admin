@@ -103,7 +103,11 @@ public class MgmtController {
 	private String stConfigJson = "config/standards.json";
 	
 	public MgmtController() {
-		secureMode = Boolean.parseBoolean(clientProp.getProperty("testbed.secure.mode", "FALSE")); 
+		if (System.getenv().get("testbed_secure_mode") != null) {
+			secureMode = Boolean.parseBoolean(System.getenv().get("testbed_secure_mode"));
+		} else {
+			secureMode = Boolean.parseBoolean(clientProp.getProperty("testbed.secure.mode", "FALSE")); 
+		}
 	}
 	
 	public void loadInitData() {
@@ -678,6 +682,9 @@ public class MgmtController {
 		}
 		
 		String url = clientProp.getProperty("testbed.admin.security.rest.path.group");
+		if (System.getenv().get("security_rest_path_group") != null) {
+			url = url.replace("https://localhost:9443", System.getenv().get("security_rest_path_group"));
+		}
 		url += clientID;
 		
 		try {
@@ -720,6 +727,9 @@ public class MgmtController {
 			}
 			
 			url = clientProp.getProperty("testbed.admin.security.rest.path.topic");
+			if (System.getenv().get("security_rest_path_topic") != null) {
+				url = url.replace("https://localhost:9443", System.getenv().get("security_rest_path_topics"));
+			}
 			url += topicName;
 			
 			try {
@@ -775,6 +785,9 @@ public class MgmtController {
 		}
 		
 		String url = clientProp.getProperty("testbed.admin.security.rest.path.topic");
+		if (System.getenv().get("security_rest_path_topic") != null) {
+			url = url.replace("https://localhost:9443", System.getenv().get("security_rest_path_topics"));
+		}
 		url += topicName;
 		
 		try {

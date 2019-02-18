@@ -29,8 +29,17 @@ public class KafkaAdminController {
 	public KafkaAdminController() {
 		log.info("KafkaAdminController");
 		schemaRest = ClientProperties.getInstance().getProperty("schema.registry.url", "http://localhost:3502");
+		if (System.getenv().get("schema_registry_url") != null) {
+			schemaRest = System.getenv().get("schema_registry_url");
+		}
 		zookeeperHost = ClientProperties.getInstance().getProperty("zookeeper.host", "localhost");
+		if (System.getenv().get("zookeeper_host") != null) {
+			zookeeperHost = System.getenv().get("zookeeper_host");
+		}
 		zookeeperPort = Integer.parseInt(ClientProperties.getInstance().getProperty("zookeeper.port", "3500"));
+		if (System.getenv().get("zookeeper_port") != null) {
+			zookeeperPort = Integer.parseInt(System.getenv().get("zookeeper_port"));
+		}
 	}
 	
 	public void createTopic(String topicName, IndexedRecord key, IndexedRecord value) throws Exception {
