@@ -56,6 +56,30 @@
  		"subscribedSolutionIDs": ["all"],
  		"description":"This is the topic where every solution gets the actual testbed trial time control."
 	},{
+		"id":"core.topic.tm.phasemessage",
+		"type":"core.topic",
+ 		"name":"system_tm_phase_message",
+ 		"state": false,
+ 		"publishSolutionIDs":["TB-TrialMgmt"],
+ 		"subscribedSolutionIDs": ["TB-AARTool"],
+ 		"description":"This is the topic to manage the trial phases."
+	},{
+		"id":"core.topic.tm.roleplayer",
+		"type":"core.topic",
+ 		"name":"system_tm_roleplayer",
+ 		"state": false,
+ 		"publishSolutionIDs":["TB-TrialMgmt"],
+ 		"subscribedSolutionIDs": ["TB-AARTool"],
+ 		"description":"This is the topic to share role player messages."
+	},{
+		"id":"core.topic.tm.sessionmgmt",
+		"type":"core.topic",
+ 		"name":"system_tm_session_mgmt",
+ 		"state": false,
+ 		"publishSolutionIDs":["TB-TrialMgmt"],
+ 		"subscribedSolutionIDs": ["TB-AARTool"],
+ 		"description":"This is the topic to share session mgmt messages."
+	},{
 		"id":"core.topic.ost.answer",
 		"type":"core.topic",
  		"name":"system_observer_tool_answer",
@@ -72,114 +96,74 @@
  		"subscribedSolutionIDs": ["TB-Ost", "TB-AARTool"],
  		"description":"This is the topic where every solution gets the actual testbed trial time control."
 	},{
-		"id":"standart.topic.large.data",
-		"type":"standard.topic",
- 		"name":"large_data_update",
- 		"msgType": "largedata",
- 		"msgTypeVersion": "1.0",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the topic where large data notification is distributed."
-	},{
-		"id":"standart.topic.map.layer",
-		"type":"standard.topic",
- 		"name":"map_layer_update",
- 		"msgType": "maplayer",
- 		"msgTypeVersion": "1.0",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the topic where map layer updates are distributed."
-	},{
 		"id":"standart.topic.cap",
 		"type":"standard.topic",
  		"name":"standard_cap",
  		"msgType": "cap",
  		"msgTypeVersion": "1.2",
  		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
+ 		"publishSolutionIDs":["sim-ci", "lcms", "crisissuite-stedin", "crisissuite-htm"],
+ 		"subscribedSolutionIDs": ["crisissuite-stedin", "crisissuite-htm", "crisissuite-io", "lcms", "TB-AARTool"],
  		"description":"This is the standard CAP topic."
 	},{
-		"id":"standart.topic.geo.json",
+		"id":"standart.topic.flood.prediction.netcdf",
 		"type":"standard.topic",
- 		"name":"standard_geojson",
- 		"msgType": "geojson",
+ 		"name":"flood_prediction_netcdf",
+ 		"msgType": "largedata",
  		"msgTypeVersion": "1.0",
  		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the standard GeoJSON topic."
+ 		"publishSolutionIDs":["3di"],
+ 		"subscribedSolutionIDs": ["sim-ci", "TB-AARTool"],
+ 		"description":"This is the topic where large data notification is distributed."
 	},{
-		"id":"standart.topic.geo.json.xvr",
+		"id":"standart.topic.flood.prediction.geojson",
 		"type":"standard.topic",
- 		"name":"standard_geojson_xvr",
- 		"msgType": "geojson",
+ 		"name":"flood_prediction_geojson",
+ 		"msgType": "named-geojson",
  		"msgTypeVersion": "1.0",
  		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the standard GeoJSON topic for XVR Simultaion."
+ 		"publishSolutionIDs":["3di"],
+ 		"subscribedSolutionIDs": ["crisissuite-stedin", "crisissuite-htm", "crisissuite-io", "keep-operational", "humlog-sim", "geojson-wms-gateway", "TB-AARTool"],
+ 		"description":"This is the topic where large data notification is distributed."
 	},{
-		"id":"standart.topic.mlp",
+		"id":"standart.topic.flood.actual",
 		"type":"standard.topic",
- 		"name":"standard_mlp",
- 		"msgType": "mlp",
+ 		"name":"flood_actual",
+ 		"msgType": "largedata",
  		"msgTypeVersion": "1.0",
  		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the standard MLP topic."
+ 		"publishSolutionIDs":["zki"],
+ 		"subscribedSolutionIDs": ["crisissuite-stedin", "crisissuite-htm", "crisissuite-io", "keep-operational", "humlog-sim", "geojson-wms-gateway", "TB-AARTool"],
+ 		"description":"This is the topic where large data notification is distributed."
 	},{
-		"id":"standart.topic.emsi",
+		"id":"standart.topic.lcms.plots",
 		"type":"standard.topic",
- 		"name":"standard_emsi",
- 		"msgType": "emsi",
+ 		"name":"lcms_plots",
+ 		"msgType": "named-geojson",
  		"msgTypeVersion": "1.0",
  		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the standard EMSI topic."
+ 		"publishSolutionIDs":["lcms"],
+ 		"subscribedSolutionIDs": ["crisissuite-stedin", "crisissuite-htm", "crisissuite-io", "TB-AARTool"],
+ 		"description":"This is the topic where large data notification is distributed."
 	},{
-		"id":"standard.topic.geojson.sim.station",
+		"id":"standart.topic.crisissuite.htm.plots",
 		"type":"standard.topic",
- 		"name":"standard_geojson_sim_station",
- 		"msgType": "geojson-sim",
+ 		"name":"crisissuite_htm_plots",
+ 		"msgType": "named-geojson",
  		"msgTypeVersion": "1.0",
  		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the standard Simulation station exchange topic."
+ 		"publishSolutionIDs":["crisissuite-htm"],
+ 		"subscribedSolutionIDs": ["lcms", "crisissuite-stedin", "crisissuite-io", "TB-AARTool"],
+ 		"description":"This is the topic where large data notification is distributed."
 	},{
-		"id":"standard.topic.geojson.sim.unit",
+		"id":"standart.topic.crisissuite.stedin.plots",
 		"type":"standard.topic",
- 		"name":"standard_geojson_sim_unit",
- 		"msgType": "geojson-sim",
+ 		"name":"crisissuite_stedin_plots",
+ 		"msgType": "named-geojson",
  		"msgTypeVersion": "1.0",
  		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the standard Simulation unit exchange topic."
-	},{
-		"id":"standard.topic.geojson.sim.item",
-		"type":"standard.topic",
- 		"name":"standard_geojson_sim_item",
- 		"msgType": "geojson-sim",
- 		"msgTypeVersion": "1.0",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the standard Simulation item exchange topic."
-	},{
-		"id":"standard.topic.geojson.sim.unitgroup",
-		"type":"standard.topic",
- 		"name":"standard_geojson_sim_unitgroup",
- 		"msgType": "geojson-sim",
- 		"msgTypeVersion": "1.0",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the standard Simulation unitgroup exchange topic."
+ 		"publishSolutionIDs":["crisissuite-stedin"],
+ 		"subscribedSolutionIDs": ["lcms", "crisissuite-htm", "crisissuite-io", "TB-AARTool"],
+ 		"description":"This is the topic where large data notification is distributed."
 	}
 ]

@@ -64,13 +64,29 @@
  		"state":false,
  		"description":"3Di application!"
 	},{
-		"id":"crisis-suite",
-		"subject.id":"O=Merlin,CN=CrisisSuite",
- 		"name":"CrisisSuite",
+		"id":"crisissuite-stedin",
+		"subject.id":"O=Merlin,CN=CrisisSuite-SteDin",
+ 		"name":"CrisisSuite SteDin",
  		"isTestbed":false,
  		"isService":false,
  		"state":false,
- 		"description":"CrisisSuite application!"
+ 		"description":"CrisisSuite SteDin application!"
+	},{
+		"id":"crisissuite-htm",
+		"subject.id":"O=Merlin,CN=CrisisSuite-HTM",
+ 		"name":"CrisisSuite HTM",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"CrisisSuite HTM application!"
+	},{
+		"id":"crisissuite-io",
+		"subject.id":"O=Merlin,CN=CrisisSuite-IO",
+ 		"name":"CrisisSuit IOe",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"CrisisSuite IO application!"
 	},{
 		"id":"zki",
 		"subject.id":"O=DLR,CN=ZKI",
@@ -96,21 +112,13 @@
  		"state":false,
  		"description":"HumLog Sim application!"
 	},{
-		"id":"lcms-plotter",
+		"id":"lcms",
 		"subject.id":"O=IVF/TNO,CN=LCMS",
  		"name":"LCMS",
  		"isTestbed":false,
  		"isService":false,
  		"state":false,
- 		"description":"LCMS Plotter application!"
-	},{
-		"id":"lcms-logger",
-		"subject.id":"O=IVF/TNO,CN=LCMS",
- 		"name":"LCMS",
- 		"isTestbed":false,
- 		"isService":false,
- 		"state":false,
- 		"description":"LCMS Logger application!"
+ 		"description":"LCMS application!"
 	},{
 		"id":"geojson-wms-gateway",
 		"subject.id":"O=TNO,CN=GeoJSON-WMS",

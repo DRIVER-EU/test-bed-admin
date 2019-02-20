@@ -52,7 +52,11 @@ import eu.driver.model.core.TimingControl;
 import eu.driver.model.edxl.EDXLDistribution;
 import eu.driver.model.emsi.TSO_2_0;
 import eu.driver.model.geojson.FeatureCollection;
+import eu.driver.model.geojson.GeoJSONEnvelope;
 import eu.driver.model.mlp.SlRep;
+import eu.driver.model.tm.PhaseMessage;
+import eu.driver.model.tm.RolePlayer;
+import eu.driver.model.tm.SessionMgmt;
 import eu.driver.model.core.Log;
 import eu.driver.model.core.TopicCreate;
 import eu.driver.model.core.TopicInvite;
@@ -299,13 +303,13 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.LARGE_DATA_UPDTAE, new EDXLDistribution(), new LargeDataUpdate());
+		/*adminController.createTopic(TopicConstants.LARGE_DATA_UPDTAE, new EDXLDistribution(), new LargeDataUpdate());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LARGE_DATA_UPDTAE + " created.", true);
 		topicController.updateTopicState(TopicConstants.LARGE_DATA_UPDTAE, true);
 		sendTopicStateChange("core.topic.large.data", true);
 		if (secureMode) {
 			this.grantCoreTopicGroupAccess(TopicConstants.LARGE_DATA_UPDTAE);
-		}
+		}*/
 		
 		adminController.createTopic(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, new EDXLDistribution(), new RequestChangeOfTrialStage());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TRIAL_STATE_CHANGE_TOPIC + " created.", true);
@@ -321,6 +325,30 @@ public class MgmtController {
 		sendTopicStateChange("core.topic.ost.answer", true);
 		if (secureMode) {
 			this.grantCoreTopicGroupAccess(TopicConstants.OST_ANSWER_TOPIC);
+		}
+		
+		adminController.createTopic(TopicConstants.PHASE_MESSAGE_TOPIC, new EDXLDistribution(), new PhaseMessage());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.PHASE_MESSAGE_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.PHASE_MESSAGE_TOPIC, true);
+		sendTopicStateChange("core.topic.tm.phasemessage", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.PHASE_MESSAGE_TOPIC);
+		}
+		
+		adminController.createTopic(TopicConstants.ROLE_PLAYER_TOPIC, new EDXLDistribution(), new RolePlayer());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ROLE_PLAYER_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.ROLE_PLAYER_TOPIC, true);
+		sendTopicStateChange("core.topic.tm.roleplayer", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.ROLE_PLAYER_TOPIC);
+		}
+		
+		adminController.createTopic(TopicConstants.SESSION_MGMT_TOPIC, new EDXLDistribution(), new SessionMgmt());
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.SESSION_MGMT_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.SESSION_MGMT_TOPIC, true);
+		sendTopicStateChange("core.topic.tm.sessionmgmt", true);
+		if (secureMode) {
+			this.grantCoreTopicGroupAccess(TopicConstants.SESSION_MGMT_TOPIC);
 		}
 		
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!", true);
@@ -349,6 +377,8 @@ public class MgmtController {
 				schema = new LargeDataUpdate();
 			} else if (topic.getMsgType().equalsIgnoreCase("maplayer")) {
 				schema = new MapLayerUpdate();
+			} else if (topic.getMsgType().equalsIgnoreCase("named-geojson")) {
+				schema = new GeoJSONEnvelope();
 			}
 			
 			if (schema != null) {
