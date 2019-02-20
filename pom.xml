@@ -6,7 +6,7 @@
 
 	<groupId>driver.eu</groupId>
 	<artifactId>admin-tool</artifactId>
-	<version>1.2.5</version>
+	<version>1.2.6</version>
 	<packaging>pom</packaging>
 
 	<name>DRIVER+ AdminTool</name>
@@ -30,7 +30,7 @@
 		</repository>
 		<repository>
 			<id>driver-mvn-repo</id>
-			<url>https://raw.github.com/DRIVER-EU/maven-repo/master/</url>
+			<url>https://raw.githubusercontent.com/DRIVER-EU/maven-repo/master/</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
