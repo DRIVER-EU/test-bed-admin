@@ -123,6 +123,7 @@ public class AdminServiceApplication {
 	public void init() {
 		if (secureMode && managementCAPath != null) {
 			this.getManagementCA();
+			this.certController.setSuperUserPwd(superUserPwd);
 			//this.getAdminToolCertificate();
 		}
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "The AdminService is up!", true);
@@ -186,6 +187,7 @@ public class AdminServiceApplication {
 				Files.copy(in, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING);
 				done = true;
 			} catch (IOException e) {
+				log.info("Waiting for " + managementCAPath + " is up!");
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e1) {
