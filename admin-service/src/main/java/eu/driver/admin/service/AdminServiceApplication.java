@@ -179,13 +179,21 @@ public class AdminServiceApplication {
 	private  void getManagementCA() {
 		String fileName = "config/cert/ManagementCA-chain.jks";
 		InputStream in;
-		try {
-			in = new URL(managementCAPath).openStream();
-			Files.copy(in, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		boolean done = false;
+		while(!done) {
+			try {
+				in = new URL(managementCAPath).openStream();
+				Files.copy(in, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING);
+				done = true;
+			} catch (IOException e) {
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e1) {
+					
+				}
+			}
 		}
+		
 		
 	    try {
 	    	KeyStore origKs = loadKeyStore( "config/cert/truststore-admin.jks", "changeit");
