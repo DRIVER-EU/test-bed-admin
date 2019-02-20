@@ -84,6 +84,8 @@ public class AdminServiceApplication {
 			secureMode = Boolean.parseBoolean(System.getenv().get("testbed_secure_mode"));
 		}
 		
+		superUserPwd = clientProp.getProperty("superadmin.password");
+		
 		Map<String, String> env = System.getenv();
         for (String envName : env.keySet()) {
         	if (envName.equalsIgnoreCase("zookeeper_host")) {
@@ -121,7 +123,7 @@ public class AdminServiceApplication {
 	public void init() {
 		if (secureMode && managementCAPath != null) {
 			this.getManagementCA();
-			this.getAdminToolCertificate();
+			//this.getAdminToolCertificate();
 		}
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "The AdminService is up!", true);
 		mgmtController.loadInitData();
