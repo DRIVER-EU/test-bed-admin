@@ -115,7 +115,9 @@ public class AdminServiceApplication {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		System.setProperty("javax.net.ssl.trustStore", "config/cert/truststore-admin.jks");
+		//System.setProperty("javax.net.ssl.trustStore", "config/cert/truststore-admin.jks");
+		
+		
 		SpringApplication.run(AdminServiceApplication.class, args);
     }
 	
@@ -198,11 +200,14 @@ public class AdminServiceApplication {
 		
 		
 	    try {
-	    	KeyStore origKs = loadKeyStore( "config/cert/truststore-admin.jks", "changeit");
-	    	KeyStore mgmtKs = loadKeyStore( "config/cert/ManagementCA-chain.jks", "changeit");
-	    	origKs.deleteEntry( "ManagementCA");
+	    	KeyStore origKs = loadKeyStore( "config/cert/ManagementCA-chain.jks", "changeit");
+	    	KeyStore mgmtKs = loadKeyStore( "config/cert/truststore-base.jks", "changeit");
 	    	mergeKeystores(origKs, mgmtKs);
-	    	this.writeKeyStore(origKs, "config/cert/truststore-admin.jks", "changeit");
+	    	this.writeKeyStore(origKs, "config/cert/ManagementCA-chain.jks", "changeit");
+	    	
+	    	System.setProperty("javax.net.ssl.trustStore", "config/cert/ManagementCA-chain.jks");
+			System.setProperty("javax.net.ssl.trustStoreType","JCEKS");
+			System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
 	    	
 	    } catch (Exception e) {
 	    	log.error("Error removing the ManagementCA from KeyStore!");
