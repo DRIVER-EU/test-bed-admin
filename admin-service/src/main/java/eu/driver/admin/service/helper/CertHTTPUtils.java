@@ -35,6 +35,7 @@ public class CertHTTPUtils {
 		log.info("CertHTTPUtils -->");
 	}
 	
+	@SuppressWarnings("static-access")
 	public String postHTTPRequest(String url, String requestMethod, String contentType, String msgParam) throws CommunicationException {
 		log.info("--> postHTTPRequest");
 		String response = null;
@@ -45,6 +46,14 @@ public class CertHTTPUtils {
 			HttpsURLConnection connection = (HttpsURLConnection) (new URL(url)).openConnection();
 			if (connection instanceof HttpsURLConnection) {
 			    ((HttpsURLConnection)connection).setSSLSocketFactory(sc.getSocketFactory());
+			    ((HttpsURLConnection)connection).setDefaultHostnameVerifier(
+			    		new javax.net.ssl.HostnameVerifier(){
+
+			    		    public boolean verify(String hostname,
+			    		            javax.net.ssl.SSLSession sslSession) {
+			    		        return true;
+			    		    }
+			    		});
 			}
 	        connection.setRequestMethod(requestMethod);
 	        connection.setDoOutput(true);
