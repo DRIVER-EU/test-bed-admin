@@ -1,5 +1,5 @@
 FROM java:8-jre-alpine
-ENV VERSION 1.2.13
+ENV VERSION 1.2.14
 ADD admin-service/target/admin-service-${VERSION}.jar /opt/application/admin-service-${VERSION}.jar
 ADD run.sh /opt/application/run.sh
 ADD dockerconfig /opt/application/config

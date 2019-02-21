@@ -43,18 +43,18 @@ public class CertHTTPUtils {
 		log.info("data: " + msgParam);
 		
 		try {
+			javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
+	    			new javax.net.ssl.HostnameVerifier(){
+	    		    public boolean verify(String hostname,
+	    		            javax.net.ssl.SSLSession sslSession) {
+	    		        return true;
+	    		    }
+	    		});
+			
 			HttpsURLConnection connection = (HttpsURLConnection) (new URL(url)).openConnection();
 			if (connection instanceof HttpsURLConnection) {
 			    ((HttpsURLConnection)connection).setSSLSocketFactory(sc.getSocketFactory());
-			    ((HttpsURLConnection)connection).setDefaultHostnameVerifier(
-			    		new javax.net.ssl.HostnameVerifier(){
-
-			    		    public boolean verify(String hostname,
-			    		            javax.net.ssl.SSLSession sslSession) {
-			    		        return true;
-			    		    }
-			    		});
-			}
+   			}
 	        connection.setRequestMethod(requestMethod);
 	        connection.setDoOutput(true);
 			connection.setRequestProperty("Content-Type", contentType);
