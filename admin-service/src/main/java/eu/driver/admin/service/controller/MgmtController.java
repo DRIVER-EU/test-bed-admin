@@ -302,15 +302,7 @@ public class MgmtController {
 		if (secureMode) {
 			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC);
 		}
-		
-		/*adminController.createTopic(TopicConstants.LARGE_DATA_UPDTAE, new EDXLDistribution(), new LargeDataUpdate());
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LARGE_DATA_UPDTAE + " created.", true);
-		topicController.updateTopicState(TopicConstants.LARGE_DATA_UPDTAE, true);
-		sendTopicStateChange("core.topic.large.data", true);
-		if (secureMode) {
-			this.grantCoreTopicGroupAccess(TopicConstants.LARGE_DATA_UPDTAE);
-		}*/
-		
+				
 		adminController.createTopic(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, new EDXLDistribution(), new RequestChangeOfTrialStage());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TRIAL_STATE_CHANGE_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, true);
@@ -420,13 +412,14 @@ public class MgmtController {
 							inviteMsgs.add(inviteMsg);
 						}
 					}
-				} else if (allSolutionsPublish) {
+				} else if (allSolutionsPublish && !allSolutionsSubscribe) {
 					for (Solution solution: solutionList) {
 						if (!solution.getIsAdmin()) {
 							TopicInvite inviteMsg = new TopicInvite();
 							inviteMsg.setId(solution.getClientId());
 							inviteMsg.setTopicName(topic.getName());
 							inviteMsg.setPublishAllowed(true);
+							inviteMsg.setSubscribeAllowed(false);
 							
 							// find the client ID in the list of subscribers
 							for (String clientID : subscribeClientIDs) {
@@ -439,13 +432,14 @@ public class MgmtController {
 							inviteMsgs.add(inviteMsg);
 						}
 					}
-				} else if (allSolutionsSubscribe) {
+				} else if (!allSolutionsPublish && allSolutionsSubscribe) {
 					for (Solution solution: solutionList) {
 						if (!solution.getIsAdmin()) {
 							TopicInvite inviteMsg = new TopicInvite();
 							inviteMsg.setId(solution.getClientId());
 							inviteMsg.setTopicName(topic.getName());
 							inviteMsg.setSubscribeAllowed(true);
+							inviteMsg.setPublishAllowed(false);
 							// find the client ID in the list of subscribers
 							for (String clientID : publishClientIDs) {
 								if (clientID.equalsIgnoreCase(solution.getClientId())) {
@@ -457,31 +451,35 @@ public class MgmtController {
 						}
 					}
 				} else {
-					Map<String, List<Boolean>> solutionMap = new HashMap<String, List<Boolean>>();
+					Map<String, Map<String, Boolean>> solutionMap = new HashMap<String, Map<String, Boolean>>();
+					
 					for (String clientID : publishClientIDs) {
-						List<Boolean> flagList = new ArrayList<Boolean>();
-						flagList.add(true);
-						solutionMap.put(clientID, flagList);
+						Map<String, Boolean> flags = new HashMap<String, Boolean>();
+						flags.put("publishAllowed", true);
+						flags.put("subscribeAllowed", false);
+						solutionMap.put(clientID, flags);
 					}
-					
 					for (String clientID : subscribeClientIDs) {
-						List<Boolean> flagList = solutionMap.get(clientID);
-						if (flagList == null) {
-							flagList = new ArrayList<Boolean>();
-							flagList.add(false);
+						Map<String, Boolean> flags = solutionMap.get(clientID);
+						if (flags == null) {
+							flags = new HashMap<String, Boolean>();
+							flags.put("publishAllowed", false);
+							flags.put("subscribeAllowed", true);
+							solutionMap.put(clientID, flags);
+						} else {
+							flags.put("subscribeAllowed", true);
+							solutionMap.put(clientID, flags);
 						}
-						flagList.add(true);
-						solutionMap.put(clientID, flagList);
 					}
 					
-					for (Map.Entry<String, List<Boolean>> entry : solutionMap.entrySet())
+					for (Map.Entry<String, Map<String, Boolean>> entry : solutionMap.entrySet())
 					{
-						List<Boolean> flagList = entry.getValue();
+						Map<String, Boolean> flags = entry.getValue();
 						TopicInvite inviteMsg = new TopicInvite();
 						inviteMsg.setId(entry.getKey());
 						inviteMsg.setTopicName(topic.getName());
-						inviteMsg.setPublishAllowed(flagList.get(0));
-						inviteMsg.setSubscribeAllowed(flagList.get(1));
+						inviteMsg.setPublishAllowed(flags.get("publishAllowed"));
+						inviteMsg.setSubscribeAllowed(flags.get("subscribeAllowed"));
 						inviteMsgs.add(inviteMsg);
 					}
 				}

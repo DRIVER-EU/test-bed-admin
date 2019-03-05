@@ -66,7 +66,7 @@
 	},{
 		"id":"core.topic.tm.roleplayer",
 		"type":"core.topic",
- 		"name":"system_tm_roleplayer",
+ 		"name":"system_tm_role_player",
  		"state": false,
  		"publishSolutionIDs":["TB-TrialMgmt"],
  		"subscribedSolutionIDs": ["TB-AARTool"],
