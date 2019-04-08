@@ -26,6 +26,7 @@ import eu.driver.adapter.core.AdminAdapter;
 import eu.driver.adapter.excpetion.CommunicationException;
 import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
+import eu.driver.admin.service.constants.TestbedSecurityMode;
 import eu.driver.admin.service.dto.gateway.Gateway;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.dto.standard.Standard;
@@ -47,6 +48,7 @@ import eu.driver.model.core.LargeDataUpdate;
 import eu.driver.model.core.MapLayerUpdate;
 import eu.driver.model.core.ObserverToolAnswer;
 import eu.driver.model.core.RequestChangeOfTrialStage;
+import eu.driver.model.core.RolePlayerMessage;
 import eu.driver.model.core.Timing;
 import eu.driver.model.core.TimingControl;
 import eu.driver.model.edxl.EDXLDistribution;
@@ -55,7 +57,6 @@ import eu.driver.model.geojson.FeatureCollection;
 import eu.driver.model.geojson.GeoJSONEnvelope;
 import eu.driver.model.mlp.SlRep;
 import eu.driver.model.core.PhaseMessage;
-import eu.driver.model.core.RolePlayer;
 import eu.driver.model.core.SessionMgmt;
 import eu.driver.model.core.Log;
 import eu.driver.model.core.TopicCreate;
@@ -99,7 +100,7 @@ public class MgmtController {
 	
 	private Boolean initDone = false;
 	private Boolean startDone = false;
-	private Boolean secureMode = false;
+	private TestbedSecurityMode secureMode = TestbedSecurityMode.DEVELOP;
 	
 	private String solConfigJson = "config/solutions.json";
 	private String topicConfigJson = "config/topics.json";
@@ -108,9 +109,9 @@ public class MgmtController {
 	
 	public MgmtController() {
 		if (System.getenv().get("testbed_secure_mode") != null) {
-			secureMode = Boolean.parseBoolean(System.getenv().get("testbed_secure_mode"));
+			secureMode = TestbedSecurityMode.valueOf(System.getenv().get("testbed_secure_mode"));
 		} else {
-			secureMode = Boolean.parseBoolean(clientProp.getProperty("testbed.secure.mode", "FALSE")); 
+			secureMode = TestbedSecurityMode.valueOf(clientProp.getProperty("testbed.secure.mode", "DEVELOP"));
 		}
 	}
 	
@@ -251,7 +252,7 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.ADMIN_HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.admin.hb", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.ADMIN_HEARTBEAT_TOPIC);
 		}
 		
@@ -259,7 +260,7 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.hb", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.HEARTBEAT_TOPIC);
 		}
 		
@@ -267,7 +268,7 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LOGGING_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.LOGGING_TOPIC, true);
 		sendTopicStateChange("core.topic.log", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.LOGGING_TOPIC);
 		}
 		
@@ -275,7 +276,7 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TIMING_TOPIC, true);
 		sendTopicStateChange("core.topic.time", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.TIMING_TOPIC);
 		}
 		
@@ -283,7 +284,7 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_CONTROL_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TIMING_CONTROL_TOPIC, true);
 		sendTopicStateChange("core.topic.time.control", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.TIMING_CONTROL_TOPIC);
 		}
 		
@@ -291,7 +292,7 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_INVITE_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TOPIC_INVITE_TOPIC, true);
 		sendTopicStateChange("core.topic.access.invite", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_INVITE_TOPIC);
 		}
 		
@@ -299,7 +300,7 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, true);
 		sendTopicStateChange("core.topic.create.request", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC);
 		}
 				
@@ -307,7 +308,7 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TRIAL_STATE_CHANGE_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, true);
 		sendTopicStateChange("core.topic.trial.stage.change", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.TRIAL_STATE_CHANGE_TOPIC);
 		}
 		
@@ -315,7 +316,7 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.OST_ANSWER_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.OST_ANSWER_TOPIC, true);
 		sendTopicStateChange("core.topic.ost.answer", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.OST_ANSWER_TOPIC);
 		}
 		
@@ -323,15 +324,15 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.PHASE_MESSAGE_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.PHASE_MESSAGE_TOPIC, true);
 		sendTopicStateChange("core.topic.tm.phasemessage", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.PHASE_MESSAGE_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.ROLE_PLAYER_TOPIC, new EDXLDistribution(), new RolePlayer());
+		adminController.createTopic(TopicConstants.ROLE_PLAYER_TOPIC, new EDXLDistribution(), new RolePlayerMessage());
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ROLE_PLAYER_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.ROLE_PLAYER_TOPIC, true);
 		sendTopicStateChange("core.topic.tm.roleplayer", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.ROLE_PLAYER_TOPIC);
 		}
 		
@@ -339,7 +340,7 @@ public class MgmtController {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.SESSION_MGMT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.SESSION_MGMT_TOPIC, true);
 		sendTopicStateChange("core.topic.tm.sessionmgmt", true);
-		if (secureMode) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.SESSION_MGMT_TOPIC);
 		}
 		
@@ -489,7 +490,7 @@ public class MgmtController {
 						// grant the access to the topics vie the Security REST API
 						boolean sendInvite = true;
 						// check if adapter is in secure mode
-						if (secureMode) {
+						if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 							sendInvite = grantTopicAccess(inviteMsg);
 						}
 						

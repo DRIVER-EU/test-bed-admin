@@ -38,6 +38,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
+import eu.driver.admin.service.constants.TestbedSecurityMode;
 import eu.driver.admin.service.controller.CertificateController;
 import eu.driver.admin.service.controller.LogRESTController;
 import eu.driver.admin.service.controller.MgmtController;
@@ -64,7 +65,7 @@ public class AdminServiceApplication {
 	private Logger log = Logger.getLogger(this.getClass());
 	private String superUserPwd = null;
 	private ClientProperties clientProp = ClientProperties.getInstance();
-	private Boolean secureMode = false;
+	private TestbedSecurityMode secureMode = TestbedSecurityMode.DEVELOP;
 	private String managementCAPath = null;
 	
 	@Autowired
@@ -78,10 +79,10 @@ public class AdminServiceApplication {
 	
 	public AdminServiceApplication() throws Exception {
 		log.info("Init. AdminServiceApplication");
-		secureMode = Boolean.parseBoolean(clientProp.getProperty("testbed.secure.mode", "FALSE"));
+		secureMode = TestbedSecurityMode.valueOf(clientProp.getProperty("testbed.secure.mode", "DEVELOP"));
 		managementCAPath = clientProp.getProperty("management.ca.cert.path");
 		if (System.getenv().get("testbed_secure_mode") != null) {
-			secureMode = Boolean.parseBoolean(System.getenv().get("testbed_secure_mode"));
+			secureMode = TestbedSecurityMode.valueOf(System.getenv().get("testbed_secure_mode"));
 		}
 		
 		superUserPwd = clientProp.getProperty("superadmin.password");
@@ -94,9 +95,6 @@ public class AdminServiceApplication {
         		log.info(envName + ": " + env.get(envName));
         	} else if (envName.equalsIgnoreCase("schema_registry_url")) {
         		log.info(envName + ": " + env.get(envName));
-        	} else if (envName.equalsIgnoreCase("testbed_secure_mode")) {
-        		log.info(envName + ": " + env.get(envName));
-        		secureMode = Boolean.parseBoolean(env.get(envName));
         	} else if (envName.equalsIgnoreCase("testbed_init_auto")) {
         		log.info(envName + ": " + env.get(envName));
         	} else if (envName.equalsIgnoreCase("management_ca_cert_path")) {
@@ -115,18 +113,14 @@ public class AdminServiceApplication {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		//System.setProperty("javax.net.ssl.trustStore", "config/cert/truststore-admin.jks");
-		
-		
 		SpringApplication.run(AdminServiceApplication.class, args);
     }
 	
 	@PostConstruct
 	public void init() {
-		if (secureMode && managementCAPath != null) {
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION) && managementCAPath != null) {
 			this.getManagementCA();
 			this.certController.setSuperUserPwd(superUserPwd);
-			//this.getAdminToolCertificate();
 		}
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "The AdminService is up!", true);
 		mgmtController.loadInitData();
