@@ -118,7 +118,7 @@ public class AdminServiceApplication {
 	
 	@PostConstruct
 	public void init() {
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION) && managementCAPath != null) {
+		if ((secureMode.equals(TestbedSecurityMode.AUTHENTICATION) || secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) && managementCAPath != null) {
 			this.getManagementCA();
 			this.certController.setSuperUserPwd(superUserPwd);
 		}
