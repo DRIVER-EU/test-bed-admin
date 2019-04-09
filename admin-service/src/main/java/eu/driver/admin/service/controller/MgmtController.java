@@ -540,11 +540,19 @@ public class MgmtController {
 					}
 					solution.setDescription(jsonobject.getString("description"));
 					
-					if (this.solutionRepo.findObjectByClientId(solution.getClientId()) == null) {
+					Solution dbSolution = this.solutionRepo.findObjectByClientId(solution.getClientId());
+					if (dbSolution == null) {
 						this.solutionRepo.saveAndFlush(solution);
 						log.info("add solution: " + solution.getName());
+					} else {
+						if (solution.getClientId().equalsIgnoreCase("TB-AdminTool")) {
+							solution.setState(true);
+						} else {
+							dbSolution.setState(false);	
+						}
+						this.solutionRepo.saveAndFlush(dbSolution);
 					}
-				}
+				} 
 			} catch (JSONException e) {
 				log.error("Error parsind the JSON solution response", e);
 			}
@@ -591,9 +599,13 @@ public class MgmtController {
 				} 
 				topic.setSubscribedSolutionIDs(subscriber);
 				
-				if (this.topicRepo.findObjectByClientId(topic.getClientId()) == null) {
+				Topic dbTopic = this.topicRepo.findObjectByClientId(topic.getClientId());
+				if (dbTopic == null) {
 					this.topicRepo.saveAndFlush(topic);
 					log.info("add topic: " + topic.getName());
+				} else {
+					dbTopic.setState(false);
+					this.topicRepo.saveAndFlush(dbTopic);
 				}
 			}
 		} catch (JSONException e) {
@@ -627,9 +639,13 @@ public class MgmtController {
 					} 
 					gateway.setManagingType(mangTypes);
 					
-					if (this.gatewayRepo.findObjectByClientId(gateway.getClientId()) == null) {
+					Gateway dbGateway = this.gatewayRepo.findObjectByClientId(gateway.getClientId());
+					if (dbGateway == null) {
 						this.gatewayRepo.saveAndFlush(gateway);
 						log.info("add gateway: " + gateway.getName());
+					} else {
+						dbGateway.setState(false);
+						this.gatewayRepo.saveAndFlush(dbGateway);
 					}
 				}
 			} catch (JSONException e) {
