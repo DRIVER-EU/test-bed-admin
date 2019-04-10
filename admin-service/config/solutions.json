@@ -127,5 +127,13 @@
  		"isService":false,
  		"state":false,
  		"description":"Test-bed GeoJSON-WMS converter (used by LCMS)!"
+	},{
+		"id":"copper",
+		"subject.id":"O=TNO,CN=Copper",
+ 		"name":"Copper",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"Copper tool from TNO1"
 	}
 ]
