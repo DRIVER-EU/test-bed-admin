@@ -34,7 +34,7 @@ public class HTTPUtils {
 		
 		try {
 			KeyStore ks = KeyStore.getInstance("PKCS12");
-			FileInputStream fis = new FileInputStream(clientProp.getProperty("cert.file.path", "config/cert/admin-tool-client.p12"));
+			FileInputStream fis = new FileInputStream(clientProp.getProperty("cert.file.path", "config/cert/TB-AdminTool.p12"));
 			ks.load(fis, certFilePassword.toCharArray());
 			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 			kmf.init(ks, certFilePassword.toCharArray());
