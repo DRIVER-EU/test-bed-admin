@@ -84,6 +84,16 @@ public class KafkaAdminController {
             	CachedSchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(schemaRest, AbstractKafkaAvroSerDeConfig.MAX_SCHEMAS_PER_SUBJECT_DEFAULT);
             	schemaRegistryClient.register(topicName + "-key", key.getSchema());
             	schemaRegistryClient.register(topicName + "-value", value.getSchema());
+            } else {
+            	// register the schema
+            	try {
+	            	log.info("Register the schema on that topic!");
+	            	CachedSchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(schemaRest, AbstractKafkaAvroSerDeConfig.MAX_SCHEMAS_PER_SUBJECT_DEFAULT);
+	            	schemaRegistryClient.register(topicName + "-key", key.getSchema());
+	            	schemaRegistryClient.register(topicName + "-value", value.getSchema());
+            	} catch (Exception e) {
+            		log.warn("Could not reister the schema!");
+            	}
             }
             
             log.info("Topic created!");
