@@ -30,7 +30,7 @@ public class WSController {
 		log.debug("setWSSession -->");
 	}
 	
-	public void sendMessage(String msg) {
+	public synchronized void sendMessage(String msg) {
 		log.debug("--> sendMessage");
 		log.debug(msg);
 		TextMessage responseMsg = new TextMessage(msg);
