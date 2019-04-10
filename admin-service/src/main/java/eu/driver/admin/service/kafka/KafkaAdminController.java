@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
+import kafka.log.LogConfig;
 import kafka.utils.ZKStringSerializer;
 import kafka.utils.ZkUtils;
 
@@ -42,7 +43,7 @@ public class KafkaAdminController {
 		}
 	}
 	
-	public void createTopic(String topicName, IndexedRecord key, IndexedRecord value) throws Exception {
+	public void createTopic(String topicName, IndexedRecord key, IndexedRecord value, Long retMSTime) throws Exception {
 		log.info("--> createTopic: " + topicName);
 		ZkClient zkClient = null;
         ZkUtils zkUtils = null;
@@ -69,6 +70,9 @@ public class KafkaAdminController {
             int noOfPartitions = 1;
             int noOfReplication = 1;
             Properties topicConfiguration = new Properties();
+            if (retMSTime != null) {
+            	topicConfiguration.setProperty(LogConfig.RetentionMsProp(), Long.toString(retMSTime));
+            }
             
             boolean topicExist = AdminUtils.topicExists(zkUtils, topicName);
             if (!topicExist) {
