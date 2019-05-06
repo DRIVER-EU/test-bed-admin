@@ -245,6 +245,22 @@ public class MgmtController {
 	    return new ResponseEntity<Boolean>(resetDone, HttpStatus.OK);
 	}
 	
+	@ApiOperation(value = "deleteLogReocrds", nickname = "deleteLogReocrds")
+	@RequestMapping(value = "/AdminService/deleteLogReocrds", method = RequestMethod.GET )
+	@ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Success", response = Boolean.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Boolean.class),
+            @ApiResponse(code = 500, message = "Failure", response = Boolean.class)})
+	public ResponseEntity<Boolean> deleteLogReocrds() {
+		log.info("--> deleteLogReocrds");
+		Boolean resetDone = false;
+		
+		logController.removeAllLogs();
+		
+		log.info("deleteLogReocrds -->");
+	    return new ResponseEntity<Boolean>(resetDone, HttpStatus.OK);
+	}
+	
 	private void createAllCoreTopics() throws Exception {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!", true);
 		
@@ -372,6 +388,8 @@ public class MgmtController {
 				schema = new MapLayerUpdate();
 			} else if (topic.getMsgType().equalsIgnoreCase("named-geojson")) {
 				schema = new GeoJSONEnvelope();
+			} else if (topic.getMsgType().equalsIgnoreCase("photo-geojson")) {
+				schema = new eu.driver.model.geojson.photo.FeatureCollection();
 			}
 			
 			if (schema != null) {

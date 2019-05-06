@@ -26,5 +26,8 @@
 	},{
 		"name":"named-geojson",
 		"versions":["1.0"]
+	},{
+		"name":"photo-geojson",
+		"versions":["1.0"]
 	}
 ]
