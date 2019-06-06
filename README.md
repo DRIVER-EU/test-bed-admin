@@ -73,25 +73,17 @@ For adding a Topic click on the "CONFIGURE NEW TOPIC" item on top of the Solutio
 Fill in the data, select the schema/version and the publisher/subscriber and cick "SUBMIT".
 ![AdminTool Add Topic example](images/newtopic.PNG)
 
-they handle. e.g.: 
-{
-	"id":"standart.topic.cap",
-	"type":"standard.topic",
- 	"name":"standard_cap",
- 	"msgType": "cap",
- 	"msgTypeVersion": "1.2",
- 	"state": false,
- 	"publishSolutionIDs":["all"],
- 	"subscribedSolutionIDs": ["all"],
- 	"description":"This is the standard CAP topic."
-}
 
 ### possible msgTypes:
 Corrently the AdminTool supports following msgTypes:
 * cap
+* largedata
+* maplayer
 * emsi
 * mlp
 * geojson
+* geojson-sim
+* named-geojson
 
 ## Gateway configuration
 Gateways are more or less solutions in the testbed but they have additional configuration properties and therefor they are handled seperately. Like solutions gateways send heartbeat messages and are marked as up or down in the Admin tool.
