@@ -5,7 +5,7 @@ Single Page Application to help you manage your personalized DRIVER+ test-bed an
 ![AdminTool](images/admintool.PNG)
 
 # Introduction
-The current version (v 1.2.2) of the Admin tool provides an overview of:
+The current version (v 1.2.29) of the Admin tool provides an overview of:
 * the solutions connected to the Testbed, including their availability
 * the available Kafka topics
 * the gateways for message exchange
@@ -15,20 +15,33 @@ Furthermore, the Admin tool
 * provides the possibility to initialize the testbed
 * provides the possibility to start the trial once the testbed was initialized
 * provides a section where log entries are displayed
+* provides the possibility to create solutions/topics/gateways
 
-# Installation
-Currently no docker image for the Admin tool is available. The Admin tool can be started by invoking the bat file in the executable directory.
-To run the Admin tool:
-* Pull the executable folder to any destination on your local disk
-* start the DB docker container: docker-compose up -d
-* ensure that the JAVA_HOME environment variable is set and point to the a JRE 8
-* start admin tool by invoking the bat file
-* request the admin HMI by calling: http://localhost:8090/#/overview
+# docker image
+A docker image is on dockerhub available
+* image: drivereu/test-bed-admin:latest
+![AdminTool Docker example](images/dockerexample.PNG)
+
+Following environment can be set:
+* KAFKA_BROKER_URL --> string (e.g.: broker:9092)
+* SCHEMA_REGISTRY_URL --> string(e.g.: http://schema_registry:3502)
+* zookeeper_host --> string (e.g.: zookeeper)
+* zookeeper_port --> int (e.g.: 3500)
+* testbed_secure_mode --> 'DEVELOP', 'AUTHENTICATION' or 'AUTHENTICATION_AND_AUTHORIZATION'
+* testbed_init_auto: 'false'
+* reset_db: 'true'
+
+And for AUTHENTICATION & AUTHORIZATION:
+* management_ca_cert_path --> string (e.g.: http://localhost:9090)
+* cert_handler_url --> string (e.g.: https://localhost:8443)
+* cert_pem_handler_url --> string (e.g.: https://localhost:8443)
+* security_rest_path_group --> string (e.g.: https://localhost:9443)
+* security_rest_path_topic --> string (e.g.: https://localhost:9443)
 
 # Swagger
 For testing the Admin tool offers also a swagger interface.
 This can be called by:
-* http://localhost:8090/swagger-ui.html
+* http://<host:port>/swagger-ui.html
 
 # Configuration
 The configuration is located in the config folder. Using the default configuration the complete testbed is running on the local machine. Changes for e.g. Kafka connection have to be made in the consumer/producer properties file. Details about the possible
@@ -45,6 +58,20 @@ unique topic name. The core topics (type=core.topic) should not be modified as t
 (type=standard.topic) have to define
 * which standard (by defining the msgType) 
 * in which version (by defining the msgTypeVersion)
+
+# Manual Configuration
+The AdminTool offers also the possibility to add solutions/topics if they are missig in the configuration that is loaded on startup.
+![AdminTool Manual added Solution/Topic](images/manualadded.PNG)
+
+## Add Solution
+For adding a Solution click on the "CONFIGURE NEW SOLUTION" item on top of the Solution list.
+Fill in the data and cick "SUBMIT".
+![AdminTool Add Solution example](images/newsolution.PNG)
+
+## Add Topic, assign the schema and define publisher/subscriber solutions 
+For adding a Topic click on the "CONFIGURE NEW TOPIC" item on top of the Solution list.
+Fill in the data, select the schema/version and the publisher/subscriber and cick "SUBMIT".
+![AdminTool Add Topic example](images/newtopic.PNG)
 
 they handle. e.g.: 
 {
