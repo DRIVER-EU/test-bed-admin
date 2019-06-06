@@ -35,6 +35,7 @@ import eu.driver.admin.service.helper.FileReader;
 import eu.driver.admin.service.helper.HTTPUtils;
 import eu.driver.admin.service.kafka.KafkaAdminController;
 import eu.driver.admin.service.repository.GatewayRepository;
+import eu.driver.admin.service.repository.LogRepository;
 import eu.driver.admin.service.repository.SolutionRepository;
 import eu.driver.admin.service.repository.StandardRepository;
 import eu.driver.admin.service.repository.TopicRepository;
@@ -98,6 +99,9 @@ public class MgmtController {
 	@Autowired
 	StandardRepository standardRepo;
 	
+	@Autowired
+	LogRepository logRepo;
+	
 	private Boolean initDone = false;
 	private Boolean startDone = false;
 	private TestbedSecurityMode secureMode = TestbedSecurityMode.DEVELOP;
@@ -115,8 +119,22 @@ public class MgmtController {
 		}
 	}
 	
-	public void loadInitData() {
+	public void loadInitData(Boolean resetDB) {
 		log.info("--> loadInitData");
+		
+		if (resetDB) {
+			logController.addLog(LogLevels.LOG_LEVEL_INFO, "CleanUp the DB!", true);
+			try {
+				solutionRepo.deleteAll();
+				topicRepo.deleteAll();
+				gatewayRepo.deleteAll();
+				standardRepo.deleteAll();	
+				logRepo.deleteAll();
+			} catch (Exception e) {
+				log.error("Error cleaning the DB!", e);
+				logController.addLog(LogLevels.LOG_LEVEL_SEVER, "Error cleaning the DB at startup: " + e.getMessage(), true);
+			}
+		}
 		
 		try {
 			loadSolutions();
@@ -143,10 +161,6 @@ public class MgmtController {
 		Boolean send = true;
 		
 		try {
-			/*loadSolutions();
-			loadTopics();
-			loadGateways();
-			loadStandards();*/
 			createAllCoreTopics();
 			adminAdapter = AdminAdapter.getInstance();
 			adminAdapter.addCallback(solutionController, TopicConstants.HEARTBEAT_TOPIC);
@@ -536,7 +550,7 @@ public class MgmtController {
 	
 	private void loadSolutions() {
 		log.info("--> loadSolutions");
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Initializing Testbed Services/Solutions!", true);
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Loading Testbed Services/Solutions!", true);
 		String solutionJson = fileReader.readFile(this.solConfigJson);
 		if (solutionJson != null) {
 			try {
@@ -925,4 +939,5 @@ public class MgmtController {
 	public void setGatewayController(GatewayRESTController gatewayController) {
 		this.gatewayController = gatewayController;
 	}
+	
 }

@@ -2,6 +2,7 @@
 
 # Admin tool
 Single Page Application to help you manage your personalized DRIVER+ test-bed and prepare the trial. It uses Apache Kafka as well as an Embedded Tomcat environment. The frontend is built with Vuejs.
+![AdminTool](images/admintool.PNG)
 
 # Introduction
 The current version (v 1.2.2) of the Admin tool provides an overview of:
@@ -75,7 +76,10 @@ After calling the Admin tool, it displays all information configured for the tri
 * All gateways
 
 ## Auto create mode
-In the client.properties the parameter init.auto defines if the topic creation is done by invoking (either by clicking on the button, or invoking the Rest Endpoint by e.g.: Trial Manager), or if the Admin tool should create all core topics on startup automatically. Be aware, the Kafka has to be up and running before the Admin Service is started. 
+In the client.properties the parameter init.auto defines if the topic creation is done by invoking (either by clicking on the button, or invoking the Rest Endpoint by e.g.: Trial Manager), or if the Admin tool should create all core topics on startup automatically. Be aware, the Kafka has to be up and running before the Admin Service is started.
+
+## reset DB mode
+In the client.properties the parameter reset.db defines, if the DB tables should be cleaned during startup. If this is set to true, all tables (also the logs) are cleaned and the configuration defined in the json files is stored. 
 
 
 ## Create all topics

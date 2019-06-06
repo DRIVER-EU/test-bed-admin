@@ -122,8 +122,13 @@ public class AdminServiceApplication {
 			this.getManagementCA();
 			this.certController.setSuperUserPwd(superUserPwd);
 		}
+		boolean resetDB = Boolean.parseBoolean(ClientProperties.getInstance().getProperty("reset.db"));
+		if (System.getenv().get("reset_db") != null) {
+			resetDB = Boolean.parseBoolean(System.getenv().get("reset_db"));
+		} 
+		mgmtController.loadInitData(resetDB);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "The AdminService is up!", true);
-		mgmtController.loadInitData();
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Testbed is running in: " + secureMode + " mode.", true);
 		
 		boolean initAuto = Boolean.parseBoolean(ClientProperties.getInstance().getProperty("init.auto"));
 		if (System.getenv().get("testbed_init_auto") != null) {
