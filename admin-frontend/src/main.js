@@ -16,10 +16,10 @@ import ConfigureGatewayForm from './components/configurationForms/ConfigureGatew
 
 export const eventBus = new Vue()
 const host = window.location.host
-/*const httpUrl = 'http://' + host + '/AdminService'
-const wsUrl = 'ws://'+ host + '/AdminServiceWSEndpoint'*/
-const httpUrl = 'http://localhost:8090/AdminService'
-const wsUrl = 'ws://localhost:8090/AdminServiceWSEndpoint'
+const httpUrl = 'http://' + host + '/AdminService'
+const wsUrl = 'ws://'+ host + '/AdminServiceWSEndpoint'
+/*const httpUrl = 'http://localhost:8090/AdminService'
+const wsUrl = 'ws://localhost:8090/AdminServiceWSEndpoint'*/
 
 Vue.use(underscore)
 
