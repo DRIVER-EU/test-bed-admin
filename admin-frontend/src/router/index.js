@@ -1,19 +1,13 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Overview from '@/components/Overview'
+import MainPage from '../pages/MainPage';
+import DiagramPage from '../pages/DiagramPage';
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   routes: [
-    {
-      path: '/',
-      redirect: '/overview'
-    },
-    {
-      path: '/overview',
-      name: 'Overview',
-      component: Overview
-    }
+    { path: '/', component: MainPage },
+    { path: '/diagram', component: DiagramPage },
   ]
 })

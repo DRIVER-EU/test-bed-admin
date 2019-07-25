@@ -13,20 +13,19 @@ import LogsTable from './components/LogsTable'
 import ConfigureSolutionForm from './components/configurationForms/ConfigureSolutionForm'
 import ConfigureTopicForm from './components/configurationForms/ConfigureTopicForm'
 import ConfigureGatewayForm from './components/configurationForms/ConfigureGatewayForm'
+import Urls from './constants/Urls'
+import Toolbar from './components/Toolbar'
 
 export const eventBus = new Vue()
-const host = window.location.host
-const httpUrl = 'http://' + host + '/AdminService'
-const wsUrl = 'ws://'+ host + '/AdminServiceWSEndpoint'
 
 Vue.use(underscore)
 
 Vue.use(VueAxios, axios.create({
-  baseURL: httpUrl
+  baseURL: Urls.HTTP_BASE
 }))
 store.axios = Vue.prototype.axios
 
-Vue.use(VueNativeSock, wsUrl, {
+Vue.use(VueNativeSock, Urls.WEBSOCKET, {
   store: store,
   format: 'json',
   reconnection: true, // (Boolean) whether to reconnect automatically (false)
@@ -49,6 +48,7 @@ Vue.component('logs-table', LogsTable)
 Vue.component('configure-solution-form',ConfigureSolutionForm)
 Vue.component('configure-topic-form',ConfigureTopicForm)
 Vue.component('configure-gateway-form',ConfigureGatewayForm)
+Vue.component('toolbar', Toolbar);
 
 Vue.config.productionTip = false
 

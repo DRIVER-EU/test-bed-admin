@@ -1,0 +1,11 @@
+<template>
+  <v-app>
+    <toolbar>
+    </toolbar>
+    <main>
+      <div>
+        hello
+      </div>
+    </main>
+  </v-app>
+</template>
