@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
+import kafka.log.LogConfig;
 import kafka.utils.ZKStringSerializer;
 import kafka.utils.ZkUtils;
 
@@ -29,11 +30,20 @@ public class KafkaAdminController {
 	public KafkaAdminController() {
 		log.info("KafkaAdminController");
 		schemaRest = ClientProperties.getInstance().getProperty("schema.registry.url", "http://localhost:3502");
+		if (System.getenv().get("schema_registry_url") != null) {
+			schemaRest = System.getenv().get("schema_registry_url");
+		}
 		zookeeperHost = ClientProperties.getInstance().getProperty("zookeeper.host", "localhost");
+		if (System.getenv().get("zookeeper_host") != null) {
+			zookeeperHost = System.getenv().get("zookeeper_host");
+		}
 		zookeeperPort = Integer.parseInt(ClientProperties.getInstance().getProperty("zookeeper.port", "3500"));
+		if (System.getenv().get("zookeeper_port") != null) {
+			zookeeperPort = Integer.parseInt(System.getenv().get("zookeeper_port"));
+		}
 	}
 	
-	public void createTopic(String topicName, IndexedRecord key, IndexedRecord value) throws Exception {
+	public void createTopic(String topicName, IndexedRecord key, IndexedRecord value, Long retMSTime) throws Exception {
 		log.info("--> createTopic: " + topicName);
 		ZkClient zkClient = null;
         ZkUtils zkUtils = null;
@@ -60,6 +70,9 @@ public class KafkaAdminController {
             int noOfPartitions = 1;
             int noOfReplication = 1;
             Properties topicConfiguration = new Properties();
+            if (retMSTime != null) {
+            	topicConfiguration.setProperty(LogConfig.RetentionMsProp(), Long.toString(retMSTime));
+            }
             
             boolean topicExist = AdminUtils.topicExists(zkUtils, topicName);
             if (!topicExist) {
@@ -71,6 +84,16 @@ public class KafkaAdminController {
             	CachedSchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(schemaRest, AbstractKafkaAvroSerDeConfig.MAX_SCHEMAS_PER_SUBJECT_DEFAULT);
             	schemaRegistryClient.register(topicName + "-key", key.getSchema());
             	schemaRegistryClient.register(topicName + "-value", value.getSchema());
+            } else {
+            	// register the schema
+            	try {
+	            	log.info("Register the schema on that topic!");
+	            	CachedSchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(schemaRest, AbstractKafkaAvroSerDeConfig.MAX_SCHEMAS_PER_SUBJECT_DEFAULT);
+	            	schemaRegistryClient.register(topicName + "-key", key.getSchema());
+	            	schemaRegistryClient.register(topicName + "-value", value.getSchema());
+            	} catch (Exception e) {
+            		log.warn("Could not reister the schema!");
+            	}
             }
             
             log.info("Topic created!");

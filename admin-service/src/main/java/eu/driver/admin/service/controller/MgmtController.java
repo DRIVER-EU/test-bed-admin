@@ -1,10 +1,13 @@
 package eu.driver.admin.service.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -17,6 +20,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,16 +28,24 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.driver.adapter.constants.TopicConstants;
 import eu.driver.adapter.core.AdminAdapter;
 import eu.driver.adapter.excpetion.CommunicationException;
+import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
+import eu.driver.admin.service.constants.TestbedSecurityMode;
+import eu.driver.admin.service.dto.configuration.Configuration;
+import eu.driver.admin.service.dto.configuration.TestbedConfig;
 import eu.driver.admin.service.dto.gateway.Gateway;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.dto.standard.Standard;
 import eu.driver.admin.service.dto.topic.Topic;
 import eu.driver.admin.service.helper.FileReader;
+import eu.driver.admin.service.helper.HTTPUtils;
 import eu.driver.admin.service.kafka.KafkaAdminController;
+import eu.driver.admin.service.repository.ConfigurationRepository;
 import eu.driver.admin.service.repository.GatewayRepository;
+import eu.driver.admin.service.repository.LogRepository;
 import eu.driver.admin.service.repository.SolutionRepository;
 import eu.driver.admin.service.repository.StandardRepository;
+import eu.driver.admin.service.repository.TestbedConfigRepository;
 import eu.driver.admin.service.repository.TopicRepository;
 import eu.driver.admin.service.ws.WSController;
 import eu.driver.admin.service.ws.mapper.StringJSONMapper;
@@ -43,12 +55,18 @@ import eu.driver.model.core.AdminHeartbeat;
 import eu.driver.model.core.Heartbeat;
 import eu.driver.model.core.LargeDataUpdate;
 import eu.driver.model.core.MapLayerUpdate;
+import eu.driver.model.core.ObserverToolAnswer;
+import eu.driver.model.core.RequestChangeOfTrialStage;
+import eu.driver.model.core.RolePlayerMessage;
 import eu.driver.model.core.Timing;
 import eu.driver.model.core.TimingControl;
 import eu.driver.model.edxl.EDXLDistribution;
 import eu.driver.model.emsi.TSO_2_0;
 import eu.driver.model.geojson.FeatureCollection;
+import eu.driver.model.geojson.GeoJSONEnvelope;
 import eu.driver.model.mlp.SlRep;
+import eu.driver.model.core.PhaseMessage;
+import eu.driver.model.core.SessionMgmt;
 import eu.driver.model.core.Log;
 import eu.driver.model.core.TopicCreate;
 import eu.driver.model.core.TopicInvite;
@@ -61,6 +79,9 @@ public class MgmtController {
 	private AdminAdapter adminAdapter = null;
 	private StringJSONMapper mapper = new StringJSONMapper();
 	private FileReader fileReader = new FileReader();
+	private ClientProperties clientProp = ClientProperties.getInstance();
+	
+	private HTTPUtils httpUtils = new HTTPUtils();
 	
 	@Autowired
 	LogRESTController logController;
@@ -86,8 +107,18 @@ public class MgmtController {
 	@Autowired
 	StandardRepository standardRepo;
 	
+	@Autowired
+	LogRepository logRepo;
+	
+	@Autowired
+	ConfigurationRepository configRepo;
+	
+	@Autowired
+	TestbedConfigRepository testbedConfigRepo;
+	
 	private Boolean initDone = false;
 	private Boolean startDone = false;
+	private TestbedSecurityMode secureMode = TestbedSecurityMode.DEVELOP;
 	
 	private String solConfigJson = "config/solutions.json";
 	private String topicConfigJson = "config/topics.json";
@@ -95,7 +126,41 @@ public class MgmtController {
 	private String stConfigJson = "config/standards.json";
 	
 	public MgmtController() {
-
+		if (System.getenv().get("testbed_secure_mode") != null) {
+			secureMode = TestbedSecurityMode.valueOf(System.getenv().get("testbed_secure_mode"));
+		} else {
+			secureMode = TestbedSecurityMode.valueOf(clientProp.getProperty("testbed.secure.mode", "DEVELOP"));
+		}
+	}
+	
+	public void loadInitData(Boolean resetDB) {
+		log.info("--> loadInitData");
+		
+		if (resetDB) {
+			logController.addLog(LogLevels.LOG_LEVEL_INFO, "CleanUp the DB!", true);
+			try {
+				solutionRepo.deleteAll();
+				topicRepo.deleteAll();
+				gatewayRepo.deleteAll();
+				standardRepo.deleteAll();	
+				logRepo.deleteAll();
+			} catch (Exception e) {
+				log.error("Error cleaning the DB!", e);
+				logController.addLog(LogLevels.LOG_LEVEL_SEVER, "Error cleaning the DB at startup: " + e.getMessage(), true);
+			}
+		}
+		
+		try {
+			loadSolutions();
+			loadTopics();
+			loadGateways();
+			loadStandards();
+		} catch (Exception e) {
+			log.error("Error initializing the AdminTool Database!", e);
+			logController.addLog(LogLevels.LOG_LEVEL_SEVER, "The Testbed wasn't initialized successful: " + e.getMessage(), true);
+		}
+		
+		log.info("loadInitData -->");
 	}
 	
 	@SuppressWarnings("static-access")
@@ -110,10 +175,6 @@ public class MgmtController {
 		Boolean send = true;
 		
 		try {
-			loadSolutions();
-			loadTopics();
-			loadGateways();
-			loadStandards();
 			createAllCoreTopics();
 			adminAdapter = AdminAdapter.getInstance();
 			adminAdapter.addCallback(solutionController, TopicConstants.HEARTBEAT_TOPIC);
@@ -140,11 +201,10 @@ public class MgmtController {
 	public ResponseEntity<Boolean> startTrialConfig() {
 		log.info("--> startTrialConfig");
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Trial start called!", true);
-		Boolean send = true;
+		Boolean send = false;
 		
 		try {
 			createTrialTopics();
-			startDone = true;
 		} catch (Exception e) {
 			log.error("Error creating the Trial Topics!", e);
 			return new ResponseEntity<Boolean>(false, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -213,47 +273,201 @@ public class MgmtController {
 	    return new ResponseEntity<Boolean>(resetDone, HttpStatus.OK);
 	}
 	
+	@ApiOperation(value = "deleteLogReocrds", nickname = "deleteLogReocrds")
+	@RequestMapping(value = "/AdminService/deleteLogReocrds", method = RequestMethod.GET )
+	@ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Success", response = Boolean.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Boolean.class),
+            @ApiResponse(code = 500, message = "Failure", response = Boolean.class)})
+	public ResponseEntity<Boolean> deleteLogReocrds() {
+		log.info("--> deleteLogReocrds");
+		Boolean resetDone = false;
+		
+		logController.removeAllLogs();
+		
+		log.info("deleteLogReocrds -->");
+	    return new ResponseEntity<Boolean>(resetDone, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "createOverviewPicture", nickname = "createOverviewPicture")
+	@RequestMapping(value = "/AdminService/createOverviewPicture", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = byte[].class),
+			@ApiResponse(code = 400, message = "Bad Request", response = byte[].class),
+			@ApiResponse(code = 500, message = "Failure", response = byte[].class) })
+	public ResponseEntity<byte[]> createOverviewPicture() {
+		log.info("-->createOverviewPicture");
+		//ByteArrayOutputStream bous = new ByteArrayOutputStream();
+		
+		log.info("createOverviewPicture-->");
+		return new ResponseEntity<byte[]>("".getBytes(), HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "getAllConfigurations", nickname = "getAllConfigurations")
+	@RequestMapping(value = "/AdminService/getAllConfigurations", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = List.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = List.class),
+			@ApiResponse(code = 500, message = "Failure", response = List.class) })
+	public ResponseEntity<List<Configuration>> getAllConfigurations() {
+		log.info("-->getAllConfigurations");
+		List<Configuration> configurations =  null;
+		
+		configurations = configRepo.findAll();
+		
+		log.info("getAllConfigurations-->");
+		return new ResponseEntity<List<Configuration>>(configurations, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "getActTestbedConfig", nickname = "getActTestbedConfig")
+	@RequestMapping(value = "/AdminService/getActTestbedConfig", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = TestbedConfig.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = TestbedConfig.class),
+			@ApiResponse(code = 500, message = "Failure", response = TestbedConfig.class) })
+	public ResponseEntity<TestbedConfig> getActTestbedConfig() {
+		log.info("-->getActTestbedConfig");
+		TestbedConfig configuration = null;
+		//ByteArrayOutputStream bous = new ByteArrayOutputStream();
+		
+		configuration = testbedConfigRepo.findActiveConfig(true);
+		
+		log.info("getActTestbedConfig-->");
+		return new ResponseEntity<TestbedConfig>(configuration, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "setActTestbedConfig", nickname = "setActTestbedConfig")
+	@RequestMapping(value = "/AdminService/setActTestbedConfig", method = RequestMethod.POST)
+	@ApiImplicitParams({ @ApiImplicitParam(name = "configuration", value = "the configuration that should be applied", required = true, dataType = "json", paramType = "body") })
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = Boolean.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = Boolean.class),
+			@ApiResponse(code = 500, message = "Failure", response = Boolean.class) })
+	public ResponseEntity<Boolean> setActTestbedConfig(@RequestBody TestbedConfig configuration) {
+		log.info("-->setActTestbedConfig");
+		
+		testbedConfigRepo.saveAndFlush(configuration);
+
+		log.info("setActTestbedConfig-->");
+		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "getAllTestbedModes", nickname = "getAllTestbedModes")
+	@RequestMapping(value = "/AdminService/getAllTestbedModes", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = TestbedConfig.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = TestbedConfig.class),
+			@ApiResponse(code = 500, message = "Failure", response = TestbedConfig.class) })
+	public ResponseEntity<List<String>> getAllTestbedModes() {
+		log.info("-->getAllTestbedModes");
+		
+		List<String> testbedModes = new ArrayList<String>();
+		testbedModes.add(TestbedSecurityMode.DEVELOP.toString());
+		testbedModes.add(TestbedSecurityMode.AUTHENTICATION.toString());
+		testbedModes.add(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION.toString());
+		
+		log.info("getAllTestbedModes-->");
+		return new ResponseEntity<List<String>>(testbedModes, HttpStatus.OK);
+	}
+	
 	private void createAllCoreTopics() throws Exception {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!", true);
-		adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat());
+		
+		adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat(), 300000L);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.ADMIN_HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.admin.hb", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.ADMIN_HEARTBEAT_TOPIC);
+		}
 		
-		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat());
+		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat(), 300000L);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.hb", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.HEARTBEAT_TOPIC);
+		}
 		
-		adminController.createTopic(TopicConstants.LOGGING_TOPIC, new EDXLDistribution(), new Log());
+		adminController.createTopic(TopicConstants.LOGGING_TOPIC, new EDXLDistribution(), new Log(), null);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LOGGING_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.LOGGING_TOPIC, true);
 		sendTopicStateChange("core.topic.log", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.LOGGING_TOPIC);
+		}
 		
-		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing());
+		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing(), null);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TIMING_TOPIC, true);
 		sendTopicStateChange("core.topic.time", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.TIMING_TOPIC);
+		}
 		
-		adminController.createTopic(TopicConstants.TIMING_CONTROL_TOPIC, new EDXLDistribution(), new TimingControl());
+		adminController.createTopic(TopicConstants.TIMING_CONTROL_TOPIC, new EDXLDistribution(), new TimingControl(), null);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_CONTROL_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TIMING_CONTROL_TOPIC, true);
 		sendTopicStateChange("core.topic.time.control", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.TIMING_CONTROL_TOPIC);
+		}
 		
-		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite());
+		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite(), null);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_INVITE_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TOPIC_INVITE_TOPIC, true);
 		sendTopicStateChange("core.topic.access.invite", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_INVITE_TOPIC);
+		}
 		
-		adminController.createTopic(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, new EDXLDistribution(), new TopicCreate());
+		adminController.createTopic(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, new EDXLDistribution(), new TopicCreate(), null);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, true);
 		sendTopicStateChange("core.topic.create.request", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC);
+		}
+				
+		adminController.createTopic(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, new EDXLDistribution(), new RequestChangeOfTrialStage(), null);
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TRIAL_STATE_CHANGE_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, true);
+		sendTopicStateChange("core.topic.trial.stage.change", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.TRIAL_STATE_CHANGE_TOPIC);
+		}
 		
-		adminController.createTopic(TopicConstants.LARGE_DATA_UPDTAE, new EDXLDistribution(), new LargeDataUpdate());
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LARGE_DATA_UPDTAE + " created.", true);
-		topicController.updateTopicState(TopicConstants.LARGE_DATA_UPDTAE, true);
-		sendTopicStateChange("core.topic.large.data", true);
+		adminController.createTopic(TopicConstants.OST_ANSWER_TOPIC, new EDXLDistribution(), new ObserverToolAnswer(), null);
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.OST_ANSWER_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.OST_ANSWER_TOPIC, true);
+		sendTopicStateChange("core.topic.ost.answer", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.OST_ANSWER_TOPIC);
+		}
+		
+		adminController.createTopic(TopicConstants.PHASE_MESSAGE_TOPIC, new EDXLDistribution(), new PhaseMessage(), null);
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.PHASE_MESSAGE_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.PHASE_MESSAGE_TOPIC, true);
+		sendTopicStateChange("core.topic.tm.phasemessage", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.PHASE_MESSAGE_TOPIC);
+		}
+		
+		adminController.createTopic(TopicConstants.ROLE_PLAYER_TOPIC, new EDXLDistribution(), new RolePlayerMessage(), null);
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ROLE_PLAYER_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.ROLE_PLAYER_TOPIC, true);
+		sendTopicStateChange("core.topic.tm.roleplayer", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.ROLE_PLAYER_TOPIC);
+		}
+		
+		adminController.createTopic(TopicConstants.SESSION_MGMT_TOPIC, new EDXLDistribution(), new SessionMgmt(), null);
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.SESSION_MGMT_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.SESSION_MGMT_TOPIC, true);
+		sendTopicStateChange("core.topic.tm.sessionmgmt", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.SESSION_MGMT_TOPIC);
+		}
 		
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!", true);
 	}
@@ -281,10 +495,14 @@ public class MgmtController {
 				schema = new LargeDataUpdate();
 			} else if (topic.getMsgType().equalsIgnoreCase("maplayer")) {
 				schema = new MapLayerUpdate();
+			} else if (topic.getMsgType().equalsIgnoreCase("named-geojson")) {
+				schema = new GeoJSONEnvelope();
+			} else if (topic.getMsgType().equalsIgnoreCase("photo-geojson")) {
+				schema = new eu.driver.model.geojson.photo.FeatureCollection();
 			}
 			
 			if (schema != null) {
-				adminController.createTopic(topic.getName(), new EDXLDistribution(), schema);
+				adminController.createTopic(topic.getName(), new EDXLDistribution(), schema, null);
 				logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
 				topicController.updateTopicState(topic.getName(), true);
 				sendTopicStateChange(topic.getClientId(), true);
@@ -322,15 +540,16 @@ public class MgmtController {
 							inviteMsgs.add(inviteMsg);
 						}
 					}
-				} else if (allSolutionsPublish) {
+				} else if (allSolutionsPublish && !allSolutionsSubscribe) {
 					for (Solution solution: solutionList) {
 						if (!solution.getIsAdmin()) {
 							TopicInvite inviteMsg = new TopicInvite();
 							inviteMsg.setId(solution.getClientId());
 							inviteMsg.setTopicName(topic.getName());
 							inviteMsg.setPublishAllowed(true);
+							inviteMsg.setSubscribeAllowed(false);
 							
-							// find the client ID in the list of subribers
+							// find the client ID in the list of subscribers
 							for (String clientID : subscribeClientIDs) {
 								if (clientID.equalsIgnoreCase(solution.getClientId())) {
 									inviteMsg.setSubscribeAllowed(true);
@@ -341,14 +560,15 @@ public class MgmtController {
 							inviteMsgs.add(inviteMsg);
 						}
 					}
-				} else if (allSolutionsSubscribe) {
+				} else if (!allSolutionsPublish && allSolutionsSubscribe) {
 					for (Solution solution: solutionList) {
 						if (!solution.getIsAdmin()) {
 							TopicInvite inviteMsg = new TopicInvite();
 							inviteMsg.setId(solution.getClientId());
 							inviteMsg.setTopicName(topic.getName());
 							inviteMsg.setSubscribeAllowed(true);
-							// find the client ID in the list of subribers
+							inviteMsg.setPublishAllowed(false);
+							// find the client ID in the list of subscribers
 							for (String clientID : publishClientIDs) {
 								if (clientID.equalsIgnoreCase(solution.getClientId())) {
 									inviteMsg.setPublishAllowed(true);
@@ -359,38 +579,51 @@ public class MgmtController {
 						}
 					}
 				} else {
-					Map<String, List<Boolean>> solutionMap = new HashMap<String, List<Boolean>>();
+					Map<String, Map<String, Boolean>> solutionMap = new HashMap<String, Map<String, Boolean>>();
+					
 					for (String clientID : publishClientIDs) {
-						List<Boolean> flagList = new ArrayList<Boolean>();
-						flagList.add(true);
-						solutionMap.put(clientID, flagList);
+						Map<String, Boolean> flags = new HashMap<String, Boolean>();
+						flags.put("publishAllowed", true);
+						flags.put("subscribeAllowed", false);
+						solutionMap.put(clientID, flags);
 					}
-					
 					for (String clientID : subscribeClientIDs) {
-						List<Boolean> flagList = solutionMap.get(clientID);
-						if (flagList == null) {
-							flagList = new ArrayList<Boolean>();
-							flagList.add(false);
+						Map<String, Boolean> flags = solutionMap.get(clientID);
+						if (flags == null) {
+							flags = new HashMap<String, Boolean>();
+							flags.put("publishAllowed", false);
+							flags.put("subscribeAllowed", true);
+							solutionMap.put(clientID, flags);
+						} else {
+							flags.put("subscribeAllowed", true);
+							solutionMap.put(clientID, flags);
 						}
-						flagList.add(true);
-						solutionMap.put(clientID, flagList);
 					}
 					
-					for (Map.Entry<String, List<Boolean>> entry : solutionMap.entrySet())
+					for (Map.Entry<String, Map<String, Boolean>> entry : solutionMap.entrySet())
 					{
-						List<Boolean> flagList = entry.getValue();
+						Map<String, Boolean> flags = entry.getValue();
 						TopicInvite inviteMsg = new TopicInvite();
 						inviteMsg.setId(entry.getKey());
 						inviteMsg.setTopicName(topic.getName());
-						inviteMsg.setPublishAllowed(flagList.get(0));
-						inviteMsg.setSubscribeAllowed(flagList.get(1));
+						inviteMsg.setPublishAllowed(flags.get("publishAllowed"));
+						inviteMsg.setSubscribeAllowed(flags.get("subscribeAllowed"));
 						inviteMsgs.add(inviteMsg);
 					}
 				}
 				for (TopicInvite inviteMsg : inviteMsgs) {
 					try {
 						logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg, true);
-						AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
+						// grant the access to the topics vie the Security REST API
+						boolean sendInvite = true;
+						// check if adapter is in secure mode
+						if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+							sendInvite = grantTopicAccess(inviteMsg);
+						}
+						
+						if (sendInvite) {
+							AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
+						}
 					} catch (CommunicationException cEx) {
 						logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString(), true);
 					}
@@ -412,7 +645,7 @@ public class MgmtController {
 	
 	private void loadSolutions() {
 		log.info("--> loadSolutions");
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Initializing Testbed Services/Solutions!", true);
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Loading Testbed Services/Solutions!", true);
 		String solutionJson = fileReader.readFile(this.solConfigJson);
 		if (solutionJson != null) {
 			try {
@@ -423,6 +656,7 @@ public class MgmtController {
 					jsonobject = jsonarray.getJSONObject(i);
 
 					solution.setClientId(jsonobject.getString("id"));
+					solution.setSubjectId(jsonobject.getString("subject.id"));
 					solution.setName(jsonobject.getString("name"));
 					solution.setIsAdmin(jsonobject.getBoolean("isTestbed"));
 					solution.setIsService(jsonobject.getBoolean("isService"));
@@ -433,11 +667,19 @@ public class MgmtController {
 					}
 					solution.setDescription(jsonobject.getString("description"));
 					
-					if (this.solutionRepo.findObjectByClientId(solution.getClientId()) == null) {
+					Solution dbSolution = this.solutionRepo.findObjectByClientId(solution.getClientId());
+					if (dbSolution == null) {
 						this.solutionRepo.saveAndFlush(solution);
 						log.info("add solution: " + solution.getName());
+					} else {
+						if (solution.getClientId().equalsIgnoreCase("TB-AdminTool")) {
+							solution.setState(true);
+						} else {
+							dbSolution.setState(false);	
+						}
+						this.solutionRepo.saveAndFlush(dbSolution);
 					}
-				}
+				} 
 			} catch (JSONException e) {
 				log.error("Error parsind the JSON solution response", e);
 			}
@@ -484,9 +726,13 @@ public class MgmtController {
 				} 
 				topic.setSubscribedSolutionIDs(subscriber);
 				
-				if (this.topicRepo.findObjectByClientId(topic.getClientId()) == null) {
+				Topic dbTopic = this.topicRepo.findObjectByClientId(topic.getClientId());
+				if (dbTopic == null) {
 					this.topicRepo.saveAndFlush(topic);
 					log.info("add topic: " + topic.getName());
+				} else {
+					dbTopic.setState(false);
+					this.topicRepo.saveAndFlush(dbTopic);
 				}
 			}
 		} catch (JSONException e) {
@@ -520,9 +766,13 @@ public class MgmtController {
 					} 
 					gateway.setManagingType(mangTypes);
 					
-					if (this.gatewayRepo.findObjectByClientId(gateway.getClientId()) == null) {
+					Gateway dbGateway = this.gatewayRepo.findObjectByClientId(gateway.getClientId());
+					if (dbGateway == null) {
 						this.gatewayRepo.saveAndFlush(gateway);
 						log.info("add gateway: " + gateway.getName());
+					} else {
+						dbGateway.setState(false);
+						this.gatewayRepo.saveAndFlush(dbGateway);
 					}
 				}
 			} catch (JSONException e) {
@@ -565,6 +815,193 @@ public class MgmtController {
 		}
 		log.info("loadStandards -->");
 	}
+	
+	private boolean grantGroupAccess(String clientID, String subjectID, String topicName) {
+		log.info("--> grantGroupAccess");
+		boolean granted = false;
+		if (subjectID == null) {
+			subjectID = this.getSubjectIdForClientId(clientID);	
+		}
+		JSONObject rulesObject = new JSONObject();
+		
+		try {
+			
+			JSONObject permissionsObject = new JSONObject();
+			
+			JSONObject publishObject = new JSONObject();
+			publishObject.put("allow", true);
+			publishObject.put("action", "READ");
+			
+			JSONObject describeObject = new JSONObject();
+			describeObject.put("allow", true);
+			describeObject.put("action", "DESCRIBE");
+			
+			JSONArray permissions = new JSONArray();
+			permissions.put(publishObject);
+			permissions.put(describeObject);
+			
+			permissionsObject.put("permissions", permissions);
+			permissionsObject.put("subject.id", subjectID);
+			
+			JSONArray rules = new JSONArray();
+			rules.put(permissionsObject);
+			
+			rulesObject.put("rules", rules);
+			
+		} catch (JSONException jEx) {
+			log.error("Error creating the JSON access grant structure!");
+			return false;
+		}
+		
+		String url = clientProp.getProperty("testbed.admin.security.rest.path.group");
+		if (System.getenv().get("security_rest_path_group") != null) {
+			url = url.replace("https://localhost:9443", System.getenv().get("security_rest_path_group"));
+		}
+		url += clientID;
+		
+		try {
+			httpUtils.postHTTPRequest(url, "PUT", "application/json", rulesObject.toString());
+			granted = true;
+		} catch (CommunicationException cex) {
+			log.error("Error grantig the access: " + cex.getMessage());
+			return false;
+		}
+		
+		if (granted) {
+			rulesObject = new JSONObject();
+			
+			try {
+				
+				JSONObject permissionsObject = new JSONObject();
+				
+				JSONObject publishObject = new JSONObject();
+				publishObject.put("allow", true);
+				publishObject.put("action", "READ");
+				
+				JSONObject describeObject = new JSONObject();
+				describeObject.put("allow", true);
+				describeObject.put("action", "DESCRIBE");
+				
+				JSONArray permissions = new JSONArray();
+				permissions.put(publishObject);
+				permissions.put(describeObject);
+				
+				permissionsObject.put("permissions", permissions);
+				permissionsObject.put("subject.group", clientID);
+				
+				JSONArray rules = new JSONArray();
+				rules.put(permissionsObject);
+				
+				rulesObject.put("rules", rules);
+				
+			} catch (JSONException jEx) {
+				log.error("Error creating the JSON access grant structure!");
+			}
+			
+			url = clientProp.getProperty("testbed.admin.security.rest.path.topic");
+			if (System.getenv().get("security_rest_path_topic") != null) {
+				url = url.replace("https://localhost:9443", System.getenv().get("security_rest_path_topics"));
+			}
+			url += topicName;
+			
+			try {
+				httpUtils.postHTTPRequest(url, "PUT", "application/json", rulesObject.toString());
+				granted = true;
+			} catch (CommunicationException cex) {
+				log.error("Error grantig the access: " + cex.getMessage());
+			}
+		}
+		
+		log.info("grantGroupAccess -->");
+		return granted;
+	}
+	
+	private boolean grantTopicAccess(TopicInvite inviteMessage) {
+		log.info("--> grantTopicAccess");
+		boolean granted = false;
+		
+		String clientID = inviteMessage.getId().toString();
+		String subjectID = this.getSubjectIdForClientId(clientID);
+		String topicName = inviteMessage.getTopicName().toString();
+		boolean publishAllowed = inviteMessage.getPublishAllowed();
+		boolean subscribeAllowed = inviteMessage.getSubscribeAllowed();
+		
+		JSONObject rulesObject = new JSONObject();
+		
+		try {
+			
+			JSONObject permissionsObject = new JSONObject();
+			
+			JSONObject publishObject = new JSONObject();
+			publishObject.put("allow", publishAllowed);
+			publishObject.put("action", "PUBLISH");
+			
+			JSONObject subsribeObject = new JSONObject();
+			subsribeObject.put("allow", subscribeAllowed);
+			subsribeObject.put("action", "SUBSCRIBE");
+			
+			JSONArray permissions = new JSONArray();
+			permissions.put(publishObject);
+			permissions.put(subsribeObject);
+			
+			permissionsObject.put("permissions", permissions);
+			permissionsObject.put("subject.id", subjectID);
+			
+			JSONArray rules = new JSONArray();
+			rules.put(permissionsObject);
+			
+			rulesObject.put("rules", rules);
+			
+		} catch (JSONException jEx) {
+			log.error("Error creating the JSON access grant structure!");
+		}
+		
+		String url = clientProp.getProperty("testbed.admin.security.rest.path.topic");
+		if (System.getenv().get("security_rest_path_topic") != null) {
+			url = url.replace("https://localhost:9443", System.getenv().get("security_rest_path_topics"));
+		}
+		url += topicName;
+		
+		try {
+			httpUtils.postHTTPRequest(url, "PUT", "application/json", rulesObject.toString());
+			granted = true;
+			
+			if (subscribeAllowed) {
+				granted = this.grantGroupAccess(clientID, null, topicName);	
+			}
+		} catch (CommunicationException cex) {
+			log.error("Error grantig the access: " + cex.getMessage());
+			granted = false;
+		}
+		
+		log.info("grantTopicAccess -->");
+		return granted;
+	}
+	
+	private String getSubjectIdForClientId(String clientId) {
+		log.info("--> getSubjectIdForClientId");
+		String subjectId = null;
+		
+		Solution solution = this.solutionRepo.findObjectByClientId(clientId);
+		if (solution != null) {
+			subjectId = solution.getSubjectId();
+		}
+		
+		log.info("getSubjectIdForClientId -->");
+		return subjectId;
+	}
+	
+	private void grantCoreTopicGroupAccess(String topicName) {
+		log.info("--> grantCoreTopicGroupAccess");
+		
+		List<Solution> solutions = this.solutionController.getSolutionList();
+		
+		for (Solution solution : solutions) {
+			this.grantGroupAccess(solution.getClientId(), solution.getSubjectId(), topicName);
+		}
+		
+		log.info("grantCoreTopicGroupAccess -->");
+	}
 
 	public LogRESTController getLogController() {
 		return logController;
@@ -597,4 +1034,5 @@ public class MgmtController {
 	public void setGatewayController(GatewayRESTController gatewayController) {
 		this.gatewayController = gatewayController;
 	}
+	
 }

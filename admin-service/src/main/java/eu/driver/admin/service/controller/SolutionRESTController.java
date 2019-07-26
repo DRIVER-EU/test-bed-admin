@@ -61,7 +61,7 @@ public class SolutionRESTController implements IAdaptorCallback {
 	}
 	
 	@Override
-	public void messageReceived(IndexedRecord key, IndexedRecord receivedMessage) {
+	public void messageReceived(IndexedRecord key, IndexedRecord receivedMessage, String topicName) {
 		log.debug("SolutionRESTController-->");
 		
 		if (receivedMessage.getSchema().getName().equalsIgnoreCase("Heartbeat")) {
@@ -82,7 +82,7 @@ public class SolutionRESTController implements IAdaptorCallback {
 		try {
 			Solution solution = this.solutionRepo.findObjectByClientId(clientID);
 			if (solution != null) {
-				solution.setLastHeartBeatReceived(isAliveDate);
+				solution.setLastHeartBeatReceived(new Date());
 				
 				if (solution.getState() != state) {
 					solution.setState(state);

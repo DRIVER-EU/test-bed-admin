@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>driver.eu</groupId>
 		<artifactId>admin-tool</artifactId>
-		<version>1.1.9</version>
+		<version>1.2.30</version>
 	</parent>
 
 	<properties>
@@ -66,7 +66,7 @@
 						<phase>generate-resources</phase>
 						<!-- Optional configuration which provides for running any npm command -->
 						<configuration>
-							<arguments>install</arguments>
+							<arguments>install --no-optional --no-package-lock</arguments>
 						</configuration>
 					</execution>
 					<!-- Build and minify static files -->

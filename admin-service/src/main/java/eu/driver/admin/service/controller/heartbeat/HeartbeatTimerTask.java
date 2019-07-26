@@ -24,15 +24,15 @@ public class HeartbeatTimerTask extends TimerTask {
 		log.debug("HeartbeatTimerTask -- run");
 		List<Solution> solutionList = this.solutionController.getSolutionList();
 		Date local = new Date();
-		DateTimeZone zone = DateTimeZone.getDefault();
-		long currentTime = zone.convertLocalToUTC(local.getTime(), false);
-		//long currentTime = (new Date()).getTime();
+		//DateTimeZone zone = DateTimeZone.getDefault();
+		//long currentTime = zone.convertLocalToUTC(local.getTime(), false);
+		long currentTime = (new Date()).getTime();
 		
 		for (Solution solution : solutionList) {
 			log.debug("Check HB from solution: " + solution.getName());
 			if (solution.getLastHeartBeatReceived() != null) {
 				long lastHBTime = solution.getLastHeartBeatReceived().getTime();
-				if (currentTime > (lastHBTime + 6000)) {
+				if (currentTime > (lastHBTime + 12000)) {
 					log.debug("No HB revceived from solution: " + solution.getName());
 					this.solutionController.updateSolutionState(solution.getClientId(), solution.getLastHeartBeatReceived(), false);
 				}	

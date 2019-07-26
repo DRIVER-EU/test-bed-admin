@@ -32,6 +32,10 @@ public class Solution {
 	@Size(min = 4, max = 255)
 	private String clientId = null;
 	
+	@Column(name="subjectId", length=255)
+	@Size(min = 4, max = 255)
+	private String subjectId = null;
+	
 	@Column(name="name", length=255)
 	@Size(min = 4, max = 255)
 	private String name = null;
@@ -65,6 +69,14 @@ public class Solution {
 
 	public String getClientId() {
 		return clientId;
+	}
+	
+	public String getSubjectId() {
+		return subjectId;
+	}
+
+	public void setSubjectId(String subjectId) {
+		this.subjectId = subjectId;
 	}
 
 	public void setClientId(String clientId) {

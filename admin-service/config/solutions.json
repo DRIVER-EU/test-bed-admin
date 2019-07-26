@@ -1,6 +1,7 @@
 [
 	{
 		"id":"TB-AdminTool",
+		"subject.id":"CN=Admin Tool,OU=Authz Service Dev Project,OU=WP923,O=DRIVER-PROJECT.EU",
  		"name":"AdminTool",
  		"isTestbed":true,
  		"isService":true,
@@ -8,6 +9,7 @@
  		"description":"This is the AdminTool"
 	},{
 		"id":"TB-AARTool",
+		"subject.id":"O=DRIVER-PROJECT.EU,CN=AARTool",
  		"name":"AARTool",
  		"isTestbed":false,
  		"isService":true,
@@ -15,6 +17,7 @@
  		"description":"This is the AfterActionReview Tool"
 	},{
 		"id":"TB-TrialMgmt",
+		"subject.id":"O=DRIVER-PROJECT.EU,CN=TrialMgmt",
  		"name":"TrialManager",
  		"isTestbed":false,
  		"isService":true,
@@ -22,10 +25,35 @@
  		"description":"This is the Trial Manager"
 	},{
 		"id":"TB-TimeService",
+		"subject.id":"O=DRIVER-PROJECT.EU,CN=TimeService",
  		"name":"TimeService",
  		"isTestbed":false,
  		"isService":true,
  		"state":false,
  		"description":"This is the Testbed TimeService"
+	},{
+		"id":"copper_gui",
+		"subject.id":"O=TNO,CN=Copper",
+ 		"name":"Copper GUI",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"Copper GUI from TNO1"
+	},{
+		"id":"copper_server",
+		"subject.id":"O=TNO,CN=Copper",
+ 		"name":"Copper Server",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"Copper Server from TNO1"
+	},{
+		"id":"silent-producer",
+		"subject.id":"O=TNO,CN=Copper",
+ 		"name":"Silent Producer",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"The Silent Producer!"
 	}
 ]

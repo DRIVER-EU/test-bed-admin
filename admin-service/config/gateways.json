@@ -1,9 +1,3 @@
 [
-	{
-		"id":"sim_pos_gateway",
- 		"name":"resource gateway",
- 		"state": false,
- 		"managingTypes":["EMSI","MLP","GEOJSON"],
- 		"description":"This is the SIM Gateway, managing resource possition via EMSI, MLP, GEOJSON"
-	}
+	
 ]
