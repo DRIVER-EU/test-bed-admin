@@ -1,10 +1,13 @@
 package eu.driver.admin.service.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -17,6 +20,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +31,8 @@ import eu.driver.adapter.excpetion.CommunicationException;
 import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.constants.TestbedSecurityMode;
+import eu.driver.admin.service.dto.configuration.Configuration;
+import eu.driver.admin.service.dto.configuration.TestbedConfig;
 import eu.driver.admin.service.dto.gateway.Gateway;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.dto.standard.Standard;
@@ -34,10 +40,12 @@ import eu.driver.admin.service.dto.topic.Topic;
 import eu.driver.admin.service.helper.FileReader;
 import eu.driver.admin.service.helper.HTTPUtils;
 import eu.driver.admin.service.kafka.KafkaAdminController;
+import eu.driver.admin.service.repository.ConfigurationRepository;
 import eu.driver.admin.service.repository.GatewayRepository;
 import eu.driver.admin.service.repository.LogRepository;
 import eu.driver.admin.service.repository.SolutionRepository;
 import eu.driver.admin.service.repository.StandardRepository;
+import eu.driver.admin.service.repository.TestbedConfigRepository;
 import eu.driver.admin.service.repository.TopicRepository;
 import eu.driver.admin.service.ws.WSController;
 import eu.driver.admin.service.ws.mapper.StringJSONMapper;
@@ -101,6 +109,12 @@ public class MgmtController {
 	
 	@Autowired
 	LogRepository logRepo;
+	
+	@Autowired
+	ConfigurationRepository configRepo;
+	
+	@Autowired
+	TestbedConfigRepository testbedConfigRepo;
 	
 	private Boolean initDone = false;
 	private Boolean startDone = false;
@@ -273,6 +287,87 @@ public class MgmtController {
 		
 		log.info("deleteLogReocrds -->");
 	    return new ResponseEntity<Boolean>(resetDone, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "createOverviewPicture", nickname = "createOverviewPicture")
+	@RequestMapping(value = "/AdminService/createOverviewPicture", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = byte[].class),
+			@ApiResponse(code = 400, message = "Bad Request", response = byte[].class),
+			@ApiResponse(code = 500, message = "Failure", response = byte[].class) })
+	public ResponseEntity<byte[]> createOverviewPicture() {
+		log.info("-->createOverviewPicture");
+		//ByteArrayOutputStream bous = new ByteArrayOutputStream();
+		
+		log.info("createOverviewPicture-->");
+		return new ResponseEntity<byte[]>("".getBytes(), HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "getAllConfigurations", nickname = "getAllConfigurations")
+	@RequestMapping(value = "/AdminService/getAllConfigurations", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = List.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = List.class),
+			@ApiResponse(code = 500, message = "Failure", response = List.class) })
+	public ResponseEntity<List<Configuration>> getAllConfigurations() {
+		log.info("-->getAllConfigurations");
+		List<Configuration> configurations =  null;
+		
+		configurations = configRepo.findAll();
+		
+		log.info("getAllConfigurations-->");
+		return new ResponseEntity<List<Configuration>>(configurations, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "getActTestbedConfig", nickname = "getActTestbedConfig")
+	@RequestMapping(value = "/AdminService/getActTestbedConfig", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = TestbedConfig.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = TestbedConfig.class),
+			@ApiResponse(code = 500, message = "Failure", response = TestbedConfig.class) })
+	public ResponseEntity<TestbedConfig> getActTestbedConfig() {
+		log.info("-->getActTestbedConfig");
+		TestbedConfig configuration = null;
+		//ByteArrayOutputStream bous = new ByteArrayOutputStream();
+		
+		configuration = testbedConfigRepo.findActiveConfig(true);
+		
+		log.info("getActTestbedConfig-->");
+		return new ResponseEntity<TestbedConfig>(configuration, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "setActTestbedConfig", nickname = "setActTestbedConfig")
+	@RequestMapping(value = "/AdminService/setActTestbedConfig", method = RequestMethod.POST)
+	@ApiImplicitParams({ @ApiImplicitParam(name = "configuration", value = "the configuration that should be applied", required = true, dataType = "json", paramType = "body") })
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = Boolean.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = Boolean.class),
+			@ApiResponse(code = 500, message = "Failure", response = Boolean.class) })
+	public ResponseEntity<Boolean> setActTestbedConfig(@RequestBody TestbedConfig configuration) {
+		log.info("-->setActTestbedConfig");
+		
+		testbedConfigRepo.saveAndFlush(configuration);
+
+		log.info("setActTestbedConfig-->");
+		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "getAllTestbedModes", nickname = "getAllTestbedModes")
+	@RequestMapping(value = "/AdminService/getAllTestbedModes", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = TestbedConfig.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = TestbedConfig.class),
+			@ApiResponse(code = 500, message = "Failure", response = TestbedConfig.class) })
+	public ResponseEntity<List<String>> getAllTestbedModes() {
+		log.info("-->getAllTestbedModes");
+		
+		List<String> testbedModes = new ArrayList<String>();
+		testbedModes.add(TestbedSecurityMode.DEVELOP.toString());
+		testbedModes.add(TestbedSecurityMode.AUTHENTICATION.toString());
+		testbedModes.add(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION.toString());
+		
+		log.info("getAllTestbedModes-->");
+		return new ResponseEntity<List<String>>(testbedModes, HttpStatus.OK);
 	}
 	
 	private void createAllCoreTopics() throws Exception {
