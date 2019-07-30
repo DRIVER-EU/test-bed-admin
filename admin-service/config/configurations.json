@@ -1,0 +1,38 @@
+[
+	{
+		"name":"Local Develop",
+		"discription":"A local develop configuration for testing",
+ 		"solutions":["TB-AdminTool",
+ 					"TB-AARTool",
+					"TB-TrialMgmt",
+					"TB-TimeService",
+					"TB-Ost"],
+ 		"topics":["core.topic.admin.hb", 
+ 					"core.topic.hb", 
+ 					"core.topic.log", 
+ 					"core.topic.access.invite", 
+ 					"core.topic.create.request", 
+ 					"core.topic.time", 
+ 					"core.topic.time.control", 
+ 					"core.topic.tm.phasemessage", 
+ 					"core.topic.tm.roleplayer", 
+ 					"core.topic.tm.sessionmgmt", 
+ 					"core.topic.ost.answer", 
+ 					"core.topic.trial.stage.change"],
+ 		"gateways":[]
+	},
+	{
+		"name":"Trial Austria",
+		"discription":"The Trial from Austria in Eisenerz",
+ 		"solutions":[],
+ 		"topics":[],
+ 		"gateways":[]
+	},
+	{
+		"name":"Final Demo",
+		"discription":"The DRIVER+ Final Demo located in Ispra and Warsaw",
+ 		"solutions":[],
+ 		"topics":[],
+ 		"gateways":[]
+	}
+]

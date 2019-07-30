@@ -1,6 +1,5 @@
 package eu.driver.admin.service.controller;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,10 +119,13 @@ public class MgmtController {
 	private Boolean startDone = false;
 	private TestbedSecurityMode secureMode = TestbedSecurityMode.DEVELOP;
 	
+	private String tbSolConfigJson = "config/testbed-solutions.json";
 	private String solConfigJson = "config/solutions.json";
+	private String tbTopicConfigJson = "config/testbed-topics.json";
 	private String topicConfigJson = "config/topics.json";
 	private String gwConfigJson = "config/gateways.json";
 	private String stConfigJson = "config/standards.json";
+	private String configurationsJson = "config/configurations.json";
 	
 	public MgmtController() {
 		if (System.getenv().get("testbed_secure_mode") != null) {
@@ -144,6 +146,7 @@ public class MgmtController {
 				gatewayRepo.deleteAll();
 				standardRepo.deleteAll();	
 				logRepo.deleteAll();
+				configRepo.deleteAll();
 			} catch (Exception e) {
 				log.error("Error cleaning the DB!", e);
 				logController.addLog(LogLevels.LOG_LEVEL_SEVER, "Error cleaning the DB at startup: " + e.getMessage(), true);
@@ -151,10 +154,13 @@ public class MgmtController {
 		}
 		
 		try {
-			loadSolutions();
-			loadTopics();
+			loadSolutions(this.tbSolConfigJson);
+			loadSolutions(this.solConfigJson);
+			loadTopics(this.tbTopicConfigJson);
+			loadTopics(this.topicConfigJson);
 			loadGateways();
 			loadStandards();
+			loadConfigurations();
 		} catch (Exception e) {
 			log.error("Error initializing the AdminTool Database!", e);
 			logController.addLog(LogLevels.LOG_LEVEL_SEVER, "The Testbed wasn't initialized successful: " + e.getMessage(), true);
@@ -248,21 +254,34 @@ public class MgmtController {
             @ApiResponse(code = 500, message = "Failure", response = Boolean.class)})
 	public ResponseEntity<Boolean> resetTestbed() {
 		log.info("--> resetTestbed");
+		Boolean cleanDone = false;
 		Boolean resetDone = false;
 		
 		this.initDone = false;
 		this.startDone = false;
 		
-		Boolean topicsRemoved = topicController.removeAllTopics();
-		Boolean solutionsRemoved = solutionController.removeAllSolutions();
-		Boolean gatewaysRemoved = gatewayController.removeAllGateways();
-		Boolean logsRemoved = logController.removeAllLogs();
+		try {
+			solutionRepo.deleteAll();
+			topicRepo.deleteAll();
+			gatewayRepo.deleteAll();
+			standardRepo.deleteAll();	
+			logRepo.deleteAll();
+			configRepo.deleteAll();
+			cleanDone = true;
+		} catch (Exception e) {
+			log.error("Error cleaning the DB!", e);
+			logController.addLog(LogLevels.LOG_LEVEL_SEVER, "Error cleaning the DB for reset: " + e.getMessage(), true);
+		}
 		
-		if (topicsRemoved && solutionsRemoved && gatewaysRemoved && logsRemoved) {
-			loadSolutions();
-			loadTopics();
+		
+		if (cleanDone) {
+			loadSolutions(this.tbSolConfigJson);
+			loadSolutions(this.solConfigJson);
+			loadTopics(this.tbTopicConfigJson);
+			loadTopics(this.topicConfigJson);
 			loadGateways();
 			loadStandards();
+			loadConfigurations();
 			resetDone = true;
 			logController.addLog(LogLevels.LOG_LEVEL_INFO, "The Testbed was re-initialized successful!", true);
 		} else {
@@ -643,10 +662,10 @@ public class MgmtController {
 				mapper.objectToJSONString(notifyMsg));
 	}
 	
-	private void loadSolutions() {
+	private void loadSolutions(String path) {
 		log.info("--> loadSolutions");
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Loading Testbed Services/Solutions!", true);
-		String solutionJson = fileReader.readFile(this.solConfigJson);
+		String solutionJson = fileReader.readFile(path);
 		if (solutionJson != null) {
 			try {
 				JSONArray jsonarray = new JSONArray(solutionJson);
@@ -687,10 +706,10 @@ public class MgmtController {
 		log.info("loadSolutions -->");
 	}
 	
-	private void loadTopics() {
+	private void loadTopics(String path) {
 		log.info("--> loadTopics");
 		try {
-			String topicJson = fileReader.readFile(this.topicConfigJson);
+			String topicJson = fileReader.readFile(path);
 			JSONArray jsonarray = new JSONArray(topicJson);
 			for (int i = 0; i < jsonarray.length(); i++) {
 				JSONObject jsonobject;
@@ -814,6 +833,78 @@ public class MgmtController {
 			}
 		}
 		log.info("loadStandards -->");
+	}
+	
+	private void loadConfigurations() {
+		log.info("--> loadConfigurations");
+		String configurationJson = fileReader.readFile(this.configurationsJson);
+		
+		if (configurationJson != null) {
+			try {
+				JSONArray jsonarray = new JSONArray(configurationJson);
+				for (int i = 0; i < jsonarray.length(); i++) {
+					JSONObject jsonobject;
+					Configuration configuration = new Configuration();
+					jsonobject = jsonarray.getJSONObject(i);
+
+					configuration.setName(jsonobject.getString("name"));
+					configuration.setDiscription(jsonobject.getString("discription"));
+					JSONArray jsonSolutions = jsonobject.getJSONArray("solutions");
+					List<Solution> solutions = new ArrayList<Solution>();
+					if (jsonSolutions != null) { 
+					   for (int a=0;a<jsonSolutions.length();a++){ 
+						   try {
+							   Solution sol = solutionRepo.findObjectByClientId(jsonSolutions.getString(a));
+							   if (sol != null) {
+								   solutions.add(sol);
+							   }
+						   } catch (Exception  e) {
+							   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The solution: " + jsonSolutions.getString(a) + " defined in the configuration cannot be found!", true);
+						   }
+					   } 
+					} 
+					configuration.setSolutions(solutions);
+					
+					JSONArray jsonTopics = jsonobject.getJSONArray("topics");
+					List<Topic> topics = new ArrayList<Topic>();
+					if (jsonTopics != null) { 
+					   for (int a=0;a<jsonTopics.length();a++){ 
+						   try {
+							   Topic top = topicRepo.findObjectByClientId(jsonTopics.getString(a));
+							   if (top != null) {
+								   topics.add(top);
+							   }
+						   } catch (Exception  e) {
+							   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The topic: " + jsonTopics.getString(a) + " defined in the configuration cannot be found!", true);
+						   }
+					   } 
+					} 
+					configuration.setTopics(topics);
+					
+					JSONArray jsonGateways = jsonobject.getJSONArray("gateways");
+					List<Gateway> gateways = new ArrayList<Gateway>();
+					if (jsonGateways != null) { 
+					   for (int a=0;a<jsonGateways.length();a++){ 
+						   try {
+							   Gateway gw = gatewayRepo.findObjectByClientId(jsonGateways.getString(a));
+							   if (gw != null) {
+								   gateways.add(gw);
+							   }
+						   } catch (Exception  e) {
+							   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The gateway: " + jsonGateways.getString(a) + " defined in the configuration cannot be found!", true);
+						   }
+					   } 
+					} 
+					configuration.setGateways(gateways);
+
+					configRepo.saveAndFlush(configuration);
+				}
+			} catch (JSONException e) {
+				log.error("Error parsind the JSON Configuration response", e);
+			}
+		}
+		
+		log.info("loadConfigurations -->");
 	}
 	
 	private boolean grantGroupAccess(String clientID, String subjectID, String topicName) {
@@ -1034,5 +1125,7 @@ public class MgmtController {
 	public void setGatewayController(GatewayRESTController gatewayController) {
 		this.gatewayController = gatewayController;
 	}
+	
+	
 	
 }
