@@ -3,7 +3,7 @@
     <toolbar class="primary">
       <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition">
         <v-btn slot="activator">
-          <v-icon left>settings</v-icon> <!-- settings_ethernet -->
+          <v-icon left>settings</v-icon>
           Configurations
         </v-btn>
         <v-card>
@@ -12,6 +12,21 @@
               <v-icon left v-if="configuration.name === currentConfiguration.configName">radio_button_checked</v-icon>
               <v-icon left v-else>radio_button_unchecked</v-icon>
               {{ configuration.name }}
+            </v-list-tile>
+          </v-list>
+        </v-card>
+      </v-menu>
+      <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition">
+        <v-btn slot="activator">
+          <v-icon left>settings_ethernet</v-icon>
+          Modes
+        </v-btn>
+        <v-card>
+          <v-list>
+            <v-list-tile v-bind:key="mode" v-for="mode in modes" @click="switchToMode(mode)">
+              <v-icon left v-if="mode === currentConfiguration.testbedMode">radio_button_checked</v-icon>
+              <v-icon left v-else>radio_button_unchecked</v-icon>
+              {{ mode }}
             </v-list-tile>
           </v-list>
         </v-card>
@@ -49,13 +64,17 @@
           this.$store.dispatch('startTrial')
         },
         switchToConfiguration: function (name) {
-          console.log('Setting configuration to ', name)
+          console.log('Setting configuration to', name)
+        },
+        switchToMode: function (name) {
+          console.log('Setting testbed mode to', name)
         }
       },
-    computed: mapGetters(['isTestbedInitialized', 'isTrialStarted', 'loading', 'configurations', 'currentConfiguration']),
+    computed: mapGetters(['isTestbedInitialized', 'isTrialStarted', 'loading', 'configurations', 'modes', 'currentConfiguration']),
     created: function () {
       this.$store.dispatch('getCurrentConfiguration');
       this.$store.dispatch('getConfigurations');
+      this.$store.dispatch('getModes');
     }
   }
 </script>

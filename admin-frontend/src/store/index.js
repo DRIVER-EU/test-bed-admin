@@ -30,6 +30,7 @@ export const store = new Vuex.Store({
     isTestbedInitialized: false,
     isTrialStarted: false,
     configurations: [],
+    modes: [],
     currentConfiguration: {}
   },
   getters: {
@@ -69,6 +70,9 @@ export const store = new Vuex.Store({
     },
     configurations(state) {
       return state.configurations;
+    },
+    modes(state) {
+      return state.modes;
     },
     currentConfiguration(state) {
       return state.currentConfiguration;
@@ -152,6 +156,9 @@ export const store = new Vuex.Store({
     },
     SET_CONFIGURATIONS(state, configurations) {
       state.configurations = configurations;
+    },
+    SET_MODES(state, modes) {
+      state.modes = modes;
     },
     SET_CURRENT_CONFIGURATION(state, currentConfiguration) {
       state.currentConfiguration = currentConfiguration;
@@ -255,6 +262,11 @@ export const store = new Vuex.Store({
     getConfigurations(context) {
       this.axios.get('getAllConfigurations').then(response => {
         context.commit('SET_CONFIGURATIONS', (response.data));
+      })
+    },
+    getModes(context) {
+      this.axios.get('getAllTestbedModes').then(response => {
+        context.commit('SET_MODES', (response.data));
       })
     },
     getCurrentConfiguration(context) {
