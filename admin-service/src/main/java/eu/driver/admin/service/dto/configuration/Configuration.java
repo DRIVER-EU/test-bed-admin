@@ -1,13 +1,16 @@
 package eu.driver.admin.service.dto.configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -38,13 +41,13 @@ public class Configuration {
 	@Size(min = 4, max = 255)
 	private String discription;
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
+	@ManyToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Solution> solutions;
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
+	@ManyToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Topic> topics;
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
+	@ManyToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Gateway> gateways;
 	
 	public Configuration() {
@@ -81,6 +84,13 @@ public class Configuration {
 
 	public void setSolutions(List<Solution> solutions) {
 		this.solutions = solutions;
+	}
+	
+	public void addSolution(Solution solution) {
+		if (this.solutions == null) {
+			this.solutions = new ArrayList<Solution>();
+		}
+		this.solutions.add(solution);
 	}
 
 	public List<Topic> getTopics() {
