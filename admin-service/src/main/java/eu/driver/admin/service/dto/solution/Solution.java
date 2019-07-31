@@ -1,17 +1,29 @@
 package eu.driver.admin.service.dto.solution;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
+
+import org.springframework.data.rest.webmvc.support.BackendId;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import eu.driver.admin.service.dto.configuration.Configuration;
 
 /**
  * The persistent class for the solution database table.
@@ -54,6 +66,14 @@ public class Solution {
 	
 	@Column(name="lastHeartBeatReceived")
 	private Date lastHeartBeatReceived = null;
+	
+	@ManyToMany(fetch=FetchType.EAGER)
+	@JoinTable(
+	  name = "admin_service.applied_solutions", 
+	  joinColumns = @JoinColumn(name = "solution_id"), 
+	  inverseJoinColumns = @JoinColumn(name = "configuration_id"))
+	@JsonBackReference
+	private List<Configuration> applConfigurations;
 	
 	public Solution() {
 		
@@ -130,4 +150,21 @@ public class Solution {
 	public void setLastHeartBeatReceived(Date lastHeartBeatReceived) {
 		this.lastHeartBeatReceived = lastHeartBeatReceived;
 	}
+
+	public List<Configuration> getApplConfigurations() {
+		return applConfigurations;
+	}
+
+	public void setApplConfigurations(List<Configuration> applConfigurations) {
+		this.applConfigurations = applConfigurations;
+	}
+	
+	public void addApplConfigurations(Configuration applConfiguration) {
+		if (this.applConfigurations == null) {
+			this.applConfigurations = new ArrayList<Configuration>();
+		}
+		this.applConfigurations.add(applConfiguration);
+	}
+	
+	
 }

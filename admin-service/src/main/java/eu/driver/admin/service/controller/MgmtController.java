@@ -849,12 +849,16 @@ public class MgmtController {
 
 					configuration.setName(jsonobject.getString("name"));
 					configuration.setDiscription(jsonobject.getString("discription"));
+					configuration = configRepo.saveAndFlush(configuration);
+					
 					JSONArray jsonSolutions = jsonobject.getJSONArray("solutions");
 					List<Solution> solutions = new ArrayList<Solution>();
 					if (jsonSolutions != null) { 
 					   for (int a=0;a<jsonSolutions.length();a++){ 
 						   try {
 							   Solution sol = solutionRepo.findObjectByClientId(jsonSolutions.getString(a));
+							   sol.addApplConfigurations(configuration);
+							   //sol = solutionRepo.saveAndFlush(sol);
 							   if (sol != null) {
 								   solutions.add(sol);
 							   }
@@ -865,7 +869,7 @@ public class MgmtController {
 					} 
 					configuration.setSolutions(solutions);
 					
-					JSONArray jsonTopics = jsonobject.getJSONArray("topics");
+					/*JSONArray jsonTopics = jsonobject.getJSONArray("topics");
 					List<Topic> topics = new ArrayList<Topic>();
 					if (jsonTopics != null) { 
 					   for (int a=0;a<jsonTopics.length();a++){ 
@@ -895,7 +899,7 @@ public class MgmtController {
 						   }
 					   } 
 					} 
-					configuration.setGateways(gateways);
+					configuration.setGateways(gateways);*/
 
 					configRepo.saveAndFlush(configuration);
 				}
