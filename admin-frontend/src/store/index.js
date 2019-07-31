@@ -28,7 +28,9 @@ export const store = new Vuex.Store({
     topicTypes: [],
     loading: false,
     isTestbedInitialized: false,
-    isTrialStarted: false
+    isTrialStarted: false,
+    configurations: [],
+    currentConfiguration: {}
   },
   getters: {
     solutions(state) {
@@ -64,9 +66,14 @@ export const store = new Vuex.Store({
     },
     isTrialStarted(state) {
       return state.isTrialStarted
+    },
+    configurations(state) {
+      return state.configurations;
+    },
+    currentConfiguration(state) {
+      return state.currentConfiguration;
     }
-  }
-  ,
+  },
   mutations: {
     SOCKET_ONOPEN(state) {
       console.log('connection open')
@@ -141,8 +148,14 @@ export const store = new Vuex.Store({
       state.isTestbedInitialized = isInitialized
     },
     LOADING(state, isTrue) {
-      state.loading = isTrue
-    }
+      state.loading = isTrue;
+    },
+    SET_CONFIGURATIONS(state, configurations) {
+      state.configurations = configurations;
+    },
+    SET_CURRENT_CONFIGURATION(state, currentConfiguration) {
+      state.currentConfiguration = currentConfiguration;
+    },
   }
   ,
   actions: {
@@ -237,6 +250,16 @@ export const store = new Vuex.Store({
     getAllTopicTypes(context) {
       this.axios.get('getAllTopicTypes').then(response => {
         context.commit('SET_TOPIC_TYPES', (response.data));
+      })
+    },
+    getConfigurations(context) {
+      this.axios.get('getAllConfigurations').then(response => {
+        context.commit('SET_CONFIGURATIONS', (response.data));
+      })
+    },
+    getCurrentConfiguration(context) {
+      this.axios.get('getActTestbedConfig').then(response => {
+        context.commit('SET_CURRENT_CONFIGURATION', (response.data));
       })
     }
   }

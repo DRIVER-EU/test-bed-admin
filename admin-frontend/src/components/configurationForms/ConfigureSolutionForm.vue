@@ -30,11 +30,10 @@
               :value="false"
             ></v-radio>
           </v-radio-group>
-          <v-text-field
+          <v-textarea
             v-model="description"
             label="Description"
-            multi-line
-          ></v-text-field>
+          ></v-textarea>
         </v-form>
       </v-card-text>
       <v-card-actions>

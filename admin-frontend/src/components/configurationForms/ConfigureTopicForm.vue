@@ -53,11 +53,10 @@
             deletable-chips
             label="Select solution(s) allowed to subscribe to this topic"
           ></v-select>
-          <v-text-field
+          <v-textarea
             v-model="description"
             label="Description"
-            multi-line
-          ></v-text-field>
+          ></v-textarea>
         </v-form>
       </v-card-text>
       <v-card-actions>
