@@ -52,6 +52,7 @@
 <script>
   import {mapGetters} from 'vuex'
   import Overview from '../components/Overview'
+  import {configurationService} from '../service/ConfigurationService'
 
   export default {
     name: 'App',
@@ -68,10 +69,10 @@
           this.$store.dispatch('startTrial')
         },
         switchToConfiguration: function (name) {
-          console.log('Setting configuration to', name);
+          configurationService.switchToConfiguration(name, this.currentConfiguration, this.modes);
         },
         switchToMode: function (name) {
-          console.log('Setting testbed mode to', name);
+          configurationService.switchToMode(name, this.currentConfiguration, this.configurations);
         },
         openOverviewDiagramPage() {
           console.log("Opening overview image");
