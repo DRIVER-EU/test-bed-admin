@@ -1,6 +1,10 @@
 <template>
   <v-app>
     <toolbar class="primary">
+      <v-btn @click="openOverviewDiagramPage()">
+        <v-icon left>insert_chart_outlined</v-icon>
+        Overview
+      </v-btn>
       <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition">
         <v-btn slot="activator">
           <v-icon left>settings</v-icon>
@@ -64,10 +68,15 @@
           this.$store.dispatch('startTrial')
         },
         switchToConfiguration: function (name) {
-          console.log('Setting configuration to', name)
+          console.log('Setting configuration to', name);
         },
         switchToMode: function (name) {
-          console.log('Setting testbed mode to', name)
+          console.log('Setting testbed mode to', name);
+        },
+        openOverviewDiagramPage() {
+          console.log("Opening overview image");
+          let routeData = this.$router.resolve({name: 'overviewDiagram'});
+          window.open(routeData.href, '_blank');
         }
       },
     computed: mapGetters(['isTestbedInitialized', 'isTrialStarted', 'loading', 'configurations', 'modes', 'currentConfiguration']),

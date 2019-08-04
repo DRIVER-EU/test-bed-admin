@@ -15,6 +15,7 @@ import ConfigureTopicForm from './components/configurationForms/ConfigureTopicFo
 import ConfigureGatewayForm from './components/configurationForms/ConfigureGatewayForm'
 import Urls from './constants/Urls'
 import Toolbar from './components/Toolbar'
+import DiagramPage from './pages/DiagramPage'
 
 export const eventBus = new Vue()
 
@@ -49,6 +50,7 @@ Vue.component('configure-solution-form',ConfigureSolutionForm)
 Vue.component('configure-topic-form',ConfigureTopicForm)
 Vue.component('configure-gateway-form',ConfigureGatewayForm)
 Vue.component('toolbar', Toolbar);
+Vue.component('diagram-page', DiagramPage);
 
 Vue.config.productionTip = false
 
