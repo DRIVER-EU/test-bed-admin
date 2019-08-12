@@ -365,6 +365,12 @@ public class MgmtController {
 	public ResponseEntity<Boolean> setActTestbedConfig(@RequestBody TestbedConfig configuration) {
 		log.info("-->setActTestbedConfig");
 		
+		TestbedConfig oldConfiguration = testbedConfigRepo.findActiveConfig(true);
+		if (oldConfiguration != null) {
+			oldConfiguration.setIsActive(false);
+			testbedConfigRepo.save(oldConfiguration);
+		}
+		configuration.setIsActive(true);
 		testbedConfigRepo.saveAndFlush(configuration);
 
 		log.info("setActTestbedConfig-->");

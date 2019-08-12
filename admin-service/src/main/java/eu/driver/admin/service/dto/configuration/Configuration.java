@@ -41,7 +41,7 @@ public class Configuration {
 	@Size(min = 4, max = 255)
 	private String discription;
 	
-	@ManyToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany(mappedBy="applConfigurations",fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Solution> solutions;
 	
 	@ManyToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
