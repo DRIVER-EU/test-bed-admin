@@ -29,9 +29,14 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.controller.heartbeat.HeartbeatTimerTask;
 import eu.driver.admin.service.dto.SolutionList;
+import eu.driver.admin.service.dto.TopicList;
+import eu.driver.admin.service.dto.configuration.Configuration;
+import eu.driver.admin.service.dto.configuration.TestbedConfig;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.helper.FileReader;
+import eu.driver.admin.service.repository.ConfigurationRepository;
 import eu.driver.admin.service.repository.SolutionRepository;
+import eu.driver.admin.service.repository.TestbedConfigRepository;
 import eu.driver.admin.service.ws.WSController;
 import eu.driver.admin.service.ws.mapper.StringJSONMapper;
 import eu.driver.admin.service.ws.object.WSSolutionStateChange;
@@ -50,6 +55,12 @@ public class SolutionRESTController implements IAdaptorCallback {
 	
 	@Autowired
 	SolutionRepository solutionRepo;
+	
+	@Autowired
+	ConfigurationRepository configRepo;
+	
+	@Autowired
+	TestbedConfigRepository testbedConfigRepo;
 
 	public SolutionRESTController() {
 		log.info("-->SolutionRESTController");
@@ -214,8 +225,22 @@ public class SolutionRESTController implements IAdaptorCallback {
 		log.info("--> getAllTrialSolutions");
 		SolutionList solutionList = new SolutionList();
 		
+		String configName = null;
 		List<Solution> solutions = this.solutionRepo.findAll();
-		solutionList.setSolutions(solutions);
+		TestbedConfig tbConfig = testbedConfigRepo.findActiveConfig(true);
+		try {
+			
+			if (tbConfig != null) {
+				configName = tbConfig.getConfigName();
+				if (configName != null) {
+					Configuration config = configRepo.findObjectByName(configName);
+					solutions = config.getSolutions();
+				}
+			}
+			solutionList.setSolutions(solutions);
+		} catch (Exception e) {
+			return new ResponseEntity<SolutionList>(solutionList, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
 		log.info("getAllTrialSolutions -->");
 		return new ResponseEntity<SolutionList>(solutionList, HttpStatus.OK);
@@ -243,4 +268,21 @@ public class SolutionRESTController implements IAdaptorCallback {
 	public void setSolutionRepo(SolutionRepository solutionRepo) {
 		this.solutionRepo = solutionRepo;
 	}
+
+	public ConfigurationRepository getConfigRepo() {
+		return configRepo;
+	}
+
+	public void setConfigRepo(ConfigurationRepository configRepo) {
+		this.configRepo = configRepo;
+	}
+
+	public TestbedConfigRepository getTestbedConfigRepo() {
+		return testbedConfigRepo;
+	}
+
+	public void setTestbedConfigRepo(TestbedConfigRepository testbedConfigRepo) {
+		this.testbedConfigRepo = testbedConfigRepo;
+	}
+		
 }

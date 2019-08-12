@@ -372,6 +372,8 @@ public class MgmtController {
 		}
 		configuration.setIsActive(true);
 		testbedConfigRepo.saveAndFlush(configuration);
+		
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Testbed setting changed to: " + configuration.getConfigName() + ", " + configuration.getTestbedMode(), true);
 
 		log.info("setActTestbedConfig-->");
 		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
@@ -864,7 +866,6 @@ public class MgmtController {
 						   try {
 							   Solution sol = solutionRepo.findObjectByClientId(jsonSolutions.getString(a));
 							   sol.addApplConfigurations(configuration);
-							   //sol = solutionRepo.saveAndFlush(sol);
 							   if (sol != null) {
 								   solutions.add(sol);
 							   }
@@ -875,12 +876,13 @@ public class MgmtController {
 					} 
 					configuration.setSolutions(solutions);
 					
-					/*JSONArray jsonTopics = jsonobject.getJSONArray("topics");
+					JSONArray jsonTopics = jsonobject.getJSONArray("topics");
 					List<Topic> topics = new ArrayList<Topic>();
 					if (jsonTopics != null) { 
 					   for (int a=0;a<jsonTopics.length();a++){ 
 						   try {
 							   Topic top = topicRepo.findObjectByClientId(jsonTopics.getString(a));
+							   top.addApplConfigurations(configuration);
 							   if (top != null) {
 								   topics.add(top);
 							   }
@@ -891,7 +893,7 @@ public class MgmtController {
 					} 
 					configuration.setTopics(topics);
 					
-					JSONArray jsonGateways = jsonobject.getJSONArray("gateways");
+					/*JSONArray jsonGateways = jsonobject.getJSONArray("gateways");
 					List<Gateway> gateways = new ArrayList<Gateway>();
 					if (jsonGateways != null) { 
 					   for (int a=0;a<jsonGateways.length();a++){ 

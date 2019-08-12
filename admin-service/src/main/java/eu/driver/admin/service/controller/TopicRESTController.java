@@ -21,10 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.dto.TopicList;
+import eu.driver.admin.service.dto.configuration.Configuration;
+import eu.driver.admin.service.dto.configuration.TestbedConfig;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.dto.standard.Standard;
 import eu.driver.admin.service.dto.topic.Topic;
+import eu.driver.admin.service.repository.ConfigurationRepository;
 import eu.driver.admin.service.repository.StandardRepository;
+import eu.driver.admin.service.repository.TestbedConfigRepository;
 import eu.driver.admin.service.repository.TopicRepository;
 
 @RestController
@@ -39,6 +43,12 @@ public class TopicRESTController {
 	
 	@Autowired
 	StandardRepository standardRepo;
+	
+	@Autowired
+	ConfigurationRepository configRepo;
+	
+	@Autowired
+	TestbedConfigRepository testbedConfigRepo;
 	
 
 	public TopicRESTController() {
@@ -164,8 +174,19 @@ public class TopicRESTController {
 		log.info("--> getAllTrialTopics");
 		TopicList topicList = new TopicList();
 		
+		String configName = null;
+		List<Topic> topics = this.topicRepo.findAll();
+		TestbedConfig tbConfig = testbedConfigRepo.findActiveConfig(true);
+		
 		try {
-			topicList.setTopics(this.topicRepo.findAll());
+			if (tbConfig != null) {
+				configName = tbConfig.getConfigName();
+				if (configName != null) {
+					Configuration config = configRepo.findObjectByName(configName);
+					topics = config.getTopics();
+				}
+			}
+			topicList.setTopics(topics);
 		} catch (Exception e) {
 			return new ResponseEntity<TopicList>(topicList, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -245,5 +266,21 @@ public class TopicRESTController {
 
 	public void setStandardRepo(StandardRepository standardRepo) {
 		this.standardRepo = standardRepo;
+	}
+
+	public ConfigurationRepository getConfigRepo() {
+		return configRepo;
+	}
+
+	public void setConfigRepo(ConfigurationRepository configRepo) {
+		this.configRepo = configRepo;
+	}
+
+	public TestbedConfigRepository getTestbedConfigRepo() {
+		return testbedConfigRepo;
+	}
+
+	public void setTestbedConfigRepo(TestbedConfigRepository testbedConfigRepo) {
+		this.testbedConfigRepo = testbedConfigRepo;
 	}
 }

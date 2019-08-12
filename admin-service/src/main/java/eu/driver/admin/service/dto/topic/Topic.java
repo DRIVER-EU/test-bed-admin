@@ -7,15 +7,22 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import eu.driver.admin.service.dto.configuration.Configuration;
 
 /**
  * The persistent class for the topic database table.
@@ -66,6 +73,14 @@ public class Topic {
 	@CollectionTable(name="subscribedSolutions", schema="admin_service", joinColumns=@JoinColumn(name="id"))
 	@Column(name="subscribedSolutionIDs")
 	private List<String> subscribedSolutionIDs = new ArrayList<String>();
+	
+	@ManyToMany(fetch=FetchType.EAGER)
+	@JoinTable(
+	  name = "admin_service.applied_topics", 
+	  joinColumns = @JoinColumn(name = "topic_id"), 
+	  inverseJoinColumns = @JoinColumn(name = "configuration_id"))
+	@JsonBackReference
+	private List<Configuration> applConfigurations;
 	
 	public Topic() {
 		
@@ -149,5 +164,20 @@ public class Topic {
 
 	public void setSubscribedSolutionIDs(List<String> subscribedSolutionIDs) {
 		this.subscribedSolutionIDs = subscribedSolutionIDs;
+	}
+
+	public List<Configuration> getApplConfigurations() {
+		return applConfigurations;
+	}
+
+	public void setApplConfigurations(List<Configuration> applConfigurations) {
+		this.applConfigurations = applConfigurations;
+	}
+	
+	public void addApplConfigurations(Configuration applConfiguration) {
+		if (this.applConfigurations == null) {
+			this.applConfigurations = new ArrayList<Configuration>();
+		}
+		this.applConfigurations.add(applConfiguration);
 	}
 }
