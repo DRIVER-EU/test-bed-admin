@@ -37,7 +37,7 @@
       </v-menu>
       <v-btn :disabled="isTestbedInitialized" v-on:click="initTestbed">
         <v-icon left>rotate_right</v-icon>
-        Initialize testbed
+        Initialize test-bed
       </v-btn>
       <v-btn :disabled="!isTestbedInitialized" v-on:click="startTrial">
         <v-icon left>play_arrow</v-icon>
