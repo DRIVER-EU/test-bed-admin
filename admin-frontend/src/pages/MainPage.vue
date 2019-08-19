@@ -12,7 +12,7 @@
         </v-btn>
         <v-card>
           <v-list>
-            <v-list-tile v-bind:key="configuration.name" v-for="configuration in configurations" @click="switchToConfiguration(configuration.name)">
+            <v-list-tile v-bind:key="configuration.id" v-for="configuration in configurations" @click="switchToConfiguration(configuration.name)">
               <v-icon left v-if="configuration.name === currentConfiguration.configName">radio_button_checked</v-icon>
               <v-icon left v-else>radio_button_unchecked</v-icon>
               {{ configuration.name }}
@@ -37,7 +37,7 @@
       </v-menu>
       <v-btn :disabled="isTestbedInitialized" v-on:click="initTestbed">
         <v-icon left>rotate_right</v-icon>
-        Initialize testbed
+        Initialize test-bed
       </v-btn>
       <v-btn :disabled="!isTestbedInitialized" v-on:click="startTrial">
         <v-icon left>play_arrow</v-icon>
