@@ -852,64 +852,70 @@ public class MgmtController {
 				JSONArray jsonarray = new JSONArray(configurationJson);
 				for (int i = 0; i < jsonarray.length(); i++) {
 					JSONObject jsonobject;
-					Configuration configuration = new Configuration();
 					jsonobject = jsonarray.getJSONObject(i);
-
-					configuration.setName(jsonobject.getString("name"));
-					configuration.setDiscription(jsonobject.getString("discription"));
-					configuration = configRepo.saveAndFlush(configuration);
-					
-					JSONArray jsonSolutions = jsonobject.getJSONArray("solutions");
-					List<Solution> solutions = new ArrayList<Solution>();
-					if (jsonSolutions != null) { 
-					   for (int a=0;a<jsonSolutions.length();a++){ 
-						   try {
-							   Solution sol = solutionRepo.findObjectByClientId(jsonSolutions.getString(a));
-							   sol.addApplConfigurations(configuration);
-							   if (sol != null) {
-								   solutions.add(sol);
+					String configName = jsonobject.getString("name");
+					Configuration configuration = configRepo.findObjectByName(configName);
+					if (configuration == null) {
+						configuration = new Configuration();
+	
+						configuration.setName(configName);
+						configuration.setDiscription(jsonobject.getString("discription"));
+						configuration = configRepo.saveAndFlush(configuration);
+						
+						JSONArray jsonSolutions = jsonobject.getJSONArray("solutions");
+						List<Solution> solutions = new ArrayList<Solution>();
+						if (jsonSolutions != null) { 
+						   for (int a=0;a<jsonSolutions.length();a++){ 
+							   try {
+								   Solution sol = solutionRepo.findObjectByClientId(jsonSolutions.getString(a));
+								   sol.addApplConfigurations(configuration);
+								   if (sol != null) {
+									   solutions.add(sol);
+								   }
+							   } catch (Exception  e) {
+								   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The solution: " + jsonSolutions.getString(a) + " defined in the configuration cannot be found!", true);
 							   }
-						   } catch (Exception  e) {
-							   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The solution: " + jsonSolutions.getString(a) + " defined in the configuration cannot be found!", true);
-						   }
-					   } 
-					} 
-					configuration.setSolutions(solutions);
-					
-					JSONArray jsonTopics = jsonobject.getJSONArray("topics");
-					List<Topic> topics = new ArrayList<Topic>();
-					if (jsonTopics != null) { 
-					   for (int a=0;a<jsonTopics.length();a++){ 
-						   try {
-							   Topic top = topicRepo.findObjectByClientId(jsonTopics.getString(a));
-							   top.addApplConfigurations(configuration);
-							   if (top != null) {
-								   topics.add(top);
+						   } 
+						} 
+						configuration.setSolutions(solutions);
+						
+						JSONArray jsonTopics = jsonobject.getJSONArray("topics");
+						List<Topic> topics = new ArrayList<Topic>();
+						if (jsonTopics != null) { 
+						   for (int a=0;a<jsonTopics.length();a++){ 
+							   try {
+								   Topic top = topicRepo.findObjectByClientId(jsonTopics.getString(a));
+								   top.addApplConfigurations(configuration);
+								   if (top != null) {
+									   topics.add(top);
+								   }
+							   } catch (Exception  e) {
+								   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The topic: " + jsonTopics.getString(a) + " defined in the configuration cannot be found!", true);
 							   }
-						   } catch (Exception  e) {
-							   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The topic: " + jsonTopics.getString(a) + " defined in the configuration cannot be found!", true);
-						   }
-					   } 
-					} 
-					configuration.setTopics(topics);
-					
-					/*JSONArray jsonGateways = jsonobject.getJSONArray("gateways");
-					List<Gateway> gateways = new ArrayList<Gateway>();
-					if (jsonGateways != null) { 
-					   for (int a=0;a<jsonGateways.length();a++){ 
-						   try {
-							   Gateway gw = gatewayRepo.findObjectByClientId(jsonGateways.getString(a));
-							   if (gw != null) {
-								   gateways.add(gw);
+						   } 
+						} 
+						configuration.setTopics(topics);
+						
+						/*JSONArray jsonGateways = jsonobject.getJSONArray("gateways");
+						List<Gateway> gateways = new ArrayList<Gateway>();
+						if (jsonGateways != null) { 
+						   for (int a=0;a<jsonGateways.length();a++){ 
+							   try {
+								   Gateway gw = gatewayRepo.findObjectByClientId(jsonGateways.getString(a));
+								   if (gw != null) {
+									   gateways.add(gw);
+								   }
+							   } catch (Exception  e) {
+								   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The gateway: " + jsonGateways.getString(a) + " defined in the configuration cannot be found!", true);
 							   }
-						   } catch (Exception  e) {
-							   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The gateway: " + jsonGateways.getString(a) + " defined in the configuration cannot be found!", true);
-						   }
-					   } 
-					} 
-					configuration.setGateways(gateways);*/
-
-					configRepo.saveAndFlush(configuration);
+						   } 
+						} 
+						configuration.setGateways(gateways);*/
+	
+						configRepo.saveAndFlush(configuration);
+					} else {
+						log.info("The configuration " + configName + " is already available!");
+					}
 				}
 			} catch (JSONException e) {
 				log.error("Error parsind the JSON Configuration response", e);

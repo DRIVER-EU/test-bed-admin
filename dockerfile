@@ -1,5 +1,5 @@
 FROM openjdk:8u212-jdk
-ENV VERSION 1.2.32
+ENV VERSION 1.2.33
 ADD admin-service/target/admin-service-${VERSION}.jar /opt/application/admin-service-${VERSION}.jar
 ADD run.sh /opt/application/run.sh
 ADD dockerconfig /opt/application/config

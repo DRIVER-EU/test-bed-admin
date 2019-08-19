@@ -112,5 +112,77 @@
  		"isService":false,
  		"state":false,
  		"description":"Copper tool from TNO1"
+	},{
+		"id":"asign-mission",
+		"subject.id":"O=Ansur,CN=ASIGN-MISSION",
+ 		"name":"Asign Mission",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"ASIGN Mission application!"
+	},{
+		"id":"asign-photo",
+		"subject.id":"O=Ansur,CN=ASIGN-PHOTO",
+ 		"name":"Asign Photo",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"ASIGN Photo application!"
+	},{
+		"id":"view-terra-1",
+		"subject.id":"O=VWORLD,CN=vieWTerra1",
+ 		"name":"vieWTerra 1",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"vieWTerra1 application!"
+	},{
+		"id":"view-terra-2",
+		"subject.id":"O=VWORLD,CN=vieWTerra2",
+ 		"name":"vieWTerra 2",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"vieWTerra2 application!"
+	},{
+		"id":"view-terra-3",
+		"subject.id":"O=VWORLD,CN=vieWTerra3",
+ 		"name":"vieWTerra 3",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"vieWTerra3 application!"
+	},{
+		"id":"CrowdTaskerProducer",
+		"subject.id":"O=AIT,CN=CrowdTasker",
+ 		"name":"CrowdTasker",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"Crowd Tasker application!"
+	},{
+		"id":"CrowdTaskerProducer2",
+		"subject.id":"O=AIT,CN=CrowdTasker2",
+ 		"name":"CrowdTasker 2",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"Crowd Tasker Backup application!"
+	},{
+		"id":"airborn",
+		"subject.id":"O=DLR,CN=AIRBORNE",
+ 		"name":"AIRBORN",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"Airborn application!"
+	},{
+		"id":"airborn-staff",
+		"subject.id":"O=DLR,CN=AIRBORNE-STAFF",
+ 		"name":"AIRBORN Staff",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"Airborn Staff application!"
 	}
 ]
