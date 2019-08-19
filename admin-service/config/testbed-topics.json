@@ -1,99 +1,159 @@
 [
 	{
-		"id":"core.topic.admin.hb",
-		"type":"core.topic",
- 		"name":"system_admin_heartbeat",
- 		"state": false,
- 		"publishSolutionIDs":["TB-AdminTool"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the topic where the admin tool publishes his heartbeat, indicating that the admin tool is up."
-	},{
-		"id":"core.topic.hb",
-		"type":"core.topic",
- 		"name":"system_heartbeat",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["TB-AdminTool"],
- 		"description":"This is the topic where every solution published the heartbeat indicating that the solution is up and alive."
-	},{
-		"id":"core.topic.log",
-		"type":"core.topic",
- 		"name":"system_logging",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["TB-AdminTool"],
- 		"description":"This is the topic where every solution published the logs to be stored in the admin tool log table."
-	},{
-		"id":"core.topic.access.invite",
-		"type":"core.topic",
- 		"name":"system_topic_access_invite",
- 		"state": false,
- 		"publishSolutionIDs":["TB-AdminTool"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the topic where every solution gets his information to which topics he is invited to join."
-	},{
-		"id":"core.topic.create.request",
-		"type":"core.topic",
- 		"name":"system_topic_create_request",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["TB-AdminTool"],
- 		"description":"This is the topic where every solution can request topic creation and sending invite message."
-	},{
-		"id":"core.topic.time",
-		"type":"core.topic",
- 		"name":"system_timing",
- 		"state": false,
- 		"publishSolutionIDs":["TB-TimeService"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the topic where every solution gets the actual testbed time."
-	},{
-		"id":"core.topic.time.control",
-		"type":"core.topic",
- 		"name":"system_timing_control",
- 		"state": false,
- 		"publishSolutionIDs":["TB-TimeService"],
- 		"subscribedSolutionIDs": ["all"],
- 		"description":"This is the topic where every solution gets the actual testbed trial time control."
-	},{
-		"id":"core.topic.tm.phasemessage",
-		"type":"core.topic",
- 		"name":"system_tm_phase_message",
- 		"state": false,
- 		"publishSolutionIDs":["TB-TrialMgmt"],
- 		"subscribedSolutionIDs": ["TB-AARTool"],
- 		"description":"This is the topic to manage the trial phases."
-	},{
-		"id":"core.topic.tm.roleplayer",
-		"type":"core.topic",
- 		"name":"system_tm_role_player",
- 		"state": false,
- 		"publishSolutionIDs":["TB-TrialMgmt"],
- 		"subscribedSolutionIDs": ["TB-AARTool"],
- 		"description":"This is the topic to share role player messages."
-	},{
-		"id":"core.topic.tm.sessionmgmt",
-		"type":"core.topic",
- 		"name":"system_tm_session_mgmt",
- 		"state": false,
- 		"publishSolutionIDs":["TB-TrialMgmt"],
- 		"subscribedSolutionIDs": ["TB-AARTool"],
- 		"description":"This is the topic to share session mgmt messages."
-	},{
-		"id":"core.topic.ost.answer",
-		"type":"core.topic",
- 		"name":"system_observer_tool_answer",
- 		"state": false,
- 		"publishSolutionIDs":["TB-Ost"],
- 		"subscribedSolutionIDs": ["TB-AARTool"],
- 		"description":"This is the topic where the OST sends the Observer answers to the AAR."
-	},{
-		"id":"core.topic.trial.stage.change",
-		"type":"core.topic",
- 		"name":"system_request_change_of_trial_stage",
- 		"state": false,
- 		"publishSolutionIDs":["TB-TrialMgmt"],
- 		"subscribedSolutionIDs": ["TB-Ost", "TB-AARTool"],
- 		"description":"This is the topic where every solution gets the actual testbed trial time control."
+		"id": "core.topic.admin.hb",
+		"type": "core.topic",
+		"name": "system_admin_heartbeat",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-AdminTool"
+		],
+		"subscribedSolutionIDs": [
+			"all"
+		],
+		"description": "This is the topic where the admin tool publishes his heartbeat, indicating that the admin tool is up."
+	},
+	{
+		"id": "core.topic.hb",
+		"type": "core.topic",
+		"name": "system_heartbeat",
+		"state": false,
+		"publishSolutionIDs": [
+			"all"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AdminTool"
+		],
+		"description": "This is the topic where every solution published the heartbeat indicating that the solution is up and alive."
+	},
+	{
+		"id": "core.topic.log",
+		"type": "core.topic",
+		"name": "system_logging",
+		"state": false,
+		"publishSolutionIDs": [
+			"all"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AdminTool"
+		],
+		"description": "This is the topic where every solution published the logs to be stored in the admin tool log table."
+	},
+	{
+		"id": "core.topic.access.invite",
+		"type": "core.topic",
+		"name": "system_topic_access_invite",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-AdminTool"
+		],
+		"subscribedSolutionIDs": [
+			"all"
+		],
+		"description": "This is the topic where every solution gets his information to which topics he is invited to join."
+	},
+	{
+		"id": "core.topic.create.request",
+		"type": "core.topic",
+		"name": "system_topic_create_request",
+		"state": false,
+		"publishSolutionIDs": [
+			"all"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AdminTool"
+		],
+		"description": "This is the topic where every solution can request topic creation and sending invite message."
+	},
+	{
+		"id": "core.topic.time",
+		"type": "core.topic",
+		"name": "system_timing",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-TimeService"
+		],
+		"subscribedSolutionIDs": [
+			"all"
+		],
+		"description": "This is the topic where every solution gets the actual testbed time."
+	},
+	{
+		"id": "core.topic.time.control",
+		"type": "core.topic",
+		"name": "system_timing_control",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-TimeService"
+		],
+		"subscribedSolutionIDs": [
+			"all"
+		],
+		"description": "This is the topic where every solution gets the actual testbed trial time control."
+	},
+	{
+		"id": "core.topic.tm.phasemessage",
+		"type": "core.topic",
+		"name": "system_tm_phase_message",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-TrialMgmt"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool"
+		],
+		"description": "This is the topic to manage the trial phases."
+	},
+	{
+		"id": "core.topic.tm.roleplayer",
+		"type": "core.topic",
+		"name": "system_tm_role_player",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-TrialMgmt"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool"
+		],
+		"description": "This is the topic to share role player messages."
+	},
+	{
+		"id": "core.topic.tm.sessionmgmt",
+		"type": "core.topic",
+		"name": "system_tm_session_mgmt",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-TrialMgmt"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool"
+		],
+		"description": "This is the topic to share session mgmt messages."
+	},
+	{
+		"id": "core.topic.ost.answer",
+		"type": "core.topic",
+		"name": "system_observer_tool_answer",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-Ost"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool"
+		],
+		"description": "This is the topic where the OST sends the Observer answers to the AAR."
+	},
+	{
+		"id": "core.topic.trial.stage.change",
+		"type": "core.topic",
+		"name": "system_request_change_of_trial_stage",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-TrialMgmt"
+		],
+		"subscribedSolutionIDs": [
+			"TB-Ost",
+			"TB-AARTool"
+		],
+		"description": "This is the topic where every solution gets the actual testbed trial time control."
 	}
 ]

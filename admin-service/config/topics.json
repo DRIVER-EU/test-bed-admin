@@ -1,53 +1,88 @@
 [
 	{
-		"id":"standart.topic.cap",
-		"type":"standard.topic",
- 		"name":"standard_cap",
- 		"msgType": "cap",
- 		"msgTypeVersion": "1.2",
- 		"state": false,
- 		"publishSolutionIDs":["sim-ci", "lcms", "crisissuite-stedin", "crisissuite-htm"],
- 		"subscribedSolutionIDs": ["crisissuite-stedin", "crisissuite-htm", "crisissuite-io", "lcms", "TB-AARTool"],
- 		"description":"This is the standard CAP topic."
-	},{
-		"id":"standart.topic.asign.info",
-		"type":"standard.topic",
- 		"name":"asign_info",
- 		"msgType": "geojson",
- 		"msgTypeVersion": "1.0",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all", "TB-AARTool"],
- 		"description":"This is the standard asign geoJSON topic."
-	},{
-		"id":"standart.topic.crowd.tasker.info",
-		"type":"standard.topic",
- 		"name":"crowd-takser_info",
- 		"msgType": "geojson",
- 		"msgTypeVersion": "1.0",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all", "TB-AARTool"],
- 		"description":"This is the standard CrowdTasker geoJSON topic."
-	},{
-		"id":"standart.topic.large.data.update",
-		"type":"standard.topic",
- 		"name":"large_data_update",
- 		"msgType": "largedata",
- 		"msgTypeVersion": "1.0",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all", "TB-AARTool"],
- 		"description":"This is the standard Flightdata topic."
-	},{
-		"id":"standart.topic.photo.data",
-		"type":"standard.topic",
- 		"name":"photo_data",
- 		"msgType": "photo-geojson",
- 		"msgTypeVersion": "1.0",
- 		"state": false,
- 		"publishSolutionIDs":["all"],
- 		"subscribedSolutionIDs": ["all", "TB-AARTool"],
- 		"description":"This is the standard Photo geoJSON topic."
+		"id": "standart.topic.cap",
+		"type": "standard.topic",
+		"name": "standard_cap",
+		"msgType": "cap",
+		"msgTypeVersion": "1.2",
+		"state": false,
+		"publishSolutionIDs": [
+			"sim-ci",
+			"lcms",
+			"crisissuite-stedin",
+			"crisissuite-htm"
+		],
+		"subscribedSolutionIDs": [
+			"crisissuite-stedin",
+			"crisissuite-htm",
+			"crisissuite-io",
+			"lcms",
+			"TB-AARTool"
+		],
+		"description": "This is the standard CAP topic."
+	},
+	{
+		"id": "standart.topic.asign.info",
+		"type": "standard.topic",
+		"name": "asign_info",
+		"msgType": "geojson",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"all"
+		],
+		"subscribedSolutionIDs": [
+			"all",
+			"TB-AARTool"
+		],
+		"description": "This is the standard asign geoJSON topic."
+	},
+	{
+		"id": "standart.topic.crowd.tasker.info",
+		"type": "standard.topic",
+		"name": "crowd-takser_info",
+		"msgType": "geojson",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"all"
+		],
+		"subscribedSolutionIDs": [
+			"all",
+			"TB-AARTool"
+		],
+		"description": "This is the standard CrowdTasker geoJSON topic."
+	},
+	{
+		"id": "standart.topic.large.data.update",
+		"type": "standard.topic",
+		"name": "large_data_update",
+		"msgType": "largedata",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"all"
+		],
+		"subscribedSolutionIDs": [
+			"all",
+			"TB-AARTool"
+		],
+		"description": "This is the standard Flightdata topic."
+	},
+	{
+		"id": "standart.topic.photo.data",
+		"type": "standard.topic",
+		"name": "photo_data",
+		"msgType": "photo-geojson",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"all"
+		],
+		"subscribedSolutionIDs": [
+			"all",
+			"TB-AARTool"
+		],
+		"description": "This is the standard Photo geoJSON topic."
 	}
 ]
