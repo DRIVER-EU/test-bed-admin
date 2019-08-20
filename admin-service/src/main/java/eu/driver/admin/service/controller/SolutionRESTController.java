@@ -246,6 +246,28 @@ public class SolutionRESTController implements IAdaptorCallback {
 		return new ResponseEntity<SolutionList>(solutionList, HttpStatus.OK);
 	}
 	
+	public List<Solution> getAllTrialSolutionList() {
+		log.info("--> getAllTrialSolutionList");
+		
+		String configName = null;
+		List<Solution> solutions = this.solutionRepo.findAll();
+		TestbedConfig tbConfig = testbedConfigRepo.findActiveConfig(true);
+		try {
+			
+			if (tbConfig != null) {
+				configName = tbConfig.getConfigName();
+				if (configName != null) {
+					Configuration config = configRepo.findObjectByName(configName);
+					solutions = config.getSolutions();
+				}
+			}
+		} catch (Exception e) {
+			
+		}
+		log.info("getAllTrialSolutionList -->");
+		return solutions;
+	}
+	
 	public List<Solution> getSolutionList() {
 		log.debug("--> getSolutionList");
 		

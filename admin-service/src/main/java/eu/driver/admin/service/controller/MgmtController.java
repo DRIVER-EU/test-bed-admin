@@ -502,8 +502,8 @@ public class MgmtController {
 	private void createTrialTopics() throws Exception {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating Trial specific Topics!", true);
 		
-		List<Solution> solutionList = solutionController.getSolutionList();
-		List<Topic> topics = topicController.getAllTrialTopic();
+		List<Solution> solutionList = solutionController.getAllTrialSolutionList();
+		List<Topic> topics = topicController.getAllTrialTopicList();
 		
 		for (Topic topic : topics) {
 			SpecificRecord schema = null;

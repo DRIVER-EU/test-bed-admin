@@ -229,8 +229,8 @@ public class TopicRESTController {
 		return this.topicRepo.findObjectByType("core.topic");
 	}
 	
-	public List<Topic> getAllTrialTopic() {
-		log.info("--> getAllTrialTopics");
+	public List<Topic> getAllTrialTopicList() {
+		log.info("--> getAllTrialTopicList");
 
 		String configName = null;
 		List<Topic> topics = this.topicRepo.findAll();
@@ -248,7 +248,7 @@ public class TopicRESTController {
 			
 		}
 			
-		log.info("getAllTrialTopics -->");
+		log.info("getAllTrialTopicList -->");
 		return topics;
 	}
 	
