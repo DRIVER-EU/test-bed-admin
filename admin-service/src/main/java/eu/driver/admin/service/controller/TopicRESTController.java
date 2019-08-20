@@ -231,9 +231,25 @@ public class TopicRESTController {
 	
 	public List<Topic> getAllTrialTopic() {
 		log.info("--> getAllTrialTopics");
+
+		String configName = null;
+		List<Topic> topics = this.topicRepo.findAll();
+		TestbedConfig tbConfig = testbedConfigRepo.findActiveConfig(true);
 		
+		try {
+			if (tbConfig != null) {
+				configName = tbConfig.getConfigName();
+				if (configName != null) {
+					Configuration config = configRepo.findObjectByName(configName);
+					topics = config.getTopics();
+				}
+			}
+		} catch (Exception e) {
+			
+		}
+			
 		log.info("getAllTrialTopics -->");
-		return this.topicRepo.findObjectByType("standard.topic");
+		return topics;
 	}
 	
 	public void updateTopicState(String topicName, Boolean state) {

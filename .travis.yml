@@ -1,10 +1,11 @@
 language: java
 jdk:
 - openjdk8
+dist: trusty
 
 env:
   matrix:
-  - VERSION=1.2.33
+  - VERSION=1.2.34
 
 install: mvn install
 
