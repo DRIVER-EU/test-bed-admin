@@ -1,5 +1,7 @@
 package eu.driver.admin.service.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +12,9 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import net.sourceforge.plantuml.FileFormat;
+import net.sourceforge.plantuml.FileFormatOption;
+import net.sourceforge.plantuml.SourceStringReader;
 
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.log4j.Logger;
@@ -17,7 +22,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -316,10 +324,82 @@ public class MgmtController {
 			@ApiResponse(code = 500, message = "Failure", response = byte[].class) })
 	public ResponseEntity<byte[]> createOverviewPicture() {
 		log.info("-->createOverviewPicture");
-		//ByteArrayOutputStream bous = new ByteArrayOutputStream();
 		
+		ByteArrayOutputStream bous = new ByteArrayOutputStream();
+		
+		TestbedConfig testbedConfig = testbedConfigRepo.findActiveConfig(true);
+		if (testbedConfig != null) {
+			String configName = testbedConfig.getConfigName();
+			if (configName != null) {
+				Configuration configuration = configRepo.findObjectByName(configName);
+				List<Topic> topics = configuration.getTopics();
+				List<Solution> solutions = configuration.getSolutions();
+				
+				String source = "@startuml\n";
+				source += "!pragma graphviz_dot jdot\n";
+				
+				for (Topic topic : topics) {
+					if (topic.getClientId().indexOf("core.topic") < 0) {
+						source += "node \"Technical infratrucure\" {\n";
+						source += "() " + topic.getName().replaceAll("-", "") + "\n";
+						source += "}\n";
+					}
+				}
+				
+				for (Topic topic : topics) {
+					if (topic.getClientId().indexOf("core.topic") < 0) {
+						List<String> publishIDs = topic.getPublishSolutionIDs();
+						
+						
+						for(String id: publishIDs) {
+							if (id.equalsIgnoreCase("all")) {
+								for (Solution solution : solutions) {
+									source += "[" + solution.getName().replaceAll("-", "") + "] --> " + topic.getName().replaceAll("-", "") + "\n";	
+								}
+							} else {
+								Solution solution = solutionRepo.findObjectByClientId(id);
+								source += "[" + solution.getName().replaceAll("-", "") + "] --> " + topic.getName().replaceAll("-", "") + "\n";	
+							}
+							
+						}
+						
+						List<String> subscribeIDs = topic.getSubscribedSolutionIDs();
+						for(String id: subscribeIDs) {
+							if (id.equalsIgnoreCase("all")) {
+								for (Solution solution : solutions) {
+									source += topic.getName().replaceAll("-", "") + " --> [" + solution.getName().replaceAll("-", "") + "]\n";
+								}
+							} else {
+								Solution solution = solutionRepo.findObjectByClientId(id);
+								source += topic.getName().replaceAll("-", "") + " --> [" + solution.getName().replaceAll("-", "") + "]\n";
+							}
+						}
+					}
+				}
+				
+				source += "@enduml";
+				SourceStringReader reader = new SourceStringReader(source);
+			    try {
+					reader.generateImage(bous, new FileFormatOption(FileFormat.SVG));
+				} catch (IOException e) {
+					log.error("Error creating the overview diagram!");
+				}
+			    // Return a null string if no generation
+			    byte[] media = bous.toByteArray();
+			    
+			    HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.valueOf("image/svg+xml"));
+			    headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+				log.info("createOverviewPicture-->");
+				return new ResponseEntity<byte[]>(media, headers, HttpStatus.OK);
+			}
+		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.valueOf("image/svg+xml"));
+	    headers.setCacheControl(CacheControl.noCache().getHeaderValue());
 		log.info("createOverviewPicture-->");
-		return new ResponseEntity<byte[]>("".getBytes(), HttpStatus.OK);
+		return new ResponseEntity<byte[]>("".getBytes(), headers, HttpStatus.OK);
+		
 	}
 	
 	@ApiOperation(value = "getAllConfigurations", nickname = "getAllConfigurations")
@@ -507,156 +587,157 @@ public class MgmtController {
 		
 		for (Topic topic : topics) {
 			SpecificRecord schema = null;
-			
-			if (topic.getMsgType().equalsIgnoreCase("cap")) {
-				schema = new Alert();
-			} else if (topic.getMsgType().equalsIgnoreCase("geojson")) {
-				schema = new FeatureCollection();
-			} else if (topic.getMsgType().equalsIgnoreCase("geojson-sim")) {
-				schema = new eu.driver.model.geojson.sim.FeatureCollection();
-			} else if (topic.getMsgType().equalsIgnoreCase("mlp")) {
-				schema = new SlRep();
-			} else if (topic.getMsgType().equalsIgnoreCase("emsi")) {
-				schema = new TSO_2_0();
-			} else if (topic.getMsgType().equalsIgnoreCase("largedata")) {
-				schema = new LargeDataUpdate();
-			} else if (topic.getMsgType().equalsIgnoreCase("maplayer")) {
-				schema = new MapLayerUpdate();
-			} else if (topic.getMsgType().equalsIgnoreCase("named-geojson")) {
-				schema = new GeoJSONEnvelope();
-			} else if (topic.getMsgType().equalsIgnoreCase("photo-geojson")) {
-				schema = new eu.driver.model.geojson.photo.FeatureCollection();
-			}
-			
-			if (schema != null) {
-				adminController.createTopic(topic.getName(), new EDXLDistribution(), schema, null);
-				logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
-				topicController.updateTopicState(topic.getName(), true);
-				sendTopicStateChange(topic.getClientId(), true);
-				// send invite message
-				
-				boolean allSolutionsPublish = false;
-				boolean allSolutionsSubscribe = false;
-				
-				List<String> publishClientIDs = topic.getPublishSolutionIDs();
-				List<String> subscribeClientIDs = topic.getSubscribedSolutionIDs();
-				
-				if (publishClientIDs.size() > 0) {
-					if (publishClientIDs.get(0).equalsIgnoreCase("all")) {
-						allSolutionsPublish = true;
-					}
+			if (topic.getMsgType() != null) {
+				if (topic.getMsgType().equalsIgnoreCase("cap")) {
+					schema = new Alert();
+				} else if (topic.getMsgType().equalsIgnoreCase("geojson")) {
+					schema = new FeatureCollection();
+				} else if (topic.getMsgType().equalsIgnoreCase("geojson-sim")) {
+					schema = new eu.driver.model.geojson.sim.FeatureCollection();
+				} else if (topic.getMsgType().equalsIgnoreCase("mlp")) {
+					schema = new SlRep();
+				} else if (topic.getMsgType().equalsIgnoreCase("emsi")) {
+					schema = new TSO_2_0();
+				} else if (topic.getMsgType().equalsIgnoreCase("largedata")) {
+					schema = new LargeDataUpdate();
+				} else if (topic.getMsgType().equalsIgnoreCase("maplayer")) {
+					schema = new MapLayerUpdate();
+				} else if (topic.getMsgType().equalsIgnoreCase("named-geojson")) {
+					schema = new GeoJSONEnvelope();
+				} else if (topic.getMsgType().equalsIgnoreCase("photo-geojson")) {
+					schema = new eu.driver.model.geojson.photo.FeatureCollection();
 				}
 				
-				if (subscribeClientIDs.size() > 0) {
-					if (subscribeClientIDs.get(0).equalsIgnoreCase("all")) {
-						allSolutionsSubscribe = true;
+				if (schema != null) {
+					adminController.createTopic(topic.getName(), new EDXLDistribution(), schema, null);
+					logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
+					topicController.updateTopicState(topic.getName(), true);
+					sendTopicStateChange(topic.getClientId(), true);
+					// send invite message
+					
+					boolean allSolutionsPublish = false;
+					boolean allSolutionsSubscribe = false;
+					
+					List<String> publishClientIDs = topic.getPublishSolutionIDs();
+					List<String> subscribeClientIDs = topic.getSubscribedSolutionIDs();
+					
+					if (publishClientIDs.size() > 0) {
+						if (publishClientIDs.get(0).equalsIgnoreCase("all")) {
+							allSolutionsPublish = true;
+						}
 					}
-				}
-				
-				List<TopicInvite> inviteMsgs = new ArrayList<TopicInvite>();
+					
+					if (subscribeClientIDs.size() > 0) {
+						if (subscribeClientIDs.get(0).equalsIgnoreCase("all")) {
+							allSolutionsSubscribe = true;
+						}
+					}
+					
+					List<TopicInvite> inviteMsgs = new ArrayList<TopicInvite>();
 
-				if (allSolutionsPublish && allSolutionsSubscribe) {
-					for (Solution solution: solutionList) {
-						if (!solution.getIsAdmin()) {
+					if (allSolutionsPublish && allSolutionsSubscribe) {
+						for (Solution solution: solutionList) {
+							if (!solution.getIsAdmin()) {
+								TopicInvite inviteMsg = new TopicInvite();
+								inviteMsg.setId(solution.getClientId());
+								inviteMsg.setTopicName(topic.getName());
+								inviteMsg.setPublishAllowed(true);
+								inviteMsg.setSubscribeAllowed(true);
+								
+								inviteMsgs.add(inviteMsg);
+							}
+						}
+					} else if (allSolutionsPublish && !allSolutionsSubscribe) {
+						for (Solution solution: solutionList) {
+							if (!solution.getIsAdmin()) {
+								TopicInvite inviteMsg = new TopicInvite();
+								inviteMsg.setId(solution.getClientId());
+								inviteMsg.setTopicName(topic.getName());
+								inviteMsg.setPublishAllowed(true);
+								inviteMsg.setSubscribeAllowed(false);
+								
+								// find the client ID in the list of subscribers
+								for (String clientID : subscribeClientIDs) {
+									if (clientID.equalsIgnoreCase(solution.getClientId())) {
+										inviteMsg.setSubscribeAllowed(true);
+										return;	
+									}
+								}
+								
+								inviteMsgs.add(inviteMsg);
+							}
+						}
+					} else if (!allSolutionsPublish && allSolutionsSubscribe) {
+						for (Solution solution: solutionList) {
+							if (!solution.getIsAdmin()) {
+								TopicInvite inviteMsg = new TopicInvite();
+								inviteMsg.setId(solution.getClientId());
+								inviteMsg.setTopicName(topic.getName());
+								inviteMsg.setSubscribeAllowed(true);
+								inviteMsg.setPublishAllowed(false);
+								// find the client ID in the list of subscribers
+								for (String clientID : publishClientIDs) {
+									if (clientID.equalsIgnoreCase(solution.getClientId())) {
+										inviteMsg.setPublishAllowed(true);
+										return;	
+									}
+								}
+								inviteMsgs.add(inviteMsg);
+							}
+						}
+					} else {
+						Map<String, Map<String, Boolean>> solutionMap = new HashMap<String, Map<String, Boolean>>();
+						
+						for (String clientID : publishClientIDs) {
+							Map<String, Boolean> flags = new HashMap<String, Boolean>();
+							flags.put("publishAllowed", true);
+							flags.put("subscribeAllowed", false);
+							solutionMap.put(clientID, flags);
+						}
+						for (String clientID : subscribeClientIDs) {
+							Map<String, Boolean> flags = solutionMap.get(clientID);
+							if (flags == null) {
+								flags = new HashMap<String, Boolean>();
+								flags.put("publishAllowed", false);
+								flags.put("subscribeAllowed", true);
+								solutionMap.put(clientID, flags);
+							} else {
+								flags.put("subscribeAllowed", true);
+								solutionMap.put(clientID, flags);
+							}
+						}
+						
+						for (Map.Entry<String, Map<String, Boolean>> entry : solutionMap.entrySet())
+						{
+							Map<String, Boolean> flags = entry.getValue();
 							TopicInvite inviteMsg = new TopicInvite();
-							inviteMsg.setId(solution.getClientId());
+							inviteMsg.setId(entry.getKey());
 							inviteMsg.setTopicName(topic.getName());
-							inviteMsg.setPublishAllowed(true);
-							inviteMsg.setSubscribeAllowed(true);
-							
+							inviteMsg.setPublishAllowed(flags.get("publishAllowed"));
+							inviteMsg.setSubscribeAllowed(flags.get("subscribeAllowed"));
 							inviteMsgs.add(inviteMsg);
 						}
 					}
-				} else if (allSolutionsPublish && !allSolutionsSubscribe) {
-					for (Solution solution: solutionList) {
-						if (!solution.getIsAdmin()) {
-							TopicInvite inviteMsg = new TopicInvite();
-							inviteMsg.setId(solution.getClientId());
-							inviteMsg.setTopicName(topic.getName());
-							inviteMsg.setPublishAllowed(true);
-							inviteMsg.setSubscribeAllowed(false);
-							
-							// find the client ID in the list of subscribers
-							for (String clientID : subscribeClientIDs) {
-								if (clientID.equalsIgnoreCase(solution.getClientId())) {
-									inviteMsg.setSubscribeAllowed(true);
-									return;	
-								}
+					for (TopicInvite inviteMsg : inviteMsgs) {
+						try {
+							logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg, true);
+							// grant the access to the topics vie the Security REST API
+							boolean sendInvite = true;
+							// check if adapter is in secure mode
+							if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+								sendInvite = grantTopicAccess(inviteMsg);
 							}
 							
-							inviteMsgs.add(inviteMsg);
-						}
-					}
-				} else if (!allSolutionsPublish && allSolutionsSubscribe) {
-					for (Solution solution: solutionList) {
-						if (!solution.getIsAdmin()) {
-							TopicInvite inviteMsg = new TopicInvite();
-							inviteMsg.setId(solution.getClientId());
-							inviteMsg.setTopicName(topic.getName());
-							inviteMsg.setSubscribeAllowed(true);
-							inviteMsg.setPublishAllowed(false);
-							// find the client ID in the list of subscribers
-							for (String clientID : publishClientIDs) {
-								if (clientID.equalsIgnoreCase(solution.getClientId())) {
-									inviteMsg.setPublishAllowed(true);
-									return;	
-								}
+							if (sendInvite) {
+								AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
 							}
-							inviteMsgs.add(inviteMsg);
+						} catch (CommunicationException cEx) {
+							logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString(), true);
 						}
 					}
 				} else {
-					Map<String, Map<String, Boolean>> solutionMap = new HashMap<String, Map<String, Boolean>>();
-					
-					for (String clientID : publishClientIDs) {
-						Map<String, Boolean> flags = new HashMap<String, Boolean>();
-						flags.put("publishAllowed", true);
-						flags.put("subscribeAllowed", false);
-						solutionMap.put(clientID, flags);
-					}
-					for (String clientID : subscribeClientIDs) {
-						Map<String, Boolean> flags = solutionMap.get(clientID);
-						if (flags == null) {
-							flags = new HashMap<String, Boolean>();
-							flags.put("publishAllowed", false);
-							flags.put("subscribeAllowed", true);
-							solutionMap.put(clientID, flags);
-						} else {
-							flags.put("subscribeAllowed", true);
-							solutionMap.put(clientID, flags);
-						}
-					}
-					
-					for (Map.Entry<String, Map<String, Boolean>> entry : solutionMap.entrySet())
-					{
-						Map<String, Boolean> flags = entry.getValue();
-						TopicInvite inviteMsg = new TopicInvite();
-						inviteMsg.setId(entry.getKey());
-						inviteMsg.setTopicName(topic.getName());
-						inviteMsg.setPublishAllowed(flags.get("publishAllowed"));
-						inviteMsg.setSubscribeAllowed(flags.get("subscribeAllowed"));
-						inviteMsgs.add(inviteMsg);
-					}
+					logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Trial specific Topic: " + topic.getName() + " could not be created, unknown schema: " + topic.getMsgType(), true);
 				}
-				for (TopicInvite inviteMsg : inviteMsgs) {
-					try {
-						logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg, true);
-						// grant the access to the topics vie the Security REST API
-						boolean sendInvite = true;
-						// check if adapter is in secure mode
-						if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-							sendInvite = grantTopicAccess(inviteMsg);
-						}
-						
-						if (sendInvite) {
-							AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
-						}
-					} catch (CommunicationException cEx) {
-						logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString(), true);
-					}
-				}
-			} else {
-				logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Trial specific Topic: " + topic.getName() + " could not be created, unknown schema: " + topic.getMsgType(), true);
 			}
 		}
 		

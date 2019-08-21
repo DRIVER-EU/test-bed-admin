@@ -161,28 +161,12 @@
  		"state":false,
  		"description":"Crowd Tasker application!"
 	},{
-		"id":"CrowdTaskerProducer2",
-		"subject.id":"O=AIT,CN=CrowdTasker2",
- 		"name":"CrowdTasker 2",
- 		"isTestbed":false,
- 		"isService":false,
- 		"state":false,
- 		"description":"Crowd Tasker Backup application!"
-	},{
-		"id":"airborn",
+		"id":"airborne",
 		"subject.id":"O=DLR,CN=AIRBORNE",
  		"name":"AIRBORN",
  		"isTestbed":false,
  		"isService":false,
  		"state":false,
  		"description":"Airborn application!"
-	},{
-		"id":"airborn-staff",
-		"subject.id":"O=DLR,CN=AIRBORNE-STAFF",
- 		"name":"AIRBORN Staff",
- 		"isTestbed":false,
- 		"isService":false,
- 		"state":false,
- 		"description":"Airborn Staff application!"
 	}
 ]

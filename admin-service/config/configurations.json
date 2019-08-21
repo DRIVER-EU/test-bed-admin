@@ -35,15 +35,14 @@
 			"TB-TrialMgmt",
 			"TB-TimeService",
 			"TB-Ost",
+			"TB-GeoServer",
 			"asign-mission",
 			"asign-photo",
 			"view-terra-1",
 			"view-terra-2",
 			"view-terra-3",
 			"CrowdTaskerProducer",
-			"CrowdTaskerProducer2",
-			"airborn",
-			"airborn-staff"
+			"airborne"
 		],
 		"topics": [
 			"core.topic.admin.hb",
@@ -61,6 +60,7 @@
 			"standart.topic.asign.info",
 			"standart.topic.crowd.tasker.info",
 			"standart.topic.large.data.update",
+			"standart.topic.map.layer.update",
 			"standart.topic.photo.data"
 		],
 		"gateways": [

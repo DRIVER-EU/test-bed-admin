@@ -1,27 +1,5 @@
 [
 	{
-		"id": "standart.topic.cap",
-		"type": "standard.topic",
-		"name": "standard_cap",
-		"msgType": "cap",
-		"msgTypeVersion": "1.2",
-		"state": false,
-		"publishSolutionIDs": [
-			"sim-ci",
-			"lcms",
-			"crisissuite-stedin",
-			"crisissuite-htm"
-		],
-		"subscribedSolutionIDs": [
-			"crisissuite-stedin",
-			"crisissuite-htm",
-			"crisissuite-io",
-			"lcms",
-			"TB-AARTool"
-		],
-		"description": "This is the standard CAP topic."
-	},
-	{
 		"id": "standart.topic.asign.info",
 		"type": "standard.topic",
 		"name": "asign_info",
@@ -29,10 +7,14 @@
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
-			"all"
+			"asign-mission",
+			"TB-TrialMgmt"
 		],
 		"subscribedSolutionIDs": [
-			"all",
+			"CrowdTaskerProducer",
+			"view-terra-1",
+			"view-terra-2",
+			"view-terra-3",
 			"TB-AARTool"
 		],
 		"description": "This is the standard asign geoJSON topic."
@@ -40,15 +22,18 @@
 	{
 		"id": "standart.topic.crowd.tasker.info",
 		"type": "standard.topic",
-		"name": "crowd-takser_info",
+		"name": "crowd-tasker_info",
 		"msgType": "geojson",
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
-			"all"
+			"CrowdTaskerProducer",
+			"TB-TrialMgmt"
 		],
 		"subscribedSolutionIDs": [
-			"all",
+			"view-terra-1",
+			"view-terra-2",
+			"view-terra-3",
 			"TB-AARTool"
 		],
 		"description": "This is the standard CrowdTasker geoJSON topic."
@@ -61,26 +46,49 @@
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
-			"all"
+			"airborne",
+			"TB-TrialMgmt"
 		],
 		"subscribedSolutionIDs": [
-			"all",
+			"TB-GeoServer",
 			"TB-AARTool"
 		],
 		"description": "This is the standard Flightdata topic."
 	},
 	{
+		"id": "standart.topic.map.layer.update",
+		"type": "standard.topic",
+		"name": "map_layer_update",
+		"msgType": "maplayer",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-GeoServer",
+			"TB-TrialMgmt"
+		],
+		"subscribedSolutionIDs": [
+			"view-terra-1",
+			"view-terra-2",
+			"view-terra-3",
+			"TB-AARTool"
+		],
+		"description": "This is the standard MapLayer topic."
+	},
+	{
 		"id": "standart.topic.photo.data",
 		"type": "standard.topic",
-		"name": "photo_data",
+		"name": "photo_geojson",
 		"msgType": "photo-geojson",
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
-			"all"
+			"asign-photo",
+			"TB-TrialMgmt"
 		],
 		"subscribedSolutionIDs": [
-			"all",
+			"view-terra-1",
+			"view-terra-2",
+			"view-terra-3",
 			"TB-AARTool"
 		],
 		"description": "This is the standard Photo geoJSON topic."

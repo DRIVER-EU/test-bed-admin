@@ -43,5 +43,14 @@
 		"isService": true,
 		"state": false,
 		"description": "This is the Testbed ObserverTool"
+	},
+	{
+		"id": "TB-GeoServer",
+		"subject.id": "O=DRIVER-PROJECT.EU,CN=GeoServer",
+		"name": "GeoServer",
+		"isTestbed": false,
+		"isService": true,
+		"state": false,
+		"description": "This is the Testbed GeoServer"
 	}
 ]
