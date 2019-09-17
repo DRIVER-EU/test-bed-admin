@@ -9,7 +9,7 @@ import eu.driver.admin.service.dto.gateway.Gateway;
 
 @RepositoryRestResource
 public interface GatewayRepository extends JpaRepository<Gateway, Long> {
-	public final static String ID_QUERY = "SELECT u FROM Gateway u where u.id=:objectId";
+	public final static String ID_QUERY = "SELECT u FROM Gateway u where u.id=:objectId ORDER BY u.id DESC";
 	
 	public final static String CLIENT_ID_QUERY = "SELECT u FROM Gateway u where u.clientId=:clientId";
 	

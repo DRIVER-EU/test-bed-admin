@@ -10,7 +10,7 @@ import eu.driver.admin.service.dto.configuration.TestbedConfig;
 @RepositoryRestResource
 public interface TestbedConfigRepository extends JpaRepository<TestbedConfig, Long> {
 	
-	public final static String ID_QUERY = "SELECT u FROM TestbedConfig u where u.id=:objectId";
+	public final static String ID_QUERY = "SELECT u FROM TestbedConfig u where u.id=:objectId ORDER BY u.id DESC";
 	public final static String ACTIVE_QUERY = "SELECT u FROM TestbedConfig u where u.isActive=:active";
 	
 	@Query(ID_QUERY)

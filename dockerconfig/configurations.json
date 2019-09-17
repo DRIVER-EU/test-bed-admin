@@ -40,7 +40,6 @@
 			"asign-photo",
 			"view-terra-1",
 			"view-terra-2",
-			"view-terra-3",
 			"CrowdTaskerProducer",
 			"airborne"
 		],
@@ -74,7 +73,14 @@
 			"TB-AARTool",
 			"TB-TrialMgmt",
 			"TB-TimeService",
-			"TB-Ost"
+			"TB-Ost",
+			"TB-GeoServer",
+			"crisissuite",
+			"view-terra-1",
+			"view-terra-2",
+			"socrates",
+			"drm",
+			"frt"
 		],
 		"topics": [
 			"core.topic.admin.hb",
@@ -88,7 +94,15 @@
 			"core.topic.tm.roleplayer",
 			"core.topic.tm.sessionmgmt",
 			"core.topic.ost.answer",
-			"core.topic.trial.stage.change"
+			"core.topic.trial.stage.change",
+			"standart.topic.large.data.update",
+			"standart.topic.map.layer.update",
+			"standart.topic.cs_internal",
+			"standart.topic.staff_map",
+			"standart.topic.socrates_map",
+			"standart.topic.frt_map",
+			"standart.topic.staff_info",
+			"standart.topic.simulation_entity"
 		],
 		"gateways": [
 		]

@@ -10,7 +10,7 @@ import eu.driver.admin.service.dto.standard.Standard;
 @RepositoryRestResource
 public interface StandardRepository  extends JpaRepository<Standard, Long> {
 
-	public final static String ID_QUERY = "SELECT u FROM Standard u where u.id=:objectId";
+	public final static String ID_QUERY = "SELECT u FROM Standard u where u.id=:objectId ORDER BY u.id DESC";
 	
 	public final static String NAME_QUERY = "SELECT u FROM Standard u where u.name=:name";
 	

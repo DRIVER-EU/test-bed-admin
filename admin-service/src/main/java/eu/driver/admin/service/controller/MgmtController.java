@@ -480,7 +480,7 @@ public class MgmtController {
 	private void createAllCoreTopics() throws Exception {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!", true);
 		
-		adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat(), 300000L);
+		adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat(), 300000L, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.ADMIN_HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.admin.hb", true);
@@ -488,7 +488,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.ADMIN_HEARTBEAT_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat(), 300000L);
+		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat(), 300000L, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.hb", true);
@@ -496,7 +496,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.HEARTBEAT_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.LOGGING_TOPIC, new EDXLDistribution(), new Log(), null);
+		adminController.createTopic(TopicConstants.LOGGING_TOPIC, new EDXLDistribution(), new Log(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LOGGING_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.LOGGING_TOPIC, true);
 		sendTopicStateChange("core.topic.log", true);
@@ -504,7 +504,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.LOGGING_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing(), null);
+		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TIMING_TOPIC, true);
 		sendTopicStateChange("core.topic.time", true);
@@ -512,7 +512,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.TIMING_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.TIMING_CONTROL_TOPIC, new EDXLDistribution(), new TimingControl(), null);
+		adminController.createTopic(TopicConstants.TIMING_CONTROL_TOPIC, new EDXLDistribution(), new TimingControl(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_CONTROL_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TIMING_CONTROL_TOPIC, true);
 		sendTopicStateChange("core.topic.time.control", true);
@@ -520,7 +520,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.TIMING_CONTROL_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite(), null);
+		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_INVITE_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TOPIC_INVITE_TOPIC, true);
 		sendTopicStateChange("core.topic.access.invite", true);
@@ -528,7 +528,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_INVITE_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, new EDXLDistribution(), new TopicCreate(), null);
+		adminController.createTopic(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, new EDXLDistribution(), new TopicCreate(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, true);
 		sendTopicStateChange("core.topic.create.request", true);
@@ -536,7 +536,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC);
 		}
 				
-		adminController.createTopic(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, new EDXLDistribution(), new RequestChangeOfTrialStage(), null);
+		adminController.createTopic(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, new EDXLDistribution(), new RequestChangeOfTrialStage(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TRIAL_STATE_CHANGE_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, true);
 		sendTopicStateChange("core.topic.trial.stage.change", true);
@@ -544,7 +544,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.TRIAL_STATE_CHANGE_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.OST_ANSWER_TOPIC, new EDXLDistribution(), new ObserverToolAnswer(), null);
+		adminController.createTopic(TopicConstants.OST_ANSWER_TOPIC, new EDXLDistribution(), new ObserverToolAnswer(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.OST_ANSWER_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.OST_ANSWER_TOPIC, true);
 		sendTopicStateChange("core.topic.ost.answer", true);
@@ -552,7 +552,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.OST_ANSWER_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.PHASE_MESSAGE_TOPIC, new EDXLDistribution(), new PhaseMessage(), null);
+		adminController.createTopic(TopicConstants.PHASE_MESSAGE_TOPIC, new EDXLDistribution(), new PhaseMessage(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.PHASE_MESSAGE_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.PHASE_MESSAGE_TOPIC, true);
 		sendTopicStateChange("core.topic.tm.phasemessage", true);
@@ -560,7 +560,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.PHASE_MESSAGE_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.ROLE_PLAYER_TOPIC, new EDXLDistribution(), new RolePlayerMessage(), null);
+		adminController.createTopic(TopicConstants.ROLE_PLAYER_TOPIC, new EDXLDistribution(), new RolePlayerMessage(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ROLE_PLAYER_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.ROLE_PLAYER_TOPIC, true);
 		sendTopicStateChange("core.topic.tm.roleplayer", true);
@@ -568,7 +568,7 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.ROLE_PLAYER_TOPIC);
 		}
 		
-		adminController.createTopic(TopicConstants.SESSION_MGMT_TOPIC, new EDXLDistribution(), new SessionMgmt(), null);
+		adminController.createTopic(TopicConstants.SESSION_MGMT_TOPIC, new EDXLDistribution(), new SessionMgmt(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.SESSION_MGMT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.SESSION_MGMT_TOPIC, true);
 		sendTopicStateChange("core.topic.tm.sessionmgmt", true);
@@ -586,6 +586,7 @@ public class MgmtController {
 		List<Topic> topics = topicController.getAllTrialTopicList();
 		
 		for (Topic topic : topics) {
+			int noOfPartitions = 1;
 			SpecificRecord schema = null;
 			if (topic.getMsgType() != null) {
 				if (topic.getMsgType().equalsIgnoreCase("cap")) {
@@ -600,16 +601,19 @@ public class MgmtController {
 					schema = new TSO_2_0();
 				} else if (topic.getMsgType().equalsIgnoreCase("largedata")) {
 					schema = new LargeDataUpdate();
+					noOfPartitions = 2;
 				} else if (topic.getMsgType().equalsIgnoreCase("maplayer")) {
 					schema = new MapLayerUpdate();
 				} else if (topic.getMsgType().equalsIgnoreCase("named-geojson")) {
 					schema = new GeoJSONEnvelope();
 				} else if (topic.getMsgType().equalsIgnoreCase("photo-geojson")) {
 					schema = new eu.driver.model.geojson.photo.FeatureCollection();
+				} else if (topic.getMsgType().equalsIgnoreCase("sim-post")) {
+					schema = new eu.driver.model.sim.entity.Post();
 				}
 				
 				if (schema != null) {
-					adminController.createTopic(topic.getName(), new EDXLDistribution(), schema, null);
+					adminController.createTopic(topic.getName(), new EDXLDistribution(), schema, null, noOfPartitions);
 					logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
 					topicController.updateTopicState(topic.getName(), true);
 					sendTopicStateChange(topic.getClientId(), true);

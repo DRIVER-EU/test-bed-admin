@@ -20,12 +20,15 @@ import org.apache.log4j.Logger;
 
 import eu.driver.adapter.properties.ClientProperties;
 
+@SuppressWarnings("deprecation")
 public class KafkaAdminController {
 	
 	private Logger log = Logger.getLogger(this.getClass());
 	private String schemaRest = "http://localhost:3502";
 	private String zookeeperHost = "localhost";
 	private int zookeeperPort = 3500;
+	
+	private boolean simulate = false;
 	
 	public KafkaAdminController() {
 		log.info("KafkaAdminController");
@@ -41,12 +44,18 @@ public class KafkaAdminController {
 		if (System.getenv().get("zookeeper_port") != null) {
 			zookeeperPort = Integer.parseInt(System.getenv().get("zookeeper_port"));
 		}
+		
+		simulate = Boolean.parseBoolean(ClientProperties.getInstance().getProperty("zookeeper.simulate.creation", "false"));
 	}
 	
-	public void createTopic(String topicName, IndexedRecord key, IndexedRecord value, Long retMSTime) throws Exception {
+	@SuppressWarnings("deprecation")
+	public void createTopic(String topicName, IndexedRecord key, IndexedRecord value, Long retMSTime, int noOfPartitions) throws Exception {
 		log.info("--> createTopic: " + topicName);
 		ZkClient zkClient = null;
         ZkUtils zkUtils = null;
+        if (simulate) {
+        	return;
+        }
         try {
             String zookeeperHosts = zookeeperHost + ":" + zookeeperPort;
             int sessionTimeOutInMs = 15 * 1000; // 15 secs
@@ -67,7 +76,7 @@ public class KafkaAdminController {
             });
             zkUtils = new ZkUtils(zkClient, new ZkConnection(zookeeperHosts), false);
 
-            int noOfPartitions = 1;
+            //int noOfPartitions = 1;
             int noOfReplication = 1;
             Properties topicConfiguration = new Properties();
             if (retMSTime != null) {

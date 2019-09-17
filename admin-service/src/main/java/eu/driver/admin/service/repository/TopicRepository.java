@@ -12,7 +12,7 @@ import eu.driver.admin.service.dto.topic.Topic;
 @RepositoryRestResource
 public interface TopicRepository extends JpaRepository<Topic, Long> {
 	
-	public final static String ID_QUERY = "SELECT u FROM Topic u where u.id=:objectId";
+	public final static String ID_QUERY = "SELECT u FROM Topic u where u.id=:objectId ORDER BY u.id DESC";
 	
 	public final static String CLIENT_ID_QUERY = "SELECT u FROM Topic u where u.clientId=:clientId";
 	

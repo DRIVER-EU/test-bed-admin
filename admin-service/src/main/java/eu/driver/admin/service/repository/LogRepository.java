@@ -11,7 +11,7 @@ import eu.driver.admin.service.dto.log.Log;
 @RepositoryRestResource
 public interface LogRepository extends JpaRepository<Log, Long> {
 		
-		public final static String ID_QUERY = "SELECT u FROM Log u where u.id=:objectId";
+		public final static String ID_QUERY = "SELECT u FROM Log u where u.id=:objectId ORDER BY u.id ASC";
 		
 		@Query(ID_QUERY)
 	    public Log findObjectById(@Param("objectId") Long objectId);

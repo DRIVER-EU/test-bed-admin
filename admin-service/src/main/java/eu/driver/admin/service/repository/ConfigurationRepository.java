@@ -9,7 +9,7 @@ import eu.driver.admin.service.dto.configuration.Configuration;
 
 @RepositoryRestResource
 public interface ConfigurationRepository extends JpaRepository<Configuration, Long> {
-	public final static String ID_QUERY = "SELECT u FROM Configuration u where u.id=:objectId";
+	public final static String ID_QUERY = "SELECT u FROM Configuration u where u.id=:objectId ORDER BY u.id DESC";
 	public final static String NAME_QUERY = "SELECT u FROM Configuration u where u.name=:name";
 	
 	@Query(ID_QUERY)

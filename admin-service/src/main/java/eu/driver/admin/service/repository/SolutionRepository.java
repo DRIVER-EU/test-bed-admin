@@ -10,7 +10,7 @@ import eu.driver.admin.service.dto.solution.Solution;
 @RepositoryRestResource
 public interface SolutionRepository extends JpaRepository<Solution, Long> {
 	
-	public final static String ID_QUERY = "SELECT u FROM Solution u where u.id=:objectId";
+	public final static String ID_QUERY = "SELECT u FROM Solution u where u.id=:objectId ORDER BY u.id DESC";
 	
 	public final static String CLIENT_ID_QUERY = "SELECT u FROM Solution u where u.clientId=:clientId";
 	
