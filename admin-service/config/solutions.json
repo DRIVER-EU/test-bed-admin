@@ -192,5 +192,13 @@
  		"isService":false,
  		"state":false,
  		"description":"FRT application!"
+	},{
+		"id":"xvr-cm",
+		"subject.id":"O=XVR,CN=cm",
+ 		"name":"XVR Crisis Media",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"description":"XVR CM application!"
 	}
 ]

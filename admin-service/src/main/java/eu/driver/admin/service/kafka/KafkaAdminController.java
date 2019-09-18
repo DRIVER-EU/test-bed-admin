@@ -50,7 +50,7 @@ public class KafkaAdminController {
 	
 	@SuppressWarnings("deprecation")
 	public void removeTopic(String topicName) throws Exception {
-		log.info("--> createTopic: " + topicName);
+		log.info("--> removeTopic: " + topicName);
 		ZkClient zkClient = null;
         ZkUtils zkUtils = null;
         if (simulate) {
@@ -89,7 +89,7 @@ public class KafkaAdminController {
                 zkClient.close();
             }
         }
-		log.info("createTopic -->");
+		log.info("removeTopic -->");
 	}
 	
 	@SuppressWarnings("deprecation")

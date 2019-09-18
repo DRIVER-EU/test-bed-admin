@@ -621,6 +621,8 @@ public class MgmtController {
 					schema = new eu.driver.model.geojson.photo.FeatureCollection();
 				} else if (topic.getMsgType().equalsIgnoreCase("sim-post")) {
 					schema = new eu.driver.model.sim.entity.Post();
+				} else if (topic.getMsgType().equalsIgnoreCase("sim-startinject")) {
+					schema = new eu.driver.model.sim.request.RequestStartInject();
 				}
 				
 				if (schema != null) {

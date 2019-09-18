@@ -44,7 +44,6 @@
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
-			"airborne",
 			"TB-TrialMgmt"
 		],
 		"subscribedSolutionIDs": [
@@ -61,12 +60,12 @@
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
-			"TB-GeoServer",
-			"TB-TrialMgmt"
+			"TB-GeoServer"
 		],
 		"subscribedSolutionIDs": [
 			"view-terra-1",
 			"view-terra-2",
+			"socrates",
 			"TB-AARTool"
 		],
 		"description": "This is the standard MapLayer topic."
@@ -172,10 +171,24 @@
 		],
 		"description": "This is the topic for Staff map information."
 	},{
-		"id": "standart.topic.simulation_entity",
+		"id": "standart.topic.simulation_entity_post",
 		"type": "standard.topic",
-		"name": "simulation_entity",
+		"name": "simulation_entity_post",
 		"msgType": "sim-post",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"xvr-cm"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool"
+		],
+		"description": "This is the topic for Staff map information."
+	},{
+		"id": "standart.topic.simulation_request_startinject",
+		"type": "standard.topic",
+		"name": "simulation_request_startinject",
+		"msgType": "sim-startinject",
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [

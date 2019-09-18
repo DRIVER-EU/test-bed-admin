@@ -32,5 +32,8 @@
 	},{
 		"name":"sim-post",
 		"versions":["1.0"]
+	},{
+		"name":"sim-startinject",
+		"versions":["1.0"]
 	}
 ]

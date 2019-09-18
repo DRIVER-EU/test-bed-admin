@@ -80,7 +80,8 @@
 			"view-terra-2",
 			"socrates",
 			"drm",
-			"frt"
+			"frt",
+			"xvr-cm"
 		],
 		"topics": [
 			"core.topic.admin.hb",
@@ -102,7 +103,8 @@
 			"standart.topic.socrates_map",
 			"standart.topic.frt_map",
 			"standart.topic.staff_info",
-			"standart.topic.simulation_entity"
+			"standart.topic.simulation_entity_post",
+			"standart.topic.simulation_request_startinject"
 		],
 		"gateways": [
 		]
