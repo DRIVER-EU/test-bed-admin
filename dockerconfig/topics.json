@@ -1,0 +1,202 @@
+[
+	{
+		"id": "standart.topic.asign.info",
+		"type": "standard.topic",
+		"name": "asign_info",
+		"msgType": "geojson",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"asign-mission",
+			"TB-TrialMgmt"
+		],
+		"subscribedSolutionIDs": [
+			"CrowdTaskerProducer",
+			"view-terra-1",
+			"view-terra-2",
+			"TB-AARTool"
+		],
+		"description": "This is the standard asign geoJSON topic."
+	},
+	{
+		"id": "standart.topic.crowd.tasker.info",
+		"type": "standard.topic",
+		"name": "crowd-tasker_info",
+		"msgType": "geojson",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"CrowdTaskerProducer",
+			"TB-TrialMgmt"
+		],
+		"subscribedSolutionIDs": [
+			"view-terra-1",
+			"view-terra-2",
+			"TB-AARTool"
+		],
+		"description": "This is the standard CrowdTasker geoJSON topic."
+	},
+	{
+		"id": "standart.topic.large.data.update",
+		"type": "standard.topic",
+		"name": "large_data_update",
+		"msgType": "largedata",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-TrialMgmt"
+		],
+		"subscribedSolutionIDs": [
+			"TB-GeoServer",
+			"TB-AARTool"
+		],
+		"description": "This is the standard Flightdata topic."
+	},
+	{
+		"id": "standart.topic.map.layer.update",
+		"type": "standard.topic",
+		"name": "map_layer_update",
+		"msgType": "maplayer",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-GeoServer"
+		],
+		"subscribedSolutionIDs": [
+			"view-terra-1",
+			"view-terra-2",
+			"socrates",
+			"TB-AARTool"
+		],
+		"description": "This is the standard MapLayer topic."
+	},
+	{
+		"id": "standart.topic.photo.data",
+		"type": "standard.topic",
+		"name": "photo_geojson",
+		"msgType": "photo-geojson",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"asign-photo",
+			"TB-TrialMgmt"
+		],
+		"subscribedSolutionIDs": [
+			"view-terra-1",
+			"view-terra-2",
+			"TB-AARTool"
+		],
+		"description": "This is the standard Photo geoJSON topic."
+	},{
+		"id": "standart.topic.cs_internal",
+		"type": "standard.topic",
+		"name": "cs_internal",
+		"msgType": "cap",
+		"msgTypeVersion": "1.2",
+		"state": false,
+		"publishSolutionIDs": [
+			"crisissuite"
+		],
+		"subscribedSolutionIDs": [
+			"crisissuite",
+			"TB-AARTool"
+		],
+		"description": "This is the topic for crisisSuite internal communication."
+	},{
+		"id": "standart.topic.staff_map",
+		"type": "standard.topic",
+		"name": "staff_map",
+		"msgType": "cap",
+		"msgTypeVersion": "1.2",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-TrialMgmt",
+			"crisissuite"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool",
+			"crisissuite",
+			"view-terra-1",
+			"view-terra-2"
+		],
+		"description": "This is the topic for Staff map information."
+	},{
+		"id": "standart.topic.socrates_map",
+		"type": "standard.topic",
+		"name": "socrates_map",
+		"msgType": "cap",
+		"msgTypeVersion": "1.2",
+		"state": false,
+		"publishSolutionIDs": [
+			"socrates"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool",
+			"crisissuite",
+			"view-terra-1",
+			"view-terra-2"
+		],
+		"description": "This is the topic for Staff map information."
+	},{
+		"id": "standart.topic.frt_map",
+		"type": "standard.topic",
+		"name": "frt_map",
+		"msgType": "cap",
+		"msgTypeVersion": "1.2",
+		"state": false,
+		"publishSolutionIDs": [
+			"frt"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool",
+			"crisissuite",
+			"socrates",
+			"view-terra-1",
+			"view-terra-2"
+		],
+		"description": "This is the topic for Staff map information."
+	},{
+		"id": "standart.topic.staff_info",
+		"type": "standard.topic",
+		"name": "staff_info",
+		"msgType": "cap",
+		"msgTypeVersion": "1.2",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-TrialMgmt"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool",
+			"crisissuite"
+		],
+		"description": "This is the topic for Staff map information."
+	},{
+		"id": "standart.topic.simulation_entity_post",
+		"type": "standard.topic",
+		"name": "simulation_entity_post",
+		"msgType": "sim-post",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"xvr-cm"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool"
+		],
+		"description": "This is the topic for Staff map information."
+	},{
+		"id": "standart.topic.simulation_request_startinject",
+		"type": "standard.topic",
+		"name": "simulation_request_startinject",
+		"msgType": "sim-startinject",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"xvr-cm"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AARTool"
+		],
+		"description": "This is the topic for Staff map information."
+	}
+]
