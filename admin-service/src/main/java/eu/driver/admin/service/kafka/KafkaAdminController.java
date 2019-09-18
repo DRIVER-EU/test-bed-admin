@@ -49,6 +49,50 @@ public class KafkaAdminController {
 	}
 	
 	@SuppressWarnings("deprecation")
+	public void removeTopic(String topicName) throws Exception {
+		log.info("--> createTopic: " + topicName);
+		ZkClient zkClient = null;
+        ZkUtils zkUtils = null;
+        if (simulate) {
+        	return;
+        }
+        try {
+            String zookeeperHosts = zookeeperHost + ":" + zookeeperPort;
+            int sessionTimeOutInMs = 15 * 1000; // 15 secs
+            int connectionTimeOutInMs = 10 * 1000; // 10 secs
+
+            zkClient = new ZkClient(zookeeperHosts, sessionTimeOutInMs, connectionTimeOutInMs);
+            zkClient.setZkSerializer(new ZkSerializer() {
+				
+				@Override
+				public byte[] serialize(Object data) throws ZkMarshallingError {
+					return ZKStringSerializer.serialize(data);
+				}
+				
+				@Override
+				public Object deserialize(byte[] bytes) throws ZkMarshallingError {
+					return ZKStringSerializer.deserialize(bytes);
+				}
+            });
+            zkUtils = new ZkUtils(zkClient, new ZkConnection(zookeeperHosts), false);
+            
+            boolean topicExist = AdminUtils.topicExists(zkUtils, topicName);
+            if (topicExist) {
+            	AdminUtils.deleteTopic(zkUtils, topicName);
+                log.info("topic deleted: " + topicName);	
+            }
+        } catch (Exception ex) {
+        	log.error("Error creating the topic and registering the schema!", ex);
+            throw new Exception("Error creating the topic and registering the schema!", ex);
+        } finally {
+            if (zkClient != null) {
+                zkClient.close();
+            }
+        }
+		log.info("createTopic -->");
+	}
+	
+	@SuppressWarnings("deprecation")
 	public void createTopic(String topicName, IndexedRecord key, IndexedRecord value, Long retMSTime, int noOfPartitions) throws Exception {
 		log.info("--> createTopic: " + topicName);
 		ZkClient zkClient = null;

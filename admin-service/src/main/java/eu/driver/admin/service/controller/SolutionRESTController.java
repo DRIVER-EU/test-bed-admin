@@ -165,6 +165,10 @@ public class SolutionRESTController implements IAdaptorCallback {
 				savedSolution.setState(solution.getState());
 				savedSolution.setLastHeartBeatReceived(solution.getLastHeartBeatReceived());
 				
+				if (savedSolution.getApplConfigurations().size() != solution.getApplConfigurations().size()) {
+					savedSolution.setApplConfigurations(solution.getApplConfigurations());	
+				}
+				
 				savedSolution = solutionRepo.saveAndFlush(savedSolution);
 			} else {
 				savedSolution = solutionRepo.saveAndFlush(solution);

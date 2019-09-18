@@ -453,6 +453,17 @@ public class MgmtController {
 		configuration.setIsActive(true);
 		testbedConfigRepo.saveAndFlush(configuration);
 		
+		// delete all topics and set the testbed init to false
+		List<Topic> topicList = topicRepo.findAll();
+		for (Topic topic : topicList) {
+			try {
+				adminController.removeTopic(topic.getClientId());
+			} catch(Exception e) {
+				log.error("Error removing the topic: " + topic.getClientId());
+			}
+		}
+		this.initDone = false;
+		
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Testbed setting changed to: " + configuration.getConfigName() + ", " + configuration.getTestbedMode(), true);
 
 		log.info("setActTestbedConfig-->");

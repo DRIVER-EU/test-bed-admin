@@ -1,15 +1,18 @@
 package eu.driver.admin.service.controller;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
-
-
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.validation.ValidationException;
 
 import org.apache.avro.generic.IndexedRecord;
@@ -20,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.driver.adapter.properties.ClientProperties;
@@ -37,10 +41,15 @@ public class LogRESTController implements IAdaptorCallback {
 	private Logger log = Logger.getLogger(this.getClass());
 	private StringJSONMapper mapper = new StringJSONMapper();
 	
+	private Double currentPageSize = 20D;
+	
 	private String clientId = ClientProperties.getInstance().getProperty("client.id");
 	
 	@Autowired
 	LogRepository logRepo;
+	
+	@PersistenceContext(unitName = "AdminSerivice")
+	private EntityManager entityManager;
 
 	public LogRESTController() {
 		log.info("LogRESTController");
@@ -82,18 +91,63 @@ public class LogRESTController implements IAdaptorCallback {
 	
 	@ApiOperation(value = "getAllLogs", nickname = "getAllLogs")
 	@RequestMapping(value = "/AdminService/getAllLogs", method = RequestMethod.GET)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", value = "the act. page of the client", required = false, dataType = "int", paramType = "query"),
+		@ApiImplicitParam(name = "size", value = "the act. size of the page records on the client", required = false, dataType = "int", paramType = "query") })
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Success", response = LogList.class),
 			@ApiResponse(code = 400, message = "Bad Request", response = LogList.class),
 			@ApiResponse(code = 500, message = "Failure", response = LogList.class) })
-	public ResponseEntity<LogList> getAllLogs() {
+	public ResponseEntity<LogList> getAllLogs(
+			@RequestParam(value="page", required=false) Integer page,
+			@RequestParam(value="size", required=false) Integer size) {
 		log.debug("-->getAllLogs");
 		LogList result = new LogList();
-		List<Log> logs = logRepo.findAll();
+		
+		String query = "SELECT NEW Log(i.id, i.clientId, i.level, i.sendDate, i.message) FROM Log i";
+		
+		query += " ORDER BY i.id DESC";
+
+		TypedQuery<Log> typedQuery = entityManager.createQuery(query, Log.class);
+		if (page != null) {
+			page--;
+			if (size == null) {
+				size = 20;
+			}
+			typedQuery.setFirstResult(page * size);
+			typedQuery.setMaxResults(size);
+			
+			this.currentPageSize = Double.valueOf(size);
+		}
+		List<Log> logs = typedQuery.getResultList();
 		
 		log.debug("getAllLogs-->");
 		result.setLogs(logs);
 		return new ResponseEntity<LogList>(result, HttpStatus.OK);
+	}
+	
+	@ApiOperation(value = "getPageCount", nickname = "getPageCount")
+	@RequestMapping(value = "/AdminService/getPageCount", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = ArrayList.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = ArrayList.class),
+			@ApiResponse(code = 500, message = "Failure", response = ArrayList.class) })
+	public ResponseEntity<Double> getPageCount() {
+		log.info("-->getPageCount");
+		String query = "SELECT NEW Log(i.id) FROM Log i";
+		TypedQuery<Log> typedQuery = entityManager.createQuery(query, Log.class);
+		
+		List<Log> records = typedQuery.getResultList();
+		
+		Double recCount = Double.valueOf(records.size());
+		
+		Double pageCount = 1D;
+		if (recCount > 0 && this.currentPageSize > 0) {
+			pageCount = Math.ceil(recCount/this.currentPageSize);
+		}
+
+		log.info("getPageCount-->");
+		return new ResponseEntity<Double>(pageCount, HttpStatus.OK);
 	}
 
 	public void addLog(String level, String message, Boolean sendNotification) {

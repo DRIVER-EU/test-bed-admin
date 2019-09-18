@@ -48,6 +48,14 @@ public class Log implements Serializable {
 	public Log() {
 		
 	}
+	
+	public Log(Long id, String clientId, String level, Date sendDate, String message) {
+		this.id = id;
+		this.clientId = clientId;
+		this.level = level;
+		this.sendDate = sendDate;
+		this.message = message;
+	}
 
 	public Long getId() {
 		return id;

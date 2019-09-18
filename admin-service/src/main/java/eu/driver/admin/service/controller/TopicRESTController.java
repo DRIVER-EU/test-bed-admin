@@ -112,6 +112,10 @@ public class TopicRESTController {
 				savedTopic.setPublishSolutionIDs(topic.getPublishSolutionIDs());
 				savedTopic.setSubscribedSolutionIDs(topic.getSubscribedSolutionIDs());
 				
+				if (savedTopic.getApplConfigurations().size() != topic.getApplConfigurations().size()) {
+					savedTopic.setApplConfigurations(topic.getApplConfigurations());
+				}
+				
 				savedTopic = topicRepo.saveAndFlush(savedTopic);
 			} else {
 				savedTopic = topicRepo.saveAndFlush(topic);
