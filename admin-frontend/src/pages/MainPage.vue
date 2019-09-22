@@ -82,6 +82,7 @@
       },
     computed: mapGetters(['isTestbedInitialized', 'isTrialStarted', 'loading', 'configurations', 'modes', 'currentConfiguration']),
     created: function () {
+      this.$store.dispatch('getPageCount');
       this.$store.dispatch('getCurrentConfiguration');
       this.$store.dispatch('getConfigurations');
       this.$store.dispatch('getModes');

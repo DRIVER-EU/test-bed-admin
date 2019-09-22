@@ -7,6 +7,7 @@ import {LogEntry} from '../objects/logEntry'
 import {Solution} from '../objects/solution'
 import {Topic} from '../objects/topic'
 import {Gateway} from '../objects/gateway'
+import Settings from '../constants/Settings'
 
 Vue.use(Vuex)
 
@@ -24,6 +25,7 @@ export const store = new Vuex.Store({
     topics: [],
     gateways: [],
     logEntries: [],
+    logsPageCount: 1,
     standards: [],
     topicTypes: [],
     loading: false,
@@ -130,14 +132,17 @@ export const store = new Vuex.Store({
     },
     SET_GATEWAY(state, gateway) {
       state.gateways.push(new Gateway(gateway))
-
     },
-    SET_LOG(state, data) {
+    GET_LOGS(state, data) {
+      state.logEntries = [];
       data.logs.forEach(logEntry => {
         logEntry.sendDate = moment.utc(logEntry.sendDate).format('YYYY-MM-DD HH:mm:ss.SSS');
         state.logEntries.push(new LogEntry(logEntry));
-      })
-
+      });
+    },
+    GET_LOGS_PAGE_COUNT (state, count) {
+      // console.log("Received records page count", count);
+      state.logsPageCount = count;
     },
     SET_STANDARDS(state, standards) {
       state.standards = standards
@@ -187,12 +192,20 @@ export const store = new Vuex.Store({
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
       });
     },
-    getAllLogs(context) {
-      this.axios.get('getAllLogs').then(response => {
-        context.commit('SET_LOG', (response.data));
+    getLogs(context, payload) {
+      const page = payload ? payload.page : null;
+      const url = page ? 'getAllLogs?size=' + Settings.PAGE_SIZE + "&page=" + page : 'getAllLogs';
+      this.axios.get(url).then(response => {
+        console.log('/getAllLogs returned count', response.data.logs.length);
+        context.commit('GET_LOGS', (response.data));
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
       });
+    },
+    getPageCount (context) {
+      this.axios.get('getPageCount').then(response => {
+        context.commit('GET_LOGS_PAGE_COUNT', (response.data));
+      }).catch(ex => console.log(ex));
     },
     startTrial(context) {
       this.axios.post('startTrialConfig').then(function () {
