@@ -45,9 +45,12 @@ public class Log implements Serializable {
 	@Column(name="message", columnDefinition="text")
 	private String message = null;
 	
-	public Log() {
-		
+	public Log() {	
 	}
+	
+   public Log(Long id) {
+      this.id = id;
+   }
 	
 	public Log(Long id, String clientId, String level, Date sendDate, String message) {
 		this.id = id;

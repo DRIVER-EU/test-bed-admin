@@ -8,7 +8,7 @@
       <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition">
         <v-btn slot="activator">
           <v-icon left>settings</v-icon>
-          Configurations
+          {{ currentConfiguration.configName ? currentConfiguration.configName : 'Configurations' }}
         </v-btn>
         <v-card>
           <v-list>
@@ -23,7 +23,7 @@
       <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition">
         <v-btn slot="activator">
           <v-icon left>settings_ethernet</v-icon>
-          Modes
+          {{ currentConfiguration.testbedMode ? currentConfiguration.testbedMode : 'Modes' }}
         </v-btn>
         <v-card>
           <v-list>
@@ -82,6 +82,7 @@
       },
     computed: mapGetters(['isTestbedInitialized', 'isTrialStarted', 'loading', 'configurations', 'modes', 'currentConfiguration']),
     created: function () {
+      this.$store.dispatch('getPageCount');
       this.$store.dispatch('getCurrentConfiguration');
       this.$store.dispatch('getConfigurations');
       this.$store.dispatch('getModes');
