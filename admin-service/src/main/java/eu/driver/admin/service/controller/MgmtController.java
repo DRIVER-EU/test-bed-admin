@@ -515,6 +515,14 @@ public class MgmtController {
 			this.grantCoreTopicGroupAccess(TopicConstants.LOGGING_TOPIC);
 		}
 		
+		adminController.createTopic(TopicConstants.EVALUATION_LOGGING_TOPIC, new EDXLDistribution(), new Log(), null, 1);
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.EVALUATION_LOGGING_TOPIC + " created.", true);
+		topicController.updateTopicState(TopicConstants.EVALUATION_LOGGING_TOPIC, true);
+		sendTopicStateChange("core.topic.eval.log", true);
+		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+			this.grantCoreTopicGroupAccess(TopicConstants.EVALUATION_LOGGING_TOPIC);
+		}
+		
 		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing(), null, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.TIMING_TOPIC, true);

@@ -87,6 +87,7 @@
 			"core.topic.admin.hb",
 			"core.topic.hb",
 			"core.topic.log",
+			"core.topic.eval.log",
 			"core.topic.access.invite",
 			"core.topic.create.request",
 			"core.topic.time",

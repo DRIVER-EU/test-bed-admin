@@ -39,6 +39,19 @@
 		"description": "This is the topic where every solution published the logs to be stored in the admin tool log table."
 	},
 	{
+		"id": "core.topic.eval.log",
+		"type": "core.topic",
+		"name": "system_evaluation_logging",
+		"state": false,
+		"publishSolutionIDs": [
+			"all"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AdminTool"
+		],
+		"description": "This is the topic where every solution published the evaluation logs to be stored in the admin tool log table."
+	},
+	{
 		"id": "core.topic.access.invite",
 		"type": "core.topic",
 		"name": "system_topic_access_invite",
