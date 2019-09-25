@@ -123,14 +123,29 @@ export const store = new Vuex.Store({
       if(obj)
         obj.state = payload.state
     },
-    SET_SOLUTION(state, solution) {
-      state.solutions.push(new Solution(solution))
-      eventBus.$emit('updateSolutionIds', solution.clientId)
+    SET_SOLUTIONS(state, solutions) {
+      state.solutions = [];
+      solutions.forEach(solution => {
+        state.solutions.push(new Solution(solution));
+        eventBus.$emit('updateSolutionIds', solution.clientId);
+      });
     },
-    SET_TOPIC(state, topic) {
-      state.topics.push(new Topic(topic))
+    ADD_SOLUTION(state, solution) {
+      state.solutions.push(new Solution(solution));
+      eventBus.$emit('updateSolutionIds', solution.clientId);
     },
-    SET_GATEWAY(state, gateway) {
+    SET_TOPICS(state, topics) {
+      state.topics = [];
+      topics.forEach(topic => state.topics.push(new Topic(topic)));
+    },
+    ADD_TOPIC(state, topic) {
+      state.topics.push(new Topic(topic));
+    },
+    SET_GATEWAYS(state, gateways) {
+      state.gateways = [];
+      gateways.forEach(gateway => state.gateways.push(new Gateway(gateway)));
+    },
+    ADD_GATEWAY(state, gateway) {
       state.gateways.push(new Gateway(gateway))
     },
     GET_LOGS(state, data) {
@@ -173,21 +188,21 @@ export const store = new Vuex.Store({
   actions: {
     getSolutions(context) {
       this.axios.get('getAllTrialSolutions').then(response => {
-        response.data.solutions.forEach(solution => context.commit('SET_SOLUTION', (solution)))
+        context.commit('SET_SOLUTIONS', response.data.solutions);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
       });
     },
     getTopics(context) {
       this.axios.get('getAllTrialTopics').then(response => {
-        response.data.topics.forEach(topic => context.commit('SET_TOPIC', (topic)))
+        context.commit('SET_TOPICS', response.data.topics);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
       });
     },
     getGateways(context) {
       this.axios.get('getAllTrialGateways').then(response => {
-        response.data.gateways.forEach(gateway => context.commit('SET_GATEWAY', (gateway)))
+        context.commit('SET_GATEWAYS', response.data.gateways);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
       });
@@ -238,29 +253,26 @@ export const store = new Vuex.Store({
     addSolution(context, solution) {
       this.axios.post('addSolution', solution).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
-        context.commit('SET_SOLUTION', (response.data));
+        context.commit('ADD_SOLUTION', (response.data));
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
-        .catch(e => {
-          eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
-        })
     },
     addGateway(context, gateway) {
       this.axios.post('addGateway', gateway).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
-        context.commit('SET_GATEWAY', (response.data))
+        context.commit('ADD_GATEWAY', (response.data))
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
-        .catch(e => {
-          eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
-        })
     },
     addTopic(context, topic) {
       this.axios.post('addTopic', topic).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
-        context.commit('SET_TOPIC', (response.data))
+        context.commit('ADD_TOPIC', (response.data))
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
-        .catch(e => {
-          eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
-        })
     },
     getAllStandards(context) {
       this.axios.get('getAllStandards').then(response => {

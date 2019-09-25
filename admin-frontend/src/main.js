@@ -61,12 +61,12 @@ new Vue({
   store,
   render: h => h(App),
   created() {
-    this.$store.dispatch('getSolutions'),
-      this.$store.dispatch('getTopics'),
-      this.$store.dispatch('getGateways'),
-      this.$store.dispatch('isTestbedInitialized'),
-      this.$store.dispatch('isTrialStarted'),
-      this.$store.dispatch('getAllStandards'),
-      this.$store.dispatch('getAllTopicTypes')
+    this.$store.dispatch('getSolutions');
+    this.$store.dispatch('getTopics');
+    this.$store.dispatch('getGateways');
+    this.$store.dispatch('isTestbedInitialized');
+    this.$store.dispatch('isTrialStarted');
+    this.$store.dispatch('getAllStandards');
+    this.$store.dispatch('getAllTopicTypes');
   }
 })
