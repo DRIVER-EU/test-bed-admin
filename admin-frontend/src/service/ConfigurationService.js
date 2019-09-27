@@ -30,6 +30,9 @@ class ConfigurationService {
     fetchService.performPost('setActTestbedConfig', configuration).then(() => {
       store.dispatch('getCurrentConfiguration');
       store.dispatch('isTestbedInitialized');
+      store.dispatch('getSolutions');
+      store.dispatch('getTopics');
+      store.dispatch('getGateways');
     }).catch(ex => console.log(ex));
   }
 }
