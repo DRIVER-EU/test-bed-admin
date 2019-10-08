@@ -6,6 +6,7 @@
 		"isTestbed": true,
 		"isService": true,
 		"state": false,
+		"orgName":"Frequentis",
 		"description": "This is the AdminTool"
 	},
 	{
@@ -15,6 +16,7 @@
 		"isTestbed": false,
 		"isService": true,
 		"state": false,
+		"orgName":"Frequentis",
 		"description": "This is the AfterActionReview Tool"
 	},
 	{
@@ -24,6 +26,7 @@
 		"isTestbed": false,
 		"isService": true,
 		"state": false,
+		"orgName":"TNO",
 		"description": "This is the Trial Manager"
 	},
 	{
@@ -33,6 +36,7 @@
 		"isTestbed": false,
 		"isService": true,
 		"state": false,
+		"orgName":"TNO",
 		"description": "This is the Testbed TimeService"
 	},
 	{
@@ -42,6 +46,7 @@
 		"isTestbed": false,
 		"isService": true,
 		"state": false,
+		"orgName":"ITTI",
 		"description": "This is the Testbed ObserverTool"
 	},
 	{
@@ -51,6 +56,7 @@
 		"isTestbed": false,
 		"isService": true,
 		"state": false,
+		"orgName":"Frequentis",
 		"description": "This is the Testbed GeoServer"
 	}
 ]

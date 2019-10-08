@@ -18,6 +18,7 @@ import net.sourceforge.plantuml.SourceStringReader;
 
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.log4j.Logger;
+import org.apache.maven.model.Organization;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +33,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.driver.adapter.constants.TopicConstants;
 import eu.driver.adapter.core.AdminAdapter;
 import eu.driver.adapter.excpetion.CommunicationException;
@@ -41,6 +46,7 @@ import eu.driver.admin.service.constants.TestbedSecurityMode;
 import eu.driver.admin.service.dto.configuration.Configuration;
 import eu.driver.admin.service.dto.configuration.TestbedConfig;
 import eu.driver.admin.service.dto.gateway.Gateway;
+import eu.driver.admin.service.dto.organisation.Organisation;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.dto.standard.Standard;
 import eu.driver.admin.service.dto.topic.Topic;
@@ -50,6 +56,7 @@ import eu.driver.admin.service.kafka.KafkaAdminController;
 import eu.driver.admin.service.repository.ConfigurationRepository;
 import eu.driver.admin.service.repository.GatewayRepository;
 import eu.driver.admin.service.repository.LogRepository;
+import eu.driver.admin.service.repository.OrganisationRepository;
 import eu.driver.admin.service.repository.SolutionRepository;
 import eu.driver.admin.service.repository.StandardRepository;
 import eu.driver.admin.service.repository.TestbedConfigRepository;
@@ -88,6 +95,8 @@ public class MgmtController {
 	private FileReader fileReader = new FileReader();
 	private ClientProperties clientProp = ClientProperties.getInstance();
 	
+	private ObjectMapper objectMapper = new ObjectMapper();
+	
 	private HTTPUtils httpUtils = new HTTPUtils();
 	
 	@Autowired
@@ -97,10 +106,16 @@ public class MgmtController {
 	TopicRESTController topicController;
 	
 	@Autowired
+	OrganisationRESTController organisationController;
+	
+	@Autowired
 	SolutionRESTController solutionController;
 	
 	@Autowired
 	GatewayRESTController gatewayController;
+	
+	@Autowired
+	OrganisationRepository organisationRepo;
 	
 	@Autowired
 	SolutionRepository solutionRepo;
@@ -127,6 +142,7 @@ public class MgmtController {
 	private Boolean startDone = false;
 	private TestbedSecurityMode secureMode = TestbedSecurityMode.DEVELOP;
 	
+	private String organisationsJson = "config/organisations.json";
 	private String tbSolConfigJson = "config/testbed-solutions.json";
 	private String solConfigJson = "config/solutions.json";
 	private String tbTopicConfigJson = "config/testbed-topics.json";
@@ -152,7 +168,8 @@ public class MgmtController {
 				solutionRepo.deleteAll();
 				topicRepo.deleteAll();
 				gatewayRepo.deleteAll();
-				standardRepo.deleteAll();	
+				standardRepo.deleteAll();
+				organisationRepo.deleteAll();
 				logRepo.deleteAll();
 				configRepo.deleteAll();
 			} catch (Exception e) {
@@ -162,6 +179,7 @@ public class MgmtController {
 		}
 		
 		try {
+			loadOrganisations();
 			loadSolutions(this.tbSolConfigJson);
 			loadSolutions(this.solConfigJson);
 			loadTopics(this.tbTopicConfigJson);
@@ -789,10 +807,22 @@ public class MgmtController {
 					jsonobject = jsonarray.getJSONObject(i);
 
 					solution.setClientId(jsonobject.getString("id"));
-					solution.setSubjectId(jsonobject.getString("subject.id"));
 					solution.setName(jsonobject.getString("name"));
 					solution.setIsAdmin(jsonobject.getBoolean("isTestbed"));
 					solution.setIsService(jsonobject.getBoolean("isService"));
+					
+					String orgName = jsonobject.getString("orgName");
+					if (orgName != null) { 
+						Organisation organisation = organisationRepo.findObjectByOrgName(orgName);
+						solution.setOrganisation(organisation);
+					}
+					
+					if (orgName != null && solution.getName() != null) {
+						solution.setSubjectId(
+								"O="+orgName.toUpperCase() 
+								+ ",CN=" + solution.getName().toUpperCase().replaceAll(" ", "-"));
+					}
+					
 					if (solution.getClientId().equalsIgnoreCase("TB-AdminTool")) {
 						solution.setState(true);
 					} else {
@@ -874,6 +904,28 @@ public class MgmtController {
 		log.info("loadTopics -->");
 	}
 	
+	private void loadOrganisations() {
+		log.info("--> loadOrganisations");
+		String organisationJson = fileReader.readFile(this.organisationsJson);
+		if (organisationJson != null) {
+			try {
+				JSONArray jsonarray = new JSONArray(organisationJson);
+				for (int i = 0; i < jsonarray.length(); i++) {
+					Organisation organisation = objectMapper.readValue(jsonarray.getJSONObject(i).toString(), Organisation.class);  
+					Organisation dbOrganisation = this.organisationRepo.findObjectByOrgName(organisation.getOrgName());
+					if (dbOrganisation == null) {
+						dbOrganisation = this.organisationRepo.saveAndFlush(organisation);
+						log.info("add organisation: " + dbOrganisation.getOrgName());
+					}
+				}
+			} catch (JSONException | IOException e) {
+				log.error("Error parsind the JSON Organisation response", e);
+			}
+		}
+		log.info("loadOrganisations -->");
+	}
+	
+	
 	private void loadGateways() {
 		log.info("--> loadGateways");
 		String gatewayJson = fileReader.readFile(this.gwConfigJson);
@@ -881,24 +933,7 @@ public class MgmtController {
 			try {
 				JSONArray jsonarray = new JSONArray(gatewayJson);
 				for (int i = 0; i < jsonarray.length(); i++) {
-					JSONObject jsonobject;
-					Gateway gateway = new Gateway();
-					jsonobject = jsonarray.getJSONObject(i);
-
-					gateway.setClientId(jsonobject.getString("id"));
-					gateway.setName(jsonobject.getString("name"));
-					gateway.setState(jsonobject.getBoolean("state"));
-					gateway.setDescription(jsonobject.getString("description"));
-
-					ArrayList<String> mangTypes = new ArrayList<String>();     
-					JSONArray jArray = jsonobject.getJSONArray("managingTypes");
-					if (jArray != null) { 
-					   for (int a=0;a<jArray.length();a++){ 
-						   mangTypes.add(jArray.getString(a));
-					   } 
-					} 
-					gateway.setManagingType(mangTypes);
-					
+					Gateway gateway = objectMapper.readValue(jsonarray.getJSONObject(i).toString(), Gateway.class);  
 					Gateway dbGateway = this.gatewayRepo.findObjectByClientId(gateway.getClientId());
 					if (dbGateway == null) {
 						this.gatewayRepo.saveAndFlush(gateway);
@@ -908,7 +943,7 @@ public class MgmtController {
 						this.gatewayRepo.saveAndFlush(dbGateway);
 					}
 				}
-			} catch (JSONException e) {
+			} catch (JSONException | IOException e) {
 				log.error("Error parsind the JSON Gateway response", e);
 			}
 		}
@@ -922,27 +957,13 @@ public class MgmtController {
 			try {
 				JSONArray jsonarray = new JSONArray(standardJson);
 				for (int i = 0; i < jsonarray.length(); i++) {
-					JSONObject jsonobject;
-					Standard standard = new Standard();
-					jsonobject = jsonarray.getJSONObject(i);
-
-					standard.setName(jsonobject.getString("name"));
-
-					ArrayList<String> versions = new ArrayList<String>();     
-					JSONArray jArray = jsonobject.getJSONArray("versions");
-					if (jArray != null) { 
-					   for (int a=0;a<jArray.length();a++){ 
-						   versions.add(jArray.getString(a));
-					   } 
-					} 
-					standard.setVersions(versions);
-					
+					Standard standard = objectMapper.readValue(jsonarray.getJSONObject(i).toString(), Standard.class);  
 					if (this.standardRepo.findObjectByName(standard.getName()) == null) {
 						this.standardRepo.saveAndFlush(standard);
 						log.info("add standard: " + standard.getName());
 					}
 				}
-			} catch (JSONException e) {
+			} catch (JSONException | IOException e) {
 				log.error("Error parsind the JSON Standard response", e);
 			}
 		}

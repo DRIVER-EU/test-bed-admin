@@ -165,12 +165,29 @@ public class SolutionRESTController implements IAdaptorCallback {
 				savedSolution.setState(solution.getState());
 				savedSolution.setLastHeartBeatReceived(solution.getLastHeartBeatReceived());
 				
+				savedSolution.setOrgName(solution.getOrgName());
+				savedSolution.setUserName(solution.getUserName());
+				savedSolution.setUserPwd(solution.getUserPwd());
+				savedSolution.setCertPwd(solution.getCertPwd());
+				savedSolution.setEmail(solution.getEmail());
+				
+				if (solution.getOrgName() != null && solution.getName() != null) {
+					savedSolution.setSubjectId(
+							"O="+solution.getOrgName().toUpperCase() 
+							+ ",CN=" + solution.getName().toUpperCase().replaceAll(" ", "-"));
+				}
+				
 				if (savedSolution.getApplConfigurations().size() != solution.getApplConfigurations().size()) {
 					savedSolution.setApplConfigurations(solution.getApplConfigurations());	
 				}
 				
 				savedSolution = solutionRepo.saveAndFlush(savedSolution);
 			} else {
+				if (solution.getOrgName() != null && solution.getName() != null) {
+					solution.setSubjectId(
+							"O="+solution.getOrgName().toUpperCase() 
+							+ ",CN=" + solution.getName().toUpperCase().replaceAll(" ", "-"));
+				}
 				savedSolution = solutionRepo.saveAndFlush(solution);
 			}
 			if (logController != null) {
