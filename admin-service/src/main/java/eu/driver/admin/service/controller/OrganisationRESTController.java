@@ -1,6 +1,5 @@
 package eu.driver.admin.service.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.swagger.annotations.ApiImplicitParam;
@@ -133,7 +132,7 @@ public class OrganisationRESTController {
 	}
 	
 	@ApiOperation(value = "getAllOrganisations", nickname = "getAllOrganisations")
-	@RequestMapping(value = "/AdminService/removeOrganisation/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/AdminService/getAllOrganisations", method = RequestMethod.GET)
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Success", response = List.class),
 			@ApiResponse(code = 400, message = "Bad Request", response = List.class),
@@ -153,6 +152,12 @@ public class OrganisationRESTController {
 		return new ResponseEntity<List<Organisation>>(organisations, HttpStatus.OK);
 	}
 	
+	@ApiOperation(value = "removeAllOrganisations", nickname = "removeAllOrganisations")
+	@RequestMapping(value = "/AdminService/removeAllOrganisations", method = RequestMethod.DELETE)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = Boolean.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = Boolean.class),
+			@ApiResponse(code = 500, message = "Failure", response = Boolean.class) })
 	public Boolean removeAllOrganisations() {
 		log.debug("--> removeAllOrganisations");
 		try {
