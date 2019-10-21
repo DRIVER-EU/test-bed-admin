@@ -475,7 +475,10 @@ public class MgmtController {
 		List<Topic> topicList = topicRepo.findAll();
 		for (Topic topic : topicList) {
 			try {
-				adminController.removeTopic(topic.getClientId());
+				adminController.removeTopic(topic.getName());
+				topic.setState(false);
+				topicRepo.saveAndFlush(topic);
+				sendTopicStateChange(topic.getClientId(), false);
 			} catch(Exception e) {
 				log.error("Error removing the topic: " + topic.getClientId());
 			}

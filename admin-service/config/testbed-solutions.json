@@ -20,6 +20,16 @@
 		"description": "This is the AfterActionReview Tool"
 	},
 	{
+		"id": "TB-AARTool-Backup",
+		"subject.id": "O=DRIVER-PROJECT.EU,CN=AARTool",
+		"name": "AARTool Backup",
+		"isTestbed": false,
+		"isService": true,
+		"state": false,
+		"orgName":"Frequentis",
+		"description": "This is the AfterActionReview Tool"
+	},
+	{
 		"id": "TB-TrialMgmt",
 		"subject.id": "O=DRIVER-PROJECT.EU,CN=TrialMgmt",
 		"name": "TrialManager",

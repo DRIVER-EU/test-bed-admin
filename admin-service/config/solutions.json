@@ -162,6 +162,22 @@
  		"orgName":"DLR",
  		"description":"Airborn application!"
 	},{
+		"id":"view-terra-m1",
+ 		"name":"vieWTerra Module-1",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"orgName":"VWORLD",
+ 		"description":"vieWTerra application at Module 1!"
+	},{
+		"id":"view-terra-m2",
+ 		"name":"vieWTerra Module-2",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"orgName":"VWORLD",
+ 		"description":"vieWTerra application at Module 2!"
+	},{
 		"id":"crisissuite",
  		"name":"CrisisSuit",
  		"isTestbed":false,

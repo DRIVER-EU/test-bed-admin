@@ -48,7 +48,8 @@
 		],
 		"subscribedSolutionIDs": [
 			"TB-GeoServer",
-			"TB-AARTool"
+			"TB-AARTool",
+			"TB-AARTool-Backup"
 		],
 		"description": "This is the standard Flightdata topic."
 	},
@@ -63,10 +64,11 @@
 			"TB-GeoServer"
 		],
 		"subscribedSolutionIDs": [
-			"view-terra-1",
-			"view-terra-2",
+			"view-terra-m1",
+			"view-terra-m2",
 			"socrates",
-			"TB-AARTool"
+			"TB-AARTool",
+			"TB-AARTool-Backup"
 		],
 		"description": "This is the standard MapLayer topic."
 	},
@@ -99,7 +101,8 @@
 		],
 		"subscribedSolutionIDs": [
 			"crisissuite",
-			"TB-AARTool"
+			"TB-AARTool",
+			"TB-AARTool-Backup"
 		],
 		"description": "This is the topic for crisisSuite internal communication."
 	},{
@@ -115,9 +118,10 @@
 		],
 		"subscribedSolutionIDs": [
 			"TB-AARTool",
+			"TB-AARTool-Backup",
 			"crisissuite",
-			"view-terra-1",
-			"view-terra-2"
+			"view-terra-m1",
+			"view-terra-m2"
 		],
 		"description": "This is the topic for Staff map information."
 	},{
@@ -132,9 +136,10 @@
 		],
 		"subscribedSolutionIDs": [
 			"TB-AARTool",
+			"TB-AARTool-Backup",
 			"crisissuite",
-			"view-terra-1",
-			"view-terra-2"
+			"view-terra-m1",
+			"view-terra-m2"
 		],
 		"description": "This is the topic for Staff map information."
 	},{
@@ -149,10 +154,11 @@
 		],
 		"subscribedSolutionIDs": [
 			"TB-AARTool",
+			"TB-AARTool-Backup",
 			"crisissuite",
 			"socrates",
-			"view-terra-1",
-			"view-terra-2"
+			"view-terra-m1",
+			"view-terra-m2"
 		],
 		"description": "This is the topic for Staff map information."
 	},{
@@ -167,6 +173,7 @@
 		],
 		"subscribedSolutionIDs": [
 			"TB-AARTool",
+			"TB-AARTool-Backup",
 			"crisissuite"
 		],
 		"description": "This is the topic for Staff map information."
@@ -181,7 +188,8 @@
 			"xvr-cm"
 		],
 		"subscribedSolutionIDs": [
-			"TB-AARTool"
+			"TB-AARTool",
+			"TB-AARTool-Backup"
 		],
 		"description": "This is the topic for Staff map information."
 	},{
@@ -195,7 +203,8 @@
 			"xvr-cm"
 		],
 		"subscribedSolutionIDs": [
-			"TB-AARTool"
+			"TB-AARTool",
+			"TB-AARTool-Backup"
 		],
 		"description": "This is the topic for Staff map information."
 	}
