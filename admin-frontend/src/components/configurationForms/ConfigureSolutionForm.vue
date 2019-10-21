@@ -30,6 +30,11 @@
               :value="false"
             ></v-radio>
           </v-radio-group>
+          <v-select
+            v-model="orgName"
+            :items="organisationNames"
+            label="Organisation Name"
+          ></v-select>
           <v-textarea
             v-model="description"
             label="Description"
@@ -65,8 +70,14 @@
         v => (v && v.length <= 25) || 'Max. 25 characters allowed.'
       ],
       isService: true,
-      description: ''
+      description: '',
+      orgName: null,
     }),
+    computed: {
+      organisationNames() {
+        return this.$store.state.organisations.map(o => o.orgName);
+      }
+    },
     created() {
       eventBus.$on('openConfigureSolutionForm', () => {
         this.open = true
@@ -81,7 +92,8 @@
               name: self.name,
             isAdmin: false,
             isService: self.isService,
-            description: self.description
+            description: self.description,
+            orgName: self.orgName,
           }
           store.dispatch('addSolution', solution)
           self.clear()

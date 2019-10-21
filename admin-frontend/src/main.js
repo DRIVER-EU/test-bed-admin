@@ -68,5 +68,6 @@ new Vue({
     this.$store.dispatch('isTrialStarted');
     this.$store.dispatch('getAllStandards');
     this.$store.dispatch('getAllTopicTypes');
+    this.$store.dispatch('getAllOrganisations');
   }
 })

@@ -33,7 +33,8 @@ export const store = new Vuex.Store({
     isTrialStarted: false,
     configurations: [],
     modes: [],
-    currentConfiguration: {}
+    currentConfiguration: {},
+    organisations: [],
   },
   getters: {
     solutions(state) {
@@ -78,6 +79,9 @@ export const store = new Vuex.Store({
     },
     currentConfiguration(state) {
       return state.currentConfiguration;
+    },
+    organisations(state) {
+      return state.organisations;
     }
   },
   mutations: {
@@ -183,8 +187,10 @@ export const store = new Vuex.Store({
     SET_CURRENT_CONFIGURATION(state, currentConfiguration) {
       state.currentConfiguration = currentConfiguration;
     },
-  }
-  ,
+    SET_ORGANISATIONS(state, organisations) {
+      state.organisations = organisations
+    },
+  },
   actions: {
     getSolutions(context) {
       this.axios.get('getAllTrialSolutions').then(response => {
@@ -297,6 +303,11 @@ export const store = new Vuex.Store({
     getCurrentConfiguration(context) {
       this.axios.get('getActTestbedConfig').then(response => {
         context.commit('SET_CURRENT_CONFIGURATION', (response.data));
+      })
+    },
+    getAllOrganisations(context) {
+      this.axios.get('getAllOrganisations').then(response => {
+        context.commit('SET_ORGANISATIONS', (response.data));
       })
     }
   }
