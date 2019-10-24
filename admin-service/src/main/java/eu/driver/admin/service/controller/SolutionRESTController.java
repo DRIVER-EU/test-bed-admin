@@ -6,9 +6,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 
 import org.apache.avro.generic.IndexedRecord;
@@ -49,6 +53,8 @@ public class SolutionRESTController implements IAdaptorCallback {
 	private Timer hbTimer = null;
 	private HeartbeatTimerTask hbTimerTask = null;
 	private StringJSONMapper mapper = new StringJSONMapper();
+	
+	private String fileStorageLocation = "./config/cert/";
 	
 	@Autowired
 	LogRESTController logController;
@@ -294,6 +300,32 @@ public class SolutionRESTController implements IAdaptorCallback {
 		
 		log.debug("getSolutionList -->");
 		return this.solutionRepo.findAll();
+	}
+	
+	
+	@ApiOperation(value = "getSolutionsCertMap", nickname = "getSolutionsCertMap")
+	@RequestMapping(value = "/AdminService/getSolutionsCertMap", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = Map.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = Map.class),
+			@ApiResponse(code = 500, message = "Failure", response = Map.class) })
+	public ResponseEntity<Map<String, String>> getSolutionsCertMap() {
+		log.info("--> getSolutionsCertMap");
+		Map<String, String> certMap = new HashMap<String, String>();
+
+		List<Solution> solutions = this.solutionRepo.findAll();
+		try {
+			for (Solution solution : solutions) {
+				if (Files.exists(Paths.get(this.fileStorageLocation + solution.getClientId() + ".p12"))) {
+					certMap.put(solution.getClientId(), solution.getClientId() + ".p12");
+				}
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<Map<String, String>>(certMap, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		log.info("getSolutionsCertMap -->");
+		return new ResponseEntity<Map<String, String>>(certMap, HttpStatus.OK);
 	}
 	
 	public LogRESTController getLogController() {
