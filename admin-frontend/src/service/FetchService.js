@@ -16,6 +16,10 @@ class FetchService {
     return this.getAxios().get(url, {withCredentials: true});
   }
 
+  performDelete(url) {
+    return this.getAxios().delete(url, {withCredentials: true});
+  }
+
   performGetBase64(url) {
     return this.getAxios().get(url, {
       responseType: 'arraybuffer',

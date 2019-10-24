@@ -7,20 +7,20 @@
           {{ d.name }}
           <v-spacer></v-spacer>
           <v-card-actions>
-            <v-btn v-if="dataType === 'solution'" :disabled="!!solutionCertificates[d.clientId] || !d.orgName" icon @click.native="createCertificate(d)">
+            <v-btn v-if="dataType === 'SOLUTION'" :disabled="!!solutionCertificates[d.clientId] || !d.orgName" icon @click.native="createCertificate(d)">
               <v-icon>playlist_add_check</v-icon>
             </v-btn>
-            <v-btn v-if="dataType === 'solution'" :disabled="!solutionCertificates[d.clientId]" icon @click.native="downloadCertificate(d)">
+            <v-btn v-if="dataType === 'SOLUTION'" :disabled="!solutionCertificates[d.clientId]" icon @click.native="downloadCertificate(d)">
               <v-icon>playlist_play</v-icon>
             </v-btn>
             <!--
             <v-btn icon @click.native="d.showDescription = !d.showDescription">
               <v-icon>text_format</v-icon>
             </v-btn>
-            <v-btn icon @click.native="d.showDescription = !d.showDescription">
+            -->
+            <v-btn icon @click.native="deleteItem(d)">
               <v-icon>delete_outline</v-icon>
             </v-btn>
-            -->
           </v-card-actions>
           <div v-if="d.hasOwnProperty('state')" style="padding-top: 6px;">
             <v-spacer></v-spacer>
@@ -77,7 +77,23 @@
         const fileName = this.solutionCertificates[solution.clientId];
         console.log("Downloading certificate for solution", solution.id, fileName);
         fetchService.performSimpleDownload("downloadCertificate/" + fileName);
-      }
+      },
+      deleteItem(item) {
+        const me = this;
+        switch (this.dataType) {
+          case "SOLUTION":
+            me.$store.dispatch("removeSolution", {item: item});
+            break;
+          case "TOPIC":
+            me.$store.dispatch("removeTopic", {item: item});
+            break;
+          case "GATEWAY":
+            me.$store.dispatch("removeGateway", {item: item});
+            break;
+          default:
+            throw "Unsupported data type for removal: " + this.dataType;
+        }
+      },
     }
   }
 </script>

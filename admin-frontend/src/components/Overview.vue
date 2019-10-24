@@ -17,7 +17,7 @@
           :items=solutionTypes
           v-model="solutionSelection"
         ></v-select>
-        <list-component :data=solutionsToShow data-type="solution"></list-component>
+        <list-component :data=solutionsToShow data-type="SOLUTION"></list-component>
       </v-flex>
       <v-flex xs4>
         <h3 class="text-xs-center primary--text">Topics
@@ -34,7 +34,7 @@
           :items=topicTypes
           v-model="topicSelection"
         ></v-select>
-        <list-component :data=topicsToShow></list-component>
+        <list-component :data=topicsToShow data-type="TOPIC"></list-component>
       </v-flex>
       <v-flex xs4>
         <h3 class="text-xs-center primary--text">Gateways
@@ -50,7 +50,7 @@
           label="There is currently no selection available."
           disabled
         ></v-select>
-        <list-component :data=gateways></list-component>
+        <list-component :data=gateways data-type="GATEWAY"></list-component>
       </v-flex>
     </v-layout>
     <v-layout column style="height: 30vh" class="scroll-y">

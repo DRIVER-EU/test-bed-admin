@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import moment from 'moment'
-import {eventBus} from "../main";
+import {eventBus} from '../main'
 import {heartbeatController} from '../heartbeatController'
 import {LogEntry} from '../objects/logEntry'
 import {Solution} from '../objects/solution'
@@ -9,6 +9,7 @@ import {Topic} from '../objects/topic'
 import {Gateway} from '../objects/gateway'
 import Settings from '../constants/Settings'
 import {fetchService} from '../service/FetchService'
+import EventName from '../constants/EventName'
 
 Vue.use(Vuex)
 
@@ -39,219 +40,235 @@ export const store = new Vuex.Store({
     solutionCertificates: {},
   },
   getters: {
-    solutions(state) {
+    solutions (state) {
       return state.solutions
     },
-    topics(state) {
+    topics (state) {
       return state.topics
     },
-    gateways(state) {
+    gateways (state) {
       return state.gateways
     },
-    logEntries(state) {
+    logEntries (state) {
       return state.logEntries.sort((a, b) => {
         return b.id - a.id
       })
     },
-    standards(state) {
+    standards (state) {
       return state.standards
     },
-    standardNames(state) {
+    standardNames (state) {
       let standardNames = []
       state.standards.forEach(standard => standardNames.push(standard.name))
       return standardNames
     },
-    topicTypes(state) {
+    topicTypes (state) {
       return state.topicTypes
     },
-    loading(state) {
+    loading (state) {
       return state.loading
     },
-    isTestbedInitialized(state) {
+    isTestbedInitialized (state) {
       return state.isTestbedInitialized
     },
-    isTrialStarted(state) {
+    isTrialStarted (state) {
       return state.isTrialStarted
     },
-    configurations(state) {
-      return state.configurations;
+    configurations (state) {
+      return state.configurations
     },
-    modes(state) {
-      return state.modes;
+    modes (state) {
+      return state.modes
     },
-    currentConfiguration(state) {
-      return state.currentConfiguration;
+    currentConfiguration (state) {
+      return state.currentConfiguration
     },
-    organisations(state) {
-      return state.organisations;
+    organisations (state) {
+      return state.organisations
     },
-    solutionCertificates(state) {
-      return state.solutionCertificates;
+    solutionCertificates (state) {
+      return state.solutionCertificates
     }
   },
   mutations: {
-    SOCKET_ONOPEN(state) {
+    SOCKET_ONOPEN (state) {
       console.log('connection open')
       state.socket.isConnected = true
       heartbeatController()
     },
-    SOCKET_ONCLOSE(state) {
+    SOCKET_ONCLOSE (state) {
       console.log('connection closed')
       state.socket.isConnected = false
-      clearInterval(state.socket.pingTimer);
-      clearInterval(state.socket.pingTimeOutTimer);
+      clearInterval(state.socket.pingTimer)
+      clearInterval(state.socket.pingTimeOutTimer)
     },
-    SOCKET_RECONNECT() {
+    SOCKET_RECONNECT () {
       console.log('reconnect')
     },
-    HBRESPONSE(state) {
+    HBRESPONSE (state) {
       state.socket.messageAccepted = true
     },
-    LOG_NOTIFICATION(state, log) {
-      log.id = Number(log.id);
+    LOG_NOTIFICATION (state, log) {
+      log.id = Number(log.id)
       state.logEntries.push(new LogEntry(log))
     },
-    UPDATE_SOLUTION(state, payload) {
+    UPDATE_SOLUTION (state, payload) {
       var obj = state.solutions.find(obj => {
         return obj.clientId === payload.id
-      });
-      if(obj)
+      })
+      if (obj) {
         obj.state = payload.state
+      }
     },
-    UPDATE_TOPIC(state, payload) {
+    UPDATE_TOPIC (state, payload) {
       var obj = state.topics.find(obj => {
         return obj.clientId === payload.id
-      });
-      if(obj)
+      })
+      if (obj) {
         obj.state = payload.state
+      }
     },
-    UPDATE_GATEWAY(state, payload) {
+    UPDATE_GATEWAY (state, payload) {
       var obj = state.gateways.find(obj => {
         return obj.clientId === payload.id
-      });
-      if(obj)
+      })
+      if (obj) {
         obj.state = payload.state
+      }
     },
-    SET_SOLUTIONS(state, solutions) {
-      state.solutions = [];
+    SET_SOLUTIONS (state, solutions) {
+      state.solutions = []
       solutions.forEach(solution => {
-        state.solutions.push(new Solution(solution));
-        eventBus.$emit('updateSolutionIds', solution.clientId);
-      });
+        state.solutions.push(new Solution(solution))
+        eventBus.$emit(EventName.ADD_SOLUTION_ID, solution.clientId)
+      })
     },
-    ADD_SOLUTION(state, solution) {
-      state.solutions.push(new Solution(solution));
-      eventBus.$emit('updateSolutionIds', solution.clientId);
+    ADD_SOLUTION (state, solution) {
+      state.solutions.push(new Solution(solution))
+      eventBus.$emit(EventName.ADD_SOLUTION_ID, solution.clientId)
     },
-    SET_TOPICS(state, topics) {
-      state.topics = [];
-      topics.forEach(topic => state.topics.push(new Topic(topic)));
+    REMOVE_SOLUTION (state, solution) {
+      const id = solution.id
+      state.solutions = [...state.solutions.filter(s => s.id !== id)]
+      eventBus.$emit(EventName.REMOVE_SOLUTION_ID, solution.clientId)
     },
-    ADD_TOPIC(state, topic) {
-      state.topics.push(new Topic(topic));
+    SET_TOPICS (state, topics) {
+      state.topics = []
+      topics.forEach(topic => state.topics.push(new Topic(topic)))
     },
-    SET_GATEWAYS(state, gateways) {
-      state.gateways = [];
-      gateways.forEach(gateway => state.gateways.push(new Gateway(gateway)));
+    ADD_TOPIC (state, topic) {
+      state.topics.push(new Topic(topic))
     },
-    ADD_GATEWAY(state, gateway) {
+    REMOVE_TOPIC (state, topic) {
+      const id = topic.id
+      state.topics = [...state.topics.filter(s => s.id !== id)]
+    },
+    SET_GATEWAYS (state, gateways) {
+      state.gateways = []
+      gateways.forEach(gateway => state.gateways.push(new Gateway(gateway)))
+    },
+    ADD_GATEWAY (state, gateway) {
       state.gateways.push(new Gateway(gateway))
     },
-    GET_LOGS(state, data) {
-      state.logEntries = [];
+    REMOVE_GATEWAY (state, gateway) {
+      const id = gateway.id
+      state.gateways = [...state.gateways.filter(s => s.id !== id)]
+    },
+    GET_LOGS (state, data) {
+      state.logEntries = []
       data.logs.forEach(logEntry => {
-        logEntry.sendDate = moment.utc(logEntry.sendDate).format('YYYY-MM-DD HH:mm:ss.SSS');
-        state.logEntries.push(new LogEntry(logEntry));
-      });
+        logEntry.sendDate = moment.utc(logEntry.sendDate).format('YYYY-MM-DD HH:mm:ss.SSS')
+        state.logEntries.push(new LogEntry(logEntry))
+      })
     },
     GET_LOGS_PAGE_COUNT (state, count) {
       // console.log("Received records page count", count);
-      state.logsPageCount = count;
+      state.logsPageCount = count
     },
-    SET_STANDARDS(state, standards) {
+    SET_STANDARDS (state, standards) {
       state.standards = standards
     },
-    SET_TOPIC_TYPES(state, topicTypes) {
+    SET_TOPIC_TYPES (state, topicTypes) {
       state.topicTypes = topicTypes
     },
-    TRIAL_STATE_CHANGE(state, isStarted) {
+    TRIAL_STATE_CHANGE (state, isStarted) {
       state.isTrialStarted = isStarted
     },
-    TESTBED_STATE_CHANGE(state, isInitialized) {
+    TESTBED_STATE_CHANGE (state, isInitialized) {
       state.isTestbedInitialized = isInitialized
     },
-    LOADING(state, isTrue) {
-      state.loading = isTrue;
+    LOADING (state, isTrue) {
+      state.loading = isTrue
     },
-    SET_CONFIGURATIONS(state, configurations) {
-      state.configurations = configurations;
+    SET_CONFIGURATIONS (state, configurations) {
+      state.configurations = configurations
     },
-    SET_MODES(state, modes) {
-      state.modes = modes;
+    SET_MODES (state, modes) {
+      state.modes = modes
     },
-    SET_CURRENT_CONFIGURATION(state, currentConfiguration) {
-      state.currentConfiguration = currentConfiguration;
+    SET_CURRENT_CONFIGURATION (state, currentConfiguration) {
+      state.currentConfiguration = currentConfiguration
     },
-    SET_ORGANISATIONS(state, organisations) {
-      state.organisations = organisations;
+    SET_ORGANISATIONS (state, organisations) {
+      state.organisations = organisations
     },
-    SET_SOLUTION_CERTIFICATES(state, solutionCertificates) {
-      state.solutionCertificates = solutionCertificates;
+    SET_SOLUTION_CERTIFICATES (state, solutionCertificates) {
+      state.solutionCertificates = solutionCertificates
     },
-    ADD_SOLUTION_CERTIFICATE(state, payload) {
-      const solution = payload.solution;
+    ADD_SOLUTION_CERTIFICATE (state, payload) {
+      const solution = payload.solution
       const fileName = payload.fileName
-      const additionalItems = {};
-      additionalItems[solution] = fileName;
-      state.solutionCertificates = {...state.solutionCertificates, ...additionalItems};
+      const additionalItems = {}
+      additionalItems[solution] = fileName
+      state.solutionCertificates = {...state.solutionCertificates, ...additionalItems}
     },
   },
   actions: {
-    getSolutions(context) {
+    getSolutions (context) {
       fetchService.performGet('getAllTrialSolutions').then(response => {
-        context.commit('SET_SOLUTIONS', response.data.solutions);
+        context.commit('SET_SOLUTIONS', response.data.solutions)
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
-      });
+      })
     },
-    getTopics(context) {
+    getTopics (context) {
       fetchService.performGet('getAllTrialTopics').then(response => {
-        context.commit('SET_TOPICS', response.data.topics);
+        context.commit('SET_TOPICS', response.data.topics)
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
-      });
+      })
     },
-    getGateways(context) {
+    getGateways (context) {
       fetchService.performGet('getAllTrialGateways').then(response => {
-        context.commit('SET_GATEWAYS', response.data.gateways);
+        context.commit('SET_GATEWAYS', response.data.gateways)
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
-      });
+      })
     },
-    getLogs(context, payload) {
-      const page = payload ? payload.page : null;
-      const url = page ? 'getAllLogs?size=' + Settings.PAGE_SIZE + "&page=" + page : 'getAllLogs';
+    getLogs (context, payload) {
+      const page = payload ? payload.page : null
+      const url = page ? 'getAllLogs?size=' + Settings.PAGE_SIZE + '&page=' + page : 'getAllLogs'
       fetchService.performGet(url).then(response => {
-        console.log('/getAllLogs returned count', response.data.logs.length);
-        context.commit('GET_LOGS', (response.data));
+        console.log('/getAllLogs returned count', response.data.logs.length)
+        context.commit('GET_LOGS', (response.data))
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
-      });
+      })
     },
     getPageCount (context) {
       fetchService.performGet('getPageCount').then(response => {
-        context.commit('GET_LOGS_PAGE_COUNT', (response.data));
-      }).catch(ex => console.log(ex));
+        context.commit('GET_LOGS_PAGE_COUNT', (response.data))
+      }).catch(ex => console.log(ex))
     },
-    startTrial(context) {
+    startTrial (context) {
       fetchService.performPost('startTrialConfig').then(function () {
         eventBus.$emit('showSnackbar', 'Trial started.', 'success')
-        context.commit('TRIAL_STATE_CHANGE', true);
+        context.commit('TRIAL_STATE_CHANGE', true)
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Trial could not be started. (' + e + ')', 'error')
-      });
+      })
     },
-    initTestbed(context) {
+    initTestbed (context) {
       fetchService.performPost('initTestbed').then(function () {
         eventBus.$emit('showSnackbar', 'Testbed initialized.', 'success')
         context.commit('TESTBED_STATE_CHANGE', true)
@@ -259,27 +276,27 @@ export const store = new Vuex.Store({
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Testbed could not be initialized. (' + e + ')', 'error')
         context.commit('LOADING', false)
-      });
+      })
     },
-    isTrialStarted(context) {
+    isTrialStarted (context) {
       fetchService.performGet('isTrialStarted').then(response => {
-        context.commit('TRIAL_STATE_CHANGE', (response.data));
-      }).catch();
+        context.commit('TRIAL_STATE_CHANGE', (response.data))
+      }).catch()
     },
-    isTestbedInitialized(context) {
+    isTestbedInitialized (context) {
       fetchService.performGet('isTestbedInitialized').then(response => {
-        context.commit('TESTBED_STATE_CHANGE', (response.data));
-      }).catch();
+        context.commit('TESTBED_STATE_CHANGE', (response.data))
+      }).catch()
     },
-    addSolution(context, solution) {
+    addSolution (context, solution) {
       fetchService.performPost('addSolution', solution).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
-        context.commit('ADD_SOLUTION', (response.data));
+        context.commit('ADD_SOLUTION', (response.data))
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
     },
-    addGateway(context, gateway) {
+    addGateway (context, gateway) {
       fetchService.performPost('addGateway', gateway).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
         context.commit('ADD_GATEWAY', (response.data))
@@ -287,7 +304,7 @@ export const store = new Vuex.Store({
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
     },
-    addTopic(context, topic) {
+    addTopic (context, topic) {
       fetchService.performPost('addTopic', topic).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
         context.commit('ADD_TOPIC', (response.data))
@@ -295,42 +312,69 @@ export const store = new Vuex.Store({
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
     },
-    getAllStandards(context) {
+    removeSolution (context, payload) {
+      const item = payload.item
+      fetchService.performDelete('removeSolution/' + item.id).then(response => {
+        eventBus.$emit('showSnackbar', 'Solution was deleted.', 'success')
+        context.commit('REMOVE_SOLUTION', item)
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Solution was not deleted. (' + e + ')', 'error')
+      })
+    },
+    removeGateway (context, payload) {
+      const item = payload.item
+      fetchService.performDelete('removeGateway/' + item.id).then(response => {
+        eventBus.$emit('showSnackbar', 'Gateway was deleted.', 'success')
+        context.commit('REMOVE_GATEWAY', item)
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Gateway was not deleted. (' + e + ')', 'error')
+      })
+    },
+    removeTopic (context, payload) {
+      const item = payload.item
+      fetchService.performDelete('removeTopic/' + item.id).then(response => {
+        eventBus.$emit('showSnackbar', 'Topic was deleted.', 'success')
+        context.commit('REMOVE_TOPIC', item)
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Topic was not deleted. (' + e + ')', 'error')
+      })
+    },
+    getAllStandards (context) {
       fetchService.performGet('getAllStandards').then(response => {
-        context.commit('SET_STANDARDS', (response.data));
+        context.commit('SET_STANDARDS', (response.data))
       })
     },
-    getAllTopicTypes(context) {
+    getAllTopicTypes (context) {
       fetchService.performGet('getAllTopicTypes').then(response => {
-        context.commit('SET_TOPIC_TYPES', (response.data));
+        context.commit('SET_TOPIC_TYPES', (response.data))
       })
     },
-    getConfigurations(context) {
+    getConfigurations (context) {
       fetchService.performGet('getAllConfigurations').then(response => {
-        context.commit('SET_CONFIGURATIONS', (response.data));
+        context.commit('SET_CONFIGURATIONS', (response.data))
       })
     },
-    getModes(context) {
+    getModes (context) {
       fetchService.performGet('getAllTestbedModes').then(response => {
-        context.commit('SET_MODES', (response.data));
+        context.commit('SET_MODES', (response.data))
       })
     },
-    getCurrentConfiguration(context) {
+    getCurrentConfiguration (context) {
       fetchService.performGet('getActTestbedConfig').then(response => {
-        context.commit('SET_CURRENT_CONFIGURATION', (response.data));
+        context.commit('SET_CURRENT_CONFIGURATION', (response.data))
       })
     },
-    getAllOrganisations(context) {
+    getAllOrganisations (context) {
       fetchService.performGet('getAllOrganisations').then(response => {
-        context.commit('SET_ORGANISATIONS', (response.data));
+        context.commit('SET_ORGANISATIONS', (response.data))
       })
     },
-    getSolutionCertificates(context) {
+    getSolutionCertificates (context) {
       fetchService.performGet('getSolutionsCertMap').then(response => {
-        context.commit('SET_SOLUTION_CERTIFICATES', (response.data));
+        context.commit('SET_SOLUTION_CERTIFICATES', (response.data))
       })
     },
-    addSolutionCertificate(context, payload) {
+    addSolutionCertificate (context, payload) {
       context.commit('ADD_SOLUTION_CERTIFICATE', payload);
     },
   }

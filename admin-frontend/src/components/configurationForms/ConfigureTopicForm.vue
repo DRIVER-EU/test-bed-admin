@@ -72,6 +72,7 @@
 <script>
   import {eventBus} from "../../main";
   import {store} from '../../store'
+  import EventName from '../../constants/EventName'
 
   export default {
     name: "ConfigureTopicForm",
@@ -115,10 +116,13 @@
       eventBus.$on('openConfigureTopicForm', () => {
         this.open = true
       })
-      eventBus.$on('updateSolutionIds', (solutionId) => {
+      eventBus.$on(EventName.ADD_SOLUTION_ID, (solutionId) => {
         this.items.solutionIds.push(solutionId)
       })
-
+      eventBus.$on(EventName.REMOVE_SOLUTION_ID, (solutionId) => {
+        const index = array.indexOf(solutionId);
+        if (index !== -1) array.splice(index, 1);
+      })
     },
     methods: {
       submit() {
