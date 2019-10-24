@@ -8,6 +8,7 @@ import {Solution} from '../objects/solution'
 import {Topic} from '../objects/topic'
 import {Gateway} from '../objects/gateway'
 import Settings from '../constants/Settings'
+import {fetchService} from '../service/FetchService'
 
 Vue.use(Vuex)
 
@@ -207,21 +208,21 @@ export const store = new Vuex.Store({
   },
   actions: {
     getSolutions(context) {
-      this.axios.get('getAllTrialSolutions').then(response => {
+      fetchService.performGet('getAllTrialSolutions').then(response => {
         context.commit('SET_SOLUTIONS', response.data.solutions);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
       });
     },
     getTopics(context) {
-      this.axios.get('getAllTrialTopics').then(response => {
+      fetchService.performGet('getAllTrialTopics').then(response => {
         context.commit('SET_TOPICS', response.data.topics);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
       });
     },
     getGateways(context) {
-      this.axios.get('getAllTrialGateways').then(response => {
+      fetchService.performGet('getAllTrialGateways').then(response => {
         context.commit('SET_GATEWAYS', response.data.gateways);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
@@ -230,7 +231,7 @@ export const store = new Vuex.Store({
     getLogs(context, payload) {
       const page = payload ? payload.page : null;
       const url = page ? 'getAllLogs?size=' + Settings.PAGE_SIZE + "&page=" + page : 'getAllLogs';
-      this.axios.get(url).then(response => {
+      fetchService.performGet(url).then(response => {
         console.log('/getAllLogs returned count', response.data.logs.length);
         context.commit('GET_LOGS', (response.data));
       }).catch(e => {
@@ -238,12 +239,12 @@ export const store = new Vuex.Store({
       });
     },
     getPageCount (context) {
-      this.axios.get('getPageCount').then(response => {
+      fetchService.performGet('getPageCount').then(response => {
         context.commit('GET_LOGS_PAGE_COUNT', (response.data));
       }).catch(ex => console.log(ex));
     },
     startTrial(context) {
-      this.axios.post('startTrialConfig').then(function () {
+      fetchService.performPost('startTrialConfig').then(function () {
         eventBus.$emit('showSnackbar', 'Trial started.', 'success')
         context.commit('TRIAL_STATE_CHANGE', true);
       }).catch(e => {
@@ -251,7 +252,7 @@ export const store = new Vuex.Store({
       });
     },
     initTestbed(context) {
-      this.axios.post('initTestbed').then(function () {
+      fetchService.performPost('initTestbed').then(function () {
         eventBus.$emit('showSnackbar', 'Testbed initialized.', 'success')
         context.commit('TESTBED_STATE_CHANGE', true)
         context.commit('LOADING', false)
@@ -261,17 +262,17 @@ export const store = new Vuex.Store({
       });
     },
     isTrialStarted(context) {
-      this.axios.get('isTrialStarted').then(response => {
+      fetchService.performGet('isTrialStarted').then(response => {
         context.commit('TRIAL_STATE_CHANGE', (response.data));
       }).catch();
     },
     isTestbedInitialized(context) {
-      this.axios.get('isTestbedInitialized').then(response => {
+      fetchService.performGet('isTestbedInitialized').then(response => {
         context.commit('TESTBED_STATE_CHANGE', (response.data));
       }).catch();
     },
     addSolution(context, solution) {
-      this.axios.post('addSolution', solution).then(response => {
+      fetchService.performPost('addSolution', solution).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
         context.commit('ADD_SOLUTION', (response.data));
       }).catch(e => {
@@ -279,7 +280,7 @@ export const store = new Vuex.Store({
       })
     },
     addGateway(context, gateway) {
-      this.axios.post('addGateway', gateway).then(response => {
+      fetchService.performPost('addGateway', gateway).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
         context.commit('ADD_GATEWAY', (response.data))
       }).catch(e => {
@@ -287,7 +288,7 @@ export const store = new Vuex.Store({
       })
     },
     addTopic(context, topic) {
-      this.axios.post('addTopic', topic).then(response => {
+      fetchService.performPost('addTopic', topic).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
         context.commit('ADD_TOPIC', (response.data))
       }).catch(e => {
@@ -295,37 +296,37 @@ export const store = new Vuex.Store({
       })
     },
     getAllStandards(context) {
-      this.axios.get('getAllStandards').then(response => {
+      fetchService.performGet('getAllStandards').then(response => {
         context.commit('SET_STANDARDS', (response.data));
       })
     },
     getAllTopicTypes(context) {
-      this.axios.get('getAllTopicTypes').then(response => {
+      fetchService.performGet('getAllTopicTypes').then(response => {
         context.commit('SET_TOPIC_TYPES', (response.data));
       })
     },
     getConfigurations(context) {
-      this.axios.get('getAllConfigurations').then(response => {
+      fetchService.performGet('getAllConfigurations').then(response => {
         context.commit('SET_CONFIGURATIONS', (response.data));
       })
     },
     getModes(context) {
-      this.axios.get('getAllTestbedModes').then(response => {
+      fetchService.performGet('getAllTestbedModes').then(response => {
         context.commit('SET_MODES', (response.data));
       })
     },
     getCurrentConfiguration(context) {
-      this.axios.get('getActTestbedConfig').then(response => {
+      fetchService.performGet('getActTestbedConfig').then(response => {
         context.commit('SET_CURRENT_CONFIGURATION', (response.data));
       })
     },
     getAllOrganisations(context) {
-      this.axios.get('getAllOrganisations').then(response => {
+      fetchService.performGet('getAllOrganisations').then(response => {
         context.commit('SET_ORGANISATIONS', (response.data));
       })
     },
     getSolutionCertificates(context) {
-      this.axios.get('getSolutionsCertMap').then(response => {
+      fetchService.performGet('getSolutionsCertMap').then(response => {
         context.commit('SET_SOLUTION_CERTIFICATES', (response.data));
       })
     },

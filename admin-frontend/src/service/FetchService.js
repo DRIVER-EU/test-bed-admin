@@ -8,15 +8,19 @@ class FetchService {
   }
 
   performPost(url, data) {
-    return this.getAxios().post(url, data);
+    // POST does not work correctly with withCredentials, needs to go via "request" instead, see https://github.com/axios/axios/issues/876
+    return this.getAxios().request({url: url, method: 'post', withCredentials: true, data: data});
   }
 
   performGet(url) {
-    return this.getAxios().get(url);
+    return this.getAxios().get(url, {withCredentials: true});
   }
 
   performGetBase64(url) {
-    return this.getAxios().get(url, {responseType: 'arraybuffer'}).then(response => Buffer.from(response.data, 'binary').toString('base64'))
+    return this.getAxios().get(url, {
+      responseType: 'arraybuffer',
+      withCredentials: true
+    }).then(response => Buffer.from(response.data, 'binary').toString('base64'));
   }
 
   performSimpleDownload(url) {
