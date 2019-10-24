@@ -10,14 +10,14 @@
         </h3>
         <v-btn @click="openConfigureSolutionForm" flat small block class="mx-auto">
           Configure new solution
-          <v-icon>create</v-icon>
+          <v-icon>add</v-icon>
         </v-btn>
         <v-select
           label="Select which solutions to show"
           :items=solutionTypes
           v-model="solutionSelection"
         ></v-select>
-        <list-component :data=solutionsToShow></list-component>
+        <list-component :data=solutionsToShow data-type="solution"></list-component>
       </v-flex>
       <v-flex xs4>
         <h3 class="text-xs-center primary--text">Topics
@@ -27,7 +27,7 @@
         </h3>
         <v-btn @click="openConfigureTopicForm" flat small block class="mx-auto">
           Configure new topic
-          <v-icon>create</v-icon>
+          <v-icon>add</v-icon>
         </v-btn>
         <v-select
           label="Select which topics to show"
@@ -44,7 +44,7 @@
         </h3>
         <v-btn @click="openConfigureGatewayForm" flat small block class="mx-auto">
           Configure new gateway
-          <v-icon>create</v-icon>
+          <v-icon>add</v-icon>
         </v-btn>
         <v-select
           label="There is currently no selection available."
@@ -161,8 +161,7 @@
             return 0
         }
       }
-    }
-    ,
+    },
     methods: {
       openConfigureSolutionForm: function () {
         eventBus.$emit('openConfigureSolutionForm')

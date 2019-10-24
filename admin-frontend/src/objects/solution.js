@@ -6,7 +6,7 @@ export function Solution(solution) {
     this.isService = solution.isService,
     this.name= solution.name,
     this.state = solution.state || false,
-    this.description = solution.description
-    this.showDescription = false
-
+    this.description = solution.description,
+    this.showDescription = false,
+    this.orgName = solution.orgName
 }
