@@ -61,6 +61,7 @@ new Vue({
   store,
   render: h => h(App),
   created() {
+    this.$store.dispatch('getSolutionCertificates');
     this.$store.dispatch('getSolutions');
     this.$store.dispatch('getTopics');
     this.$store.dispatch('getGateways');

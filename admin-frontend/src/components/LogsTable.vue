@@ -67,7 +67,7 @@
     },
     computed: {
       logEntries: function () {
-        return this.$store.getters.logEntries
+        return this.$store.getters.logEntries;
       },
       logsPageCount: function () {
         return this.$store.state.logsPageCount;

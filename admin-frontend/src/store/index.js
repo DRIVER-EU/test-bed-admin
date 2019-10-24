@@ -35,6 +35,7 @@ export const store = new Vuex.Store({
     modes: [],
     currentConfiguration: {},
     organisations: [],
+    solutionCertificates: {},
   },
   getters: {
     solutions(state) {
@@ -82,6 +83,9 @@ export const store = new Vuex.Store({
     },
     organisations(state) {
       return state.organisations;
+    },
+    solutionCertificates(state) {
+      return state.solutionCertificates;
     }
   },
   mutations: {
@@ -188,7 +192,17 @@ export const store = new Vuex.Store({
       state.currentConfiguration = currentConfiguration;
     },
     SET_ORGANISATIONS(state, organisations) {
-      state.organisations = organisations
+      state.organisations = organisations;
+    },
+    SET_SOLUTION_CERTIFICATES(state, solutionCertificates) {
+      state.solutionCertificates = solutionCertificates;
+    },
+    ADD_SOLUTION_CERTIFICATE(state, payload) {
+      const solution = payload.solution;
+      const fileName = payload.fileName
+      const additionalItems = {};
+      additionalItems[solution] = fileName;
+      state.solutionCertificates = {...state.solutionCertificates, ...additionalItems};
     },
   },
   actions: {
@@ -309,6 +323,14 @@ export const store = new Vuex.Store({
       this.axios.get('getAllOrganisations').then(response => {
         context.commit('SET_ORGANISATIONS', (response.data));
       })
-    }
+    },
+    getSolutionCertificates(context) {
+      this.axios.get('getSolutionsCertMap').then(response => {
+        context.commit('SET_SOLUTION_CERTIFICATES', (response.data));
+      })
+    },
+    addSolutionCertificate(context, payload) {
+      context.commit('ADD_SOLUTION_CERTIFICATE', payload);
+    },
   }
 })

@@ -7,10 +7,10 @@
           {{ d.name }}
           <v-spacer></v-spacer>
           <v-card-actions>
-            <v-btn v-if="dataType === 'solution'" :disabled="!!solutionCertificateNames[d.id] || !d.orgName" icon @click.native="createCertificate(d)">
+            <v-btn v-if="dataType === 'solution'" :disabled="!!solutionCertificates[d.clientId] || !d.orgName" icon @click.native="createCertificate(d)">
               <v-icon>playlist_add_check</v-icon>
             </v-btn>
-            <v-btn v-if="dataType === 'solution'" :disabled="!solutionCertificateNames[d.id]" icon @click.native="downloadCertificate(d.id)">
+            <v-btn v-if="dataType === 'solution'" :disabled="!solutionCertificates[d.clientId]" icon @click.native="downloadCertificate(d)">
               <v-icon>playlist_play</v-icon>
             </v-btn>
             <!--
@@ -48,11 +48,14 @@
   export default {
     name: 'ListComponent',
     props: ['data', 'dataType'],
-    data: () => ({
-      solutionCertificateNames: {}
-    }),
+    computed: {
+      solutionCertificates: function () {
+        return this.$store.state.solutionCertificates;
+      },
+    },
     methods: {
       createCertificate(solution) {
+        const me = this;
         fetchService.performGet('getAllOrganisations').then(response => {
           const organisation = response.data.find(o => o.orgName === solution.orgName);
           if (organisation) {
@@ -63,16 +66,16 @@
             console.log("Creating certificate for solution ", solution.id);
             fetchService.performGet(url).then(response => {
               const fileName = response.data;
-              this.$set(this.solutionCertificateNames, solution.id, fileName);
+              me.$store.dispatch('addSolutionCertificate', {solution: solution.clientId, fileName: fileName});
             })
           } else {
             console.log("No organisation found for name " + solution.orgName);
           }
         });
       },
-      downloadCertificate(id) {
-        const fileName = this.solutionCertificateNames[id];
-        console.log("Downloading certificate for solution", id, fileName);
+      downloadCertificate(solution) {
+        const fileName = this.solutionCertificates[solution.clientId];
+        console.log("Downloading certificate for solution", solution.id, fileName);
         fetchService.performSimpleDownload("downloadCertificate/" + fileName);
       }
     }
