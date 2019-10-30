@@ -77,6 +77,7 @@
 <script>
   import {mapGetters} from 'vuex'
   import {eventBus} from "../main"
+  import EventName from '../constants/EventName'
   export default {
     name: "Overview",
     data: () => ({
@@ -164,13 +165,13 @@
     },
     methods: {
       openConfigureSolutionForm: function () {
-        eventBus.$emit('openConfigureSolutionForm')
+        eventBus.$emit(EventName.OPEN_SOLUTION_FORM);
       },
       openConfigureTopicForm: function () {
-        eventBus.$emit('openConfigureTopicForm')
+        eventBus.$emit(EventName.OPEN_TOPIC_FORM);
       },
       openConfigureGatewayForm: function () {
-        eventBus.$emit('openConfigureGatewayForm')
+        eventBus.$emit(EventName.OPEN_GATEWAY_FORM);
       },
 
     }

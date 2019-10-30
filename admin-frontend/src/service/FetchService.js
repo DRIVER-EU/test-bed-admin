@@ -12,6 +12,10 @@ class FetchService {
     return this.getAxios().request({url: url, method: 'post', withCredentials: true, data: data});
   }
 
+  performPut(url, data) {
+    return this.getAxios().request({url: url, method: 'put', withCredentials: true, data: data});
+  }
+
   performGet(url) {
     return this.getAxios().get(url, {withCredentials: true});
   }

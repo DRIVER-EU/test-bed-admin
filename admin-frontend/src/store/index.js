@@ -113,28 +113,23 @@ export const store = new Vuex.Store({
       state.logEntries.push(new LogEntry(log))
     },
     UPDATE_SOLUTION (state, payload) {
-      var obj = state.solutions.find(obj => {
-        return obj.clientId === payload.id
-      })
-      if (obj) {
-        obj.state = payload.state
-      }
+      const obj = state.solutions.find(obj => obj.id === payload.id);
+      const index = state.solutions.indexOf(obj);
+      state.solutions.splice(index, 1, new Solution(payload));
     },
     UPDATE_TOPIC (state, payload) {
-      var obj = state.topics.find(obj => {
-        return obj.clientId === payload.id
-      })
-      if (obj) {
-        obj.state = payload.state
-      }
+      const obj = state.topics.find(obj => obj.id === payload.id);
+      const index = state.topics.indexOf(obj);
+      state.topics.splice(index, 1, new Topic(payload));
     },
     UPDATE_GATEWAY (state, payload) {
-      var obj = state.gateways.find(obj => {
-        return obj.clientId === payload.id
-      })
-      if (obj) {
-        obj.state = payload.state
-      }
+      const obj = state.gateways.find(obj => obj.id === payload.id);
+      const index = state.gateways.indexOf(obj);
+      state.gateways.splice(index, 1, new Gateway(payload));
+
+      console.log("### UPDATE", state.gateways, payload);
+
+
     },
     SET_SOLUTIONS (state, solutions) {
       state.solutions = []
@@ -308,6 +303,30 @@ export const store = new Vuex.Store({
       fetchService.performPost('addTopic', topic).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
         context.commit('ADD_TOPIC', (response.data))
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
+      })
+    },
+    updateSolution (context, solution) {
+      fetchService.performPut('updateSolution', solution).then(response => {
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
+        context.commit('UPDATE_SOLUTION', response.data);
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
+      })
+    },
+    updateGateway (context, gateway) {
+      fetchService.performPut('updateGateway', gateway).then(response => {
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
+        context.commit('UPDATE_GATEWAY', response.data);
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
+      })
+    },
+    updateTopic (context, topic) {
+      fetchService.performPut('updateTopic', topic).then(response => {
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
+        context.commit('UPDATE_TOPIC', response.data);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })

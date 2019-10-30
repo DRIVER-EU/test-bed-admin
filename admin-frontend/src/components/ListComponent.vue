@@ -13,11 +13,9 @@
             <v-btn v-if="dataType === 'SOLUTION'" :disabled="!solutionCertificates[d.clientId]" icon @click.native="downloadCertificate(d)">
               <v-icon>playlist_play</v-icon>
             </v-btn>
-            <!--
-            <v-btn icon @click.native="d.showDescription = !d.showDescription">
+            <v-btn icon @click.native="editItem(d)">
               <v-icon>text_format</v-icon>
             </v-btn>
-            -->
             <v-btn icon @click.native="deleteItem(d)">
               <v-icon>delete_outline</v-icon>
             </v-btn>
@@ -44,6 +42,8 @@
 
 <script>
   import {fetchService} from '../service/FetchService'
+  import {eventBus} from "../main"
+  import EventName from '../constants/EventName'
 
   export default {
     name: 'ListComponent',
@@ -89,6 +89,22 @@
             break;
           case "GATEWAY":
             me.$store.dispatch("removeGateway", {item: item});
+            break;
+          default:
+            throw "Unsupported data type for removal: " + this.dataType;
+        }
+      },
+      editItem(item) {
+        const me = this;
+        switch (this.dataType) {
+          case "SOLUTION":
+            eventBus.$emit(EventName.OPEN_SOLUTION_FORM, item);
+            break;
+          case "TOPIC":
+            eventBus.$emit(EventName.OPEN_TOPIC_FORM, item);
+            break;
+          case "GATEWAY":
+            eventBus.$emit(EventName.OPEN_GATEWAY_FORM, item);
             break;
           default:
             throw "Unsupported data type for removal: " + this.dataType;

@@ -19,7 +19,7 @@
             :counter="25"
             required
           ></v-text-field>
-          <v-radio-group row v-model="isService"  mandatory label="Testbed service:">
+          <v-radio-group row v-model="isService" mandatory label="Testbed service:">
             <v-spacer></v-spacer>
             <v-radio
               label="Yes"
@@ -52,12 +52,15 @@
 </template>
 
 <script>
-  import {eventBus} from "../../main";
+  import {eventBus} from '../../main'
   import {store} from '../../store'
+  import EventName from '../../constants/EventName'
+
   export default {
-    name: "ConfigureSolutionForm",
+    name: 'ConfigureSolutionForm',
     data: () => ({
       open: false,
+      editedItem: null,
       valid: false,
       clientId: '',
       clientIdRules: [
@@ -74,38 +77,59 @@
       orgName: null,
     }),
     computed: {
-      organisationNames() {
+      organisationNames () {
         return this.$store.state.organisations.map(o => o.orgName);
       }
     },
-    created() {
-      eventBus.$on('openConfigureSolutionForm', () => {
-        this.open = true
+    created () {
+      const me = this
+      this.clear = this.clear.bind(this);
+      eventBus.$on(EventName.OPEN_SOLUTION_FORM, (item) => {
+        me.editedItem = item;
+        me.clear();
+        if (item) {
+          me.clientId = item.clientId;
+          me.name = item.name;
+          me.isService = item.isService;
+          me.description = item.description;
+          me.orgName = item.orgName;
+        }
+        me.open = true;
       });
     },
     methods: {
-      submit() {
-        const self = this;
-        if (self.$refs.form.validate()) {
+      submit () {
+        const me = this
+        if (me.$refs.form.validate()) {
           let solution = {
-            clientId: self.clientId,
-              name: self.name,
+            id: this.editedItem ? this.editedItem.id : null,
+            clientId: me.clientId,
+            name: me.name,
             isAdmin: false,
-            isService: self.isService,
-            description: self.description,
-            orgName: self.orgName,
+            isService: me.isService,
+            description: me.description,
+            orgName: me.orgName,
           }
-          store.dispatch('addSolution', solution)
-          self.clear()
-          self.open = false
+          if (this.editedItem) {
+            store.dispatch('updateSolution', solution);
+          } else {
+            store.dispatch('addSolution', solution);
+          }
+          me.clear();
+          me.open = false;
         }
       },
-      clear() {
-        const self = this;
-        self.$refs.form.reset()
-         self.isService = true
+      clear () {
+        const me = this;
+        // me.$refs.form.reset(); // leads to empty v-radio selection
+        this.$refs.form.resetValidation();
+        me.clientId = "";
+        me.name = "";
+        me.isService = true;
+        me.description = "";
+        me.orgName = null;
       }
-    }
+    },
   }
 </script>
 

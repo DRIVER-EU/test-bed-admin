@@ -8,5 +8,6 @@ export function Topic(topic) {
     this.msgTypeVersion = topic.msgTypeVersion,
     this.description = topic.description,
     this.publishSolutionIDs = topic.publishSolutionIDs,
+    this.subscribedSolutionIDs = topic.subscribedSolutionIDs,
     this.showDescription = false
 }

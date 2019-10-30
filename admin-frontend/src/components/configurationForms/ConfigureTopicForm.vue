@@ -39,7 +39,7 @@
           ></v-select>
           <v-select
             :items=items.solutionIds
-            v-model="publishIDs"
+            v-model="publishSolutionIDs"
             multiple
             chips
             deletable-chips
@@ -47,7 +47,7 @@
           ></v-select>
           <v-select
             :items=items.solutionIds
-            v-model="subscribeIDs"
+            v-model="subscribedSolutionIDs"
             multiple
             chips
             deletable-chips
@@ -78,6 +78,7 @@
     name: "ConfigureTopicForm",
     data: () => ({
       open: false,
+      editedItem: null,
       valid: false,
       clientId: '',
       clientIdRules: [
@@ -92,8 +93,8 @@
       type: null,
       standard: null,
       standardVersion: null,
-      publishIDs: [],
-      subscribeIDs: [],
+      publishSolutionIDs: [],
+      subscribedSolutionIDs: [],
       items: {
         standardVersions: [],
         solutionIds: []
@@ -110,11 +111,24 @@
       topicTypes: function () {
         return this.$store.getters.topicTypes
       },
-
     },
     created() {
-      eventBus.$on('openConfigureTopicForm', () => {
-        this.open = true
+      const me = this;
+      this.clear = this.clear.bind(this);
+      eventBus.$on(EventName.OPEN_TOPIC_FORM, (item) => {
+        me.editedItem = item;
+        me.clear();
+        if (item) {
+          me.clientId = item.clientId;
+          me.name = item.name;
+          me.type = item.type;
+          me.standard = item.msgType;
+          me.standardVersion = item.msgTypeVersion;
+          me.publishSolutionIDs = item.publishSolutionIDs;
+          me.subscribedSolutionIDs = item.subscribedSolutionIDs;
+          me.description = item.description;
+        }
+        me.open = true
       })
       eventBus.$on(EventName.ADD_SOLUTION_ID, (solutionId) => {
         this.items.solutionIds.push(solutionId)
@@ -126,25 +140,40 @@
     },
     methods: {
       submit() {
-        const self = this;
-        if (self.$refs.form.validate()) {
+        const me = this;
+        if (me.$refs.form.validate()) {
           let topic = {
-            clientId: self.clientId,
-            name: self.name,
-            type: self.type,
-            msgType: self.standard,
-            msgTypeVersion: self.standardVersion,
-            publishIDs: self.publishIDs,
-            subscribeIDs: self.subscribeIDs,
-            description: self.description
+            id: this.editedItem ? this.editedItem.id : null,
+            clientId: me.clientId,
+            name: me.name,
+            type: me.type,
+            msgType: me.standard,
+            msgTypeVersion: me.standardVersion,
+            publishSolutionIDs: me.publishSolutionIDs,
+            subscribedSolutionIDs: me.subscribedSolutionIDs,
+            description: me.description
           }
-          store.dispatch('addTopic', topic)
-          self.clear()
-          self.open = false
+          if (this.editedItem) {
+            store.dispatch('updateTopic', topic);
+          } else {
+            store.dispatch('addTopic', topic);
+          }
+          me.clear();
+          me.open = false;
         }
       },
       clear() {
-        this.$refs.form.reset()
+        const me = this;
+        // me.$refs.form.reset(); // leads to empty v-radio selection
+        this.$refs.form.resetValidation();
+        me.clientId = "";
+        me.name = "";
+        me.type = null;
+        me.standard = null;
+        me.standardVersion = null;
+        me.publishSolutionIDs = [];
+        me.subscribedSolutionIDs = [];
+        me.description = "";
       }
     },
     watch: {

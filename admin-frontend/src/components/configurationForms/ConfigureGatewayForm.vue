@@ -20,7 +20,7 @@
             required
           ></v-text-field>
           <v-select
-            v-model=managingTypes
+            v-model="managingType"
             :items="managingTypesItems"
             :rules="[v =>(!!v && v.length > 0) || 'At least one type is required']"
             multiple
@@ -48,10 +48,12 @@
 <script>
   import {eventBus} from "../../main";
   import {store} from '../../store'
+  import EventName from '../../constants/EventName'
   export default {
     name: "ConfigureGatewayForm",
     data: () => ({
       open: false,
+      editedItem: null,
       valid: true,
       clientId: '',
       clientIdRules: [
@@ -63,13 +65,22 @@
         v => !!v || 'Name is required',
         v => (v && v.length <= 25) || 'Max. 25 characters allowed.'
       ],
-      managingTypes:[],
+      managingType:[],
       description: ''
     }),
     created() {
-
-      eventBus.$on('openConfigureGatewayForm', () => {
-        this.open = true
+      const me = this
+      this.clear = this.clear.bind(this);
+      eventBus.$on(EventName.OPEN_GATEWAY_FORM, (item) => {
+        me.editedItem = item;
+        me.clear();
+        if (item) {
+          me.clientId = item.clientId;
+          me.name = item.name;
+          me.managingType = item.managingType;
+          me.description = item.description;
+        }
+        me.open = true;
       })
     },
     computed: {
@@ -79,22 +90,35 @@
     },
     methods: {
       submit() {
-        const self = this;
-        if (self.$refs.form.validate()) {
+        const me = this;
+        if (me.$refs.form.validate()) {
           let gateway = {
-            clientId: self.clientId,
-            name: self.name,
-            managingTypes: self.managingTypes,
-            description: self.description
+            id: this.editedItem ? this.editedItem.id : null,
+            clientId: me.clientId,
+            name: me.name,
+            managingType: me.managingType,
+            description: me.description
           }
-          store.dispatch('addGateway', gateway)
-          self.clear()
-          self.open = false
+
+          console.log("### X", gateway);
+
+          if (this.editedItem) {
+            store.dispatch('updateGateway', gateway);
+          } else {
+            store.dispatch('addGateway', gateway);
+          }
+          me.clear()
+          me.open = false
         }
       },
       clear() {
-        this.$refs.form.reset()
-        //this.valid = true
+        const me = this;
+        // me.$refs.form.reset(); // leads to empty v-radio selection
+        this.$refs.form.resetValidation();
+        me.clientId = "";
+        me.name = "";
+        me.managingType = [];
+        me.description = "";
       }
     }
   }
