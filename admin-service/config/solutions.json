@@ -134,7 +134,7 @@
  		"isTestbed":false,
  		"isService":false,
  		"state":false,
- 		"orgName":"VWORLD",
+ 		"orgName":"VWorld",
  		"description":"vieWTerra1 application!"
 	},{
 		"id":"view-terra-2",
@@ -142,7 +142,7 @@
  		"isTestbed":false,
  		"isService":false,
  		"state":false,
- 		"orgName":"VWORLD",
+ 		"orgName":"VWorld",
  		"description":"vieWTerra2 application!"
 	},{
 		"id":"CrowdTaskerProducer",
@@ -167,7 +167,7 @@
  		"isTestbed":false,
  		"isService":false,
  		"state":false,
- 		"orgName":"VWORLD",
+ 		"orgName":"VWorld",
  		"description":"vieWTerra application at Module 1!"
 	},{
 		"id":"view-terra-m2",
@@ -175,7 +175,7 @@
  		"isTestbed":false,
  		"isService":false,
  		"state":false,
- 		"orgName":"VWORLD",
+ 		"orgName":"VWorld",
  		"description":"vieWTerra application at Module 2!"
 	},{
 		"id":"crisissuite",

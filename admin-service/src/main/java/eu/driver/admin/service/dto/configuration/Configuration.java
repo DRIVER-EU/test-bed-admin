@@ -12,7 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -41,7 +40,7 @@ public class Configuration {
 	@Size(min = 4, max = 255)
 	private String discription;
 	
-	@ManyToMany(mappedBy="applConfigurations",fetch=FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany(mappedBy="applSolConfigurations",fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Solution> solutions;
 	
 	@ManyToMany(mappedBy="applConfigurations",fetch=FetchType.EAGER, cascade = CascadeType.ALL)

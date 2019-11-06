@@ -20,9 +20,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
 
-import org.springframework.data.rest.webmvc.support.BackendId;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.driver.admin.service.dto.configuration.Configuration;
 import eu.driver.admin.service.dto.organisation.Organisation;
@@ -63,33 +61,14 @@ public class Solution {
 	@Column(name="state")
 	private Boolean state = false;
 	
-	@Column(name="orgName", length=255)
-	@Size(min = 4, max = 255)
-	private String orgName = null;
-	
-	@Column(name="userName", length=255)
-	@Size(min = 4, max = 255)
-	private String userName = null;
-	
-	@Column(name="userPwd", length=255)
-	@Size(min = 4, max = 255)
-	private String userPwd = null;
-	
-	@Column(name="certPwd", length=255)
-	@Size(min = 4, max = 255)
-	private String certPwd = null;
-	
-	@Column(name="email", length=255)
-	@Size(max = 255)
-	private String email = null;
-	
 	@Column(name="description", columnDefinition="text")
 	private String description = null;
 	
 	@Column(name="lastHeartBeatReceived")
 	private Date lastHeartBeatReceived = null;
 	
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name = "organisation_id")
 	private Organisation organisation = null;
 	
 	@ManyToMany(fetch=FetchType.EAGER)
@@ -97,8 +76,8 @@ public class Solution {
 	  name = "admin_service.applied_solutions", 
 	  joinColumns = @JoinColumn(name = "solution_id"), 
 	  inverseJoinColumns = @JoinColumn(name = "configuration_id"))
-	@JsonBackReference
-	private List<Configuration> applConfigurations;
+	@JsonIgnore
+	private List<Configuration> applSolConfigurations;
 	
 	public Solution() {
 		
@@ -159,46 +138,6 @@ public class Solution {
 	public void setState(Boolean state) {
 		this.state = state;
 	}
-	
-	public String getOrgName() {
-		return orgName;
-	}
-
-	public void setOrgName(String orgName) {
-		this.orgName = orgName;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getUserPwd() {
-		return userPwd;
-	}
-
-	public void setUserPwd(String userPwd) {
-		this.userPwd = userPwd;
-	}
-
-	public String getCertPwd() {
-		return certPwd;
-	}
-
-	public void setCertPwd(String certPwd) {
-		this.certPwd = certPwd;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
 
 	public String getDescription() {
 		return description;
@@ -224,19 +163,19 @@ public class Solution {
 		this.organisation = organisation;
 	}
 
-	public List<Configuration> getApplConfigurations() {
-		return applConfigurations;
+	public List<Configuration> getApplSolConfigurations() {
+		return applSolConfigurations;
 	}
 
-	public void setApplConfigurations(List<Configuration> applConfigurations) {
-		this.applConfigurations = applConfigurations;
+	public void setApplSolConfigurations(List<Configuration> applSolConfigurations) {
+		this.applSolConfigurations = applSolConfigurations;
 	}
 	
-	public void addApplConfigurations(Configuration applConfiguration) {
-		if (this.applConfigurations == null) {
-			this.applConfigurations = new ArrayList<Configuration>();
+	public void addApplSolConfigurations(Configuration applConfiguration) {
+		if (this.applSolConfigurations == null) {
+			this.applSolConfigurations = new ArrayList<Configuration>();
 		}
-		this.applConfigurations.add(applConfiguration);
+		this.applSolConfigurations.add(applConfiguration);
 	}
 	
 	

@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiResponses;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,9 +18,6 @@ import java.util.Timer;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.specific.SpecificData;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,21 +27,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.driver.adapter.core.AdminAdapter;
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.controller.heartbeat.HeartbeatTimerTask;
 import eu.driver.admin.service.dto.SolutionList;
-import eu.driver.admin.service.dto.TopicList;
 import eu.driver.admin.service.dto.configuration.Configuration;
 import eu.driver.admin.service.dto.configuration.TestbedConfig;
+import eu.driver.admin.service.dto.log.Log;
 import eu.driver.admin.service.dto.solution.Solution;
-import eu.driver.admin.service.helper.FileReader;
 import eu.driver.admin.service.repository.ConfigurationRepository;
+import eu.driver.admin.service.repository.OrganisationRepository;
 import eu.driver.admin.service.repository.SolutionRepository;
 import eu.driver.admin.service.repository.TestbedConfigRepository;
 import eu.driver.admin.service.ws.WSController;
 import eu.driver.admin.service.ws.mapper.StringJSONMapper;
 import eu.driver.admin.service.ws.object.WSSolutionStateChange;
 import eu.driver.api.IAdaptorCallback;
+import eu.driver.model.core.Level;
 
 @RestController
 public class SolutionRESTController implements IAdaptorCallback {
@@ -67,6 +66,9 @@ public class SolutionRESTController implements IAdaptorCallback {
 	
 	@Autowired
 	TestbedConfigRepository testbedConfigRepo;
+	
+	@Autowired
+	OrganisationRepository orgRepo;
 
 	public SolutionRESTController() {
 		log.info("-->SolutionRESTController");
@@ -104,9 +106,19 @@ public class SolutionRESTController implements IAdaptorCallback {
 				if (solution.getState() != state) {
 					solution.setState(state);
 					if (logController != null) {
-						logController.addLog(LogLevels.LOG_LEVEL_INFO,
+						Log dbLog = logController.addLog(LogLevels.LOG_LEVEL_INFO,
 							"The Solution: " + solution.getName() + " changed its state to: " + solution.getState(),
 							true);
+						eu.driver.model.core.Log logEntry = new eu.driver.model.core.Log();
+						logEntry.setId(dbLog.getId().toString());
+						logEntry.setDateTimeSent(dbLog.getSendDate().getTime());
+						if (state) {
+							logEntry.setLevel(Level.INFO);
+						} else {
+							logEntry.setLevel(Level.ERROR);
+						}
+						logEntry.setLog(dbLog.getMessage());
+						AdminAdapter.getInstance().addLogEntry(logEntry);
 					}
 					WSSolutionStateChange notification = new WSSolutionStateChange(solution.getClientId(), solution.getState());
 					WSController.getInstance().sendMessage(mapper.objectToJSONString(notification));
@@ -171,27 +183,27 @@ public class SolutionRESTController implements IAdaptorCallback {
 				savedSolution.setState(solution.getState());
 				savedSolution.setLastHeartBeatReceived(solution.getLastHeartBeatReceived());
 				
-				savedSolution.setOrgName(solution.getOrgName());
-				savedSolution.setUserName(solution.getUserName());
-				savedSolution.setUserPwd(solution.getUserPwd());
-				savedSolution.setCertPwd(solution.getCertPwd());
-				savedSolution.setEmail(solution.getEmail());
-				
-				if (solution.getOrgName() != null && solution.getName() != null) {
-					savedSolution.setSubjectId(
-							"O="+solution.getOrgName().toUpperCase() 
-							+ ",CN=" + solution.getName().toUpperCase().replaceAll(" ", "-"));
+				if (solution.getOrganisation() != null) {
+					savedSolution.setOrganisation(solution.getOrganisation());
 				}
 				
-				if (savedSolution.getApplConfigurations().size() != solution.getApplConfigurations().size()) {
-					savedSolution.setApplConfigurations(solution.getApplConfigurations());	
+				if (savedSolution.getOrganisation().getOrgName() != null && savedSolution.getName() != null) {
+					savedSolution.setSubjectId(
+							"O="+savedSolution.getOrganisation().getOrgName().toUpperCase() 
+							+ ",CN=" + savedSolution.getName().toUpperCase().replaceAll(" ", "-"));
+				}
+				
+				if (solution.getApplSolConfigurations() != null) {
+					if (savedSolution.getApplSolConfigurations().size() != solution.getApplSolConfigurations().size()) {
+						savedSolution.setApplSolConfigurations(solution.getApplSolConfigurations());	
+					}	
 				}
 				
 				savedSolution = solutionRepo.saveAndFlush(savedSolution);
 			} else {
-				if (solution.getOrgName() != null && solution.getName() != null) {
+				if (solution.getOrganisation().getOrgName() != null && solution.getName() != null) {
 					solution.setSubjectId(
-							"O="+solution.getOrgName().toUpperCase() 
+							"O="+solution.getOrganisation().getOrgName().toUpperCase() 
 							+ ",CN=" + solution.getName().toUpperCase().replaceAll(" ", "-"));
 				}
 				savedSolution = solutionRepo.saveAndFlush(solution);
@@ -262,6 +274,7 @@ public class SolutionRESTController implements IAdaptorCallback {
 				if (configName != null) {
 					Configuration config = configRepo.findObjectByName(configName);
 					solutions = config.getSolutions();
+					Collections.sort(solutions, (a, b) -> a.getId() < b.getId() ? -1 : 0);
 				}
 			}
 			solutionList.setSolutions(solutions);

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTimeZone;
 
 import eu.driver.admin.service.controller.SolutionRESTController;
 import eu.driver.admin.service.dto.solution.Solution;
@@ -23,9 +22,6 @@ public class HeartbeatTimerTask extends TimerTask {
 	public void run() {
 		log.debug("HeartbeatTimerTask -- run");
 		List<Solution> solutionList = this.solutionController.getSolutionList();
-		Date local = new Date();
-		//DateTimeZone zone = DateTimeZone.getDefault();
-		//long currentTime = zone.convertLocalToUTC(local.getTime(), false);
 		long currentTime = (new Date()).getTime();
 		
 		for (Solution solution : solutionList) {

@@ -1,5 +1,11 @@
 package eu.driver.admin.service.controller;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,18 +13,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.transaction.Transactional;
+
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.log4j.Logger;
-import org.apache.maven.model.Organization;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,8 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.driver.adapter.constants.TopicConstants;
@@ -68,22 +71,22 @@ import eu.driver.model.cap.Alert;
 import eu.driver.model.core.AdminHeartbeat;
 import eu.driver.model.core.Heartbeat;
 import eu.driver.model.core.LargeDataUpdate;
+import eu.driver.model.core.Log;
 import eu.driver.model.core.MapLayerUpdate;
 import eu.driver.model.core.ObserverToolAnswer;
+import eu.driver.model.core.PhaseMessage;
 import eu.driver.model.core.RequestChangeOfTrialStage;
 import eu.driver.model.core.RolePlayerMessage;
+import eu.driver.model.core.SessionMgmt;
 import eu.driver.model.core.Timing;
 import eu.driver.model.core.TimingControl;
+import eu.driver.model.core.TopicCreate;
+import eu.driver.model.core.TopicInvite;
 import eu.driver.model.edxl.EDXLDistribution;
 import eu.driver.model.emsi.TSO_2_0;
 import eu.driver.model.geojson.FeatureCollection;
 import eu.driver.model.geojson.GeoJSONEnvelope;
 import eu.driver.model.mlp.SlRep;
-import eu.driver.model.core.PhaseMessage;
-import eu.driver.model.core.SessionMgmt;
-import eu.driver.model.core.Log;
-import eu.driver.model.core.TopicCreate;
-import eu.driver.model.core.TopicInvite;
 
 @RestController
 public class MgmtController {
@@ -138,6 +141,9 @@ public class MgmtController {
 	@Autowired
 	TestbedConfigRepository testbedConfigRepo;
 	
+	@PersistenceContext(unitName = "AdminService")
+	private EntityManager entityManager;
+	
 	private Boolean initDone = false;
 	private Boolean startDone = false;
 	private TestbedSecurityMode secureMode = TestbedSecurityMode.DEVELOP;
@@ -159,33 +165,61 @@ public class MgmtController {
 		}
 	}
 	
+	@Transactional
 	public void loadInitData(Boolean resetDB) {
 		log.info("--> loadInitData");
 		
 		if (resetDB) {
-			logController.addLog(LogLevels.LOG_LEVEL_INFO, "CleanUp the DB!", true);
+			Query query = null;
 			try {
-				solutionRepo.deleteAll();
-				topicRepo.deleteAll();
-				gatewayRepo.deleteAll();
-				standardRepo.deleteAll();
-				organisationRepo.deleteAll();
-				logRepo.deleteAll();
-				configRepo.deleteAll();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.applied_solutions");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.applied_topics");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.configuration");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.testbedconfig");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.solution");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.organisation");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.publishsolutions");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.subscribedsolutions");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.topic");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.gateway");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.managingtypes");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.version");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.standard");
+				query.executeUpdate();
+				query = entityManager.createNativeQuery("DELETE FROM admin_service.log");
+				query.executeUpdate();
 			} catch (Exception e) {
 				log.error("Error cleaning the DB!", e);
 				logController.addLog(LogLevels.LOG_LEVEL_SEVER, "Error cleaning the DB at startup: " + e.getMessage(), true);
 			}
+			logController.addLog(LogLevels.LOG_LEVEL_INFO, "CleanUp DB done!", true);
 		}
 		
 		try {
 			loadOrganisations();
+			logController.addLog(LogLevels.LOG_LEVEL_INFO, "Loading Testbed Services/Solutions!", true);
 			loadSolutions(this.tbSolConfigJson);
+			logController.addLog(LogLevels.LOG_LEVEL_INFO, "Loading Connected Services/Solutions!", true);
 			loadSolutions(this.solConfigJson);
+			logController.addLog(LogLevels.LOG_LEVEL_INFO, "Loading System Topics!", true);
 			loadTopics(this.tbTopicConfigJson);
+			logController.addLog(LogLevels.LOG_LEVEL_INFO, "Loading Standard Topics!", true);
 			loadTopics(this.topicConfigJson);
 			loadGateways();
 			loadStandards();
+			logController.addLog(LogLevels.LOG_LEVEL_INFO, "Loading Testbed Configurations!", true);
 			loadConfigurations();
 		} catch (Exception e) {
 			log.error("Error initializing the AdminTool Database!", e);
@@ -195,7 +229,6 @@ public class MgmtController {
 		log.info("loadInitData -->");
 	}
 	
-	@SuppressWarnings("static-access")
 	@ApiOperation(value = "initTestbed", nickname = "initTestbed")
 	@RequestMapping(value = "/AdminService/initTestbed", method = RequestMethod.POST )
 	@ApiResponses(value = { 
@@ -288,11 +321,25 @@ public class MgmtController {
 		
 		try {
 			solutionRepo.deleteAll();
+			solutionRepo.flush();
+			
+			organisationRepo.deleteAll();
+			organisationRepo.flush();
+			
 			topicRepo.deleteAll();
+			topicRepo.flush();
+			
 			gatewayRepo.deleteAll();
-			standardRepo.deleteAll();	
+			gatewayRepo.flush();
+			
+			standardRepo.deleteAll();
+			standardRepo.flush();
+			
 			logRepo.deleteAll();
+			logRepo.flush();
+			
 			configRepo.deleteAll();
+			configRepo.flush();
 			cleanDone = true;
 		} catch (Exception e) {
 			log.error("Error cleaning the DB!", e);
@@ -799,7 +846,7 @@ public class MgmtController {
 	
 	private void loadSolutions(String path) {
 		log.info("--> loadSolutions");
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Loading Testbed Services/Solutions!", true);
+		
 		String solutionJson = fileReader.readFile(path);
 		if (solutionJson != null) {
 			try {
@@ -998,8 +1045,8 @@ public class MgmtController {
 						   for (int a=0;a<jsonSolutions.length();a++){ 
 							   try {
 								   Solution sol = solutionRepo.findObjectByClientId(jsonSolutions.getString(a));
-								   sol.addApplConfigurations(configuration);
 								   if (sol != null) {
+									   sol.addApplSolConfigurations(configuration);
 									   solutions.add(sol);
 								   }
 							   } catch (Exception  e) {

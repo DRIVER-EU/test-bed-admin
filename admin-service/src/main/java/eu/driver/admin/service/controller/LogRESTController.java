@@ -48,7 +48,7 @@ public class LogRESTController implements IAdaptorCallback {
 	@Autowired
 	LogRepository logRepo;
 	
-	@PersistenceContext(unitName = "AdminSerivice")
+	@PersistenceContext(unitName = "AdminService")
 	private EntityManager entityManager;
 
 	public LogRESTController() {
@@ -150,7 +150,7 @@ public class LogRESTController implements IAdaptorCallback {
 		return new ResponseEntity<Double>(pageCount, HttpStatus.OK);
 	}
 
-	public void addLog(String level, String message, Boolean sendNotification) {
+	public Log addLog(String level, String message, Boolean sendNotification) {
 		Log log = new Log();
 		log.setClientId(clientId);
 		log.setLevel(level);
@@ -162,6 +162,7 @@ public class LogRESTController implements IAdaptorCallback {
 		if (sendNotification) {
 			sendWSNotification(dbLog);
 		}
+		return dbLog;
 	}
 	
 	public Boolean removeAllLogs() {

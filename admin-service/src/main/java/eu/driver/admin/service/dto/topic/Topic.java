@@ -20,7 +20,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.driver.admin.service.dto.configuration.Configuration;
 
@@ -79,7 +79,7 @@ public class Topic {
 	  name = "admin_service.applied_topics", 
 	  joinColumns = @JoinColumn(name = "topic_id"), 
 	  inverseJoinColumns = @JoinColumn(name = "configuration_id"))
-	@JsonBackReference
+	@JsonIgnore
 	private List<Configuration> applConfigurations;
 	
 	public Topic() {

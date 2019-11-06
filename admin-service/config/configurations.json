@@ -71,6 +71,7 @@
 		"solutions": [
 			"TB-AdminTool",
 			"TB-AARTool",
+			"TB-AARTool-Backup",
 			"TB-TrialMgmt",
 			"TB-TimeService",
 			"TB-Ost",

@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -106,16 +107,22 @@ public class TopicRESTController {
 				savedTopic.setType(topic.getType());
 				savedTopic.setName(topic.getName());
 				savedTopic.setState(topic.getState());
-				savedTopic.setMsgType(topic.getMsgType());
-				savedTopic.setMsgTypeVersion(topic.getMsgTypeVersion());
+				if (topic.getMsgType() != null) {
+					savedTopic.setMsgType(topic.getMsgType());
+					if (topic.getMsgTypeVersion() != null) {
+						savedTopic.setMsgTypeVersion(topic.getMsgTypeVersion());	
+					}
+				}
 				savedTopic.setDescription(topic.getDescription());
 				savedTopic.setPublishSolutionIDs(topic.getPublishSolutionIDs());
 				savedTopic.setSubscribedSolutionIDs(topic.getSubscribedSolutionIDs());
 				
-				if (savedTopic.getApplConfigurations().size() != topic.getApplConfigurations().size()) {
-					savedTopic.setApplConfigurations(topic.getApplConfigurations());
+				if (topic.getApplConfigurations() != null) {
+					if (savedTopic.getApplConfigurations().size() != topic.getApplConfigurations().size()) {
+						savedTopic.setApplConfigurations(topic.getApplConfigurations());
+					}
 				}
-				
+			
 				savedTopic = topicRepo.saveAndFlush(savedTopic);
 			} else {
 				savedTopic = topicRepo.saveAndFlush(topic);
@@ -188,6 +195,7 @@ public class TopicRESTController {
 				if (configName != null) {
 					Configuration config = configRepo.findObjectByName(configName);
 					topics = config.getTopics();
+					Collections.sort(topics, (a, b) -> a.getId() < b.getId() ? -1 : 0);
 				}
 			}
 			topicList.setTopics(topics);
