@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>driver.eu</groupId>
 		<artifactId>admin-tool</artifactId>
-		<version>1.2.42</version>
+		<version>1.2.43</version>
 	</parent>
 
 	<properties>
