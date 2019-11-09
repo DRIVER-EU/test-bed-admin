@@ -30,7 +30,6 @@ export const store = new Vuex.Store({
     logsPageCount: 1,
     standards: [],
     topicTypes: [],
-    loading: false,
     isTestbedInitialized: false,
     isTrialStarted: false,
     configurations: [],
@@ -64,9 +63,6 @@ export const store = new Vuex.Store({
     },
     topicTypes (state) {
       return state.topicTypes
-    },
-    loading (state) {
-      return state.loading
     },
     isTestbedInitialized (state) {
       return state.isTestbedInitialized
@@ -188,9 +184,6 @@ export const store = new Vuex.Store({
     TESTBED_STATE_CHANGE (state, isInitialized) {
       state.isTestbedInitialized = isInitialized
     },
-    LOADING (state, isTrue) {
-      state.loading = isTrue
-    },
     SET_CONFIGURATIONS (state, configurations) {
       state.configurations = configurations
     },
@@ -251,23 +244,11 @@ export const store = new Vuex.Store({
         context.commit('GET_LOGS_PAGE_COUNT', (response.data))
       }).catch(ex => console.log(ex))
     },
-    startTrial (context) {
-      fetchService.performPost('startTrialConfig').then(function () {
-        eventBus.$emit('showSnackbar', 'Trial started.', 'success')
-        context.commit('TRIAL_STATE_CHANGE', true)
-      }).catch(e => {
-        eventBus.$emit('showSnackbar', 'Trial could not be started. (' + e + ')', 'error')
-      })
+    startTrialSuccess(context) {
+      context.commit('TRIAL_STATE_CHANGE', true);
     },
-    initTestbed (context) {
-      fetchService.performPost('initTestbed').then(function () {
-        eventBus.$emit('showSnackbar', 'Testbed initialized.', 'success')
-        context.commit('TESTBED_STATE_CHANGE', true)
-        context.commit('LOADING', false)
-      }).catch(e => {
-        eventBus.$emit('showSnackbar', 'Testbed could not be initialized. (' + e + ')', 'error')
-        context.commit('LOADING', false)
-      })
+    initTestbedSuccess(context) {
+      context.commit('TESTBED_STATE_CHANGE', true);
     },
     isTrialStarted (context) {
       fetchService.performGet('isTrialStarted').then(response => {

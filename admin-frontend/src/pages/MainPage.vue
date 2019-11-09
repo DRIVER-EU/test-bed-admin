@@ -35,14 +35,12 @@
           </v-list>
         </v-card>
       </v-menu>
-      <v-btn :disabled="isTestbedInitialized" v-on:click="initTestbed">
-        <v-icon left>rotate_right</v-icon>
+      <fetch-button :disabled="isTestbedInitialized" icon="rotate_right" url="/initTestbed" method="POST" :onSuccess="handleInitTestbedSuccess" :onError="handleInitTestbedError">
         Initialize test-bed
-      </v-btn>
-      <v-btn :disabled="!isTestbedInitialized" v-on:click="startTrial">
-        <v-icon left>play_arrow</v-icon>
+      </fetch-button>
+      <fetch-button :disabled="!isTestbedInitialized" icon="play_arrow" url="/startTrialConfig" method="POST" :onSuccess="handleStartTrialSuccess" :onError="handleStartTrialError">
         Start trial
-      </v-btn>
+      </fetch-button>
     </toolbar>
     <main>
       <Overview></Overview>
@@ -53,20 +51,27 @@
   import {mapGetters} from 'vuex'
   import Overview from '../components/Overview'
   import {configurationService} from '../service/ConfigurationService'
+  import FetchButton from '../components/FetchButton'
+  import {eventBus} from "../main"
 
   export default {
     name: 'App',
-    components: {Overview},
+    components: {Overview, FetchButton},
     methods:
       {
-        initTestbed: function () {
-          console.log('initTestbed')
-          this.$store.dispatch('initTestbed')
-          this.$store.commit('LOADING', true)
+        handleInitTestbedSuccess: function() {
+          eventBus.$emit('showSnackbar', 'Testbed initialized.', 'success')
+          this.$store.dispatch('initTestbedSuccess')
         },
-        startTrial: function () {
-          console.log('startTrial')
-          this.$store.dispatch('startTrial')
+        handleInitTestbedError: function(e) {
+          eventBus.$emit('showSnackbar', 'Testbed could not be initialized (' + e + ').', 'error')
+        },
+        handleStartTrialSuccess: function() {
+          eventBus.$emit('showSnackbar', 'Trial started.', 'success')
+          this.$store.dispatch('initStartTrialSuccess')
+        },
+        handleStartTrialError: function(e) {
+          eventBus.$emit('showSnackbar', 'Trial could not be started (' + e + ').', 'error')
         },
         switchToConfiguration: function (name) {
           configurationService.switchToConfiguration(name, this.currentConfiguration, this.modes);
