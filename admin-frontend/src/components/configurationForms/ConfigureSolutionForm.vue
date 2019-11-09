@@ -31,9 +31,11 @@
             ></v-radio>
           </v-radio-group>
           <v-select
-            v-model="orgName"
-            :items="organisationNames"
+            v-model="organisation"
+            :items="organisations"
+            item-text="orgName"
             label="Organisation Name"
+            return-object
           ></v-select>
           <v-textarea
             v-model="description"
@@ -73,12 +75,14 @@
         v => (v && v.length <= 25) || 'Max. 25 characters allowed.'
       ],
       isService: true,
+      isAdmin: false,
+      state: false,
       description: '',
-      orgName: null,
+      organisation: null,
     }),
     computed: {
-      organisationNames () {
-        return this.$store.state.organisations.map(o => o.orgName);
+      organisations () {
+        return this.$store.state.organisations;
       }
     },
     created () {
@@ -91,8 +95,10 @@
           me.clientId = item.clientId;
           me.name = item.name;
           me.isService = item.isService;
+          me.isAdmin = item.isAdmin;
+          me.state = item.state;
           me.description = item.description;
-          me.orgName = item.orgName;
+          me.organisation = item.organisation;
         }
         me.open = true;
       });
@@ -105,10 +111,11 @@
             id: this.editedItem ? this.editedItem.id : null,
             clientId: me.clientId,
             name: me.name,
-            isAdmin: false,
             isService: me.isService,
+            isAdmin: me.isAdmin,
+            state: me.state,
             description: me.description,
-            orgName: me.orgName,
+            organisation: me.organisation,
           }
           if (this.editedItem) {
             store.dispatch('updateSolution', solution);
@@ -126,8 +133,10 @@
         me.clientId = "";
         me.name = "";
         me.isService = true;
+        me.isAdmin = false;
+        me.state = false;
         me.description = "";
-        me.orgName = null;
+        me.organisation = null;
       }
     },
   }

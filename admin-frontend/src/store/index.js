@@ -126,10 +126,6 @@ export const store = new Vuex.Store({
       const obj = state.gateways.find(obj => obj.id === payload.id);
       const index = state.gateways.indexOf(obj);
       state.gateways.splice(index, 1, new Gateway(payload));
-
-      console.log("### UPDATE", state.gateways, payload);
-
-
     },
     SET_SOLUTIONS (state, solutions) {
       state.solutions = []
