@@ -68,7 +68,7 @@
         },
         handleStartTrialSuccess: function() {
           eventBus.$emit('showSnackbar', 'Trial started.', 'success')
-          this.$store.dispatch('initStartTrialSuccess')
+          this.$store.dispatch('startTrialSuccess')
         },
         handleStartTrialError: function(e) {
           eventBus.$emit('showSnackbar', 'Trial could not be started (' + e + ').', 'error')

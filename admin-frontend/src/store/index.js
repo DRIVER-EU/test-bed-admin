@@ -11,7 +11,7 @@ import Settings from '../constants/Settings'
 import {fetchService} from '../service/FetchService'
 import EventName from '../constants/EventName'
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
@@ -57,8 +57,8 @@ export const store = new Vuex.Store({
       return state.standards
     },
     standardNames (state) {
-      let standardNames = []
-      state.standards.forEach(standard => standardNames.push(standard.name))
+      let standardNames = [];
+      state.standards.forEach(standard => standardNames.push(standard.name));
       return standardNames
     },
     topicTypes (state) {
@@ -88,24 +88,37 @@ export const store = new Vuex.Store({
   },
   mutations: {
     SOCKET_ONOPEN (state) {
-      console.log('connection open')
-      state.socket.isConnected = true
+      console.log('Web socket connection opened.');
+      state.socket.isConnected = true;
       heartbeatController()
     },
     SOCKET_ONCLOSE (state) {
-      console.log('connection closed')
-      state.socket.isConnected = false
-      clearInterval(state.socket.pingTimer)
-      clearInterval(state.socket.pingTimeOutTimer)
+      console.log('Web socket connection closed.');
+      state.socket.isConnected = false;
+      if (state.socket.pingTimer) {
+        console.log("Stopped heartbeat timer", state.socket.pingTimer);
+        clearInterval(state.socket.pingTimer);
+        state.socket.pingTimer = null
+      }
+      if (state.socket.pingTimeOutTimer) {
+        console.log("Stopped heartbeat timeout timer", state.socket.pingTimeOutTimer);
+        clearInterval(state.socket.pingTimeOutTimer);
+        state.socket.pingTimeOutTimer = null
+      }
     },
-    SOCKET_RECONNECT () {
-      console.log('reconnect')
+    SOCKET_RECONNECT (state) {
+      console.log('Web socket reconnected.');
+      state.socket.isConnected = true;
+      heartbeatController()
+    },
+    SOCKET_ONMESSAGE(state, msg) {
+      console.log('Received unhandled message', msg)
     },
     HBRESPONSE (state) {
       state.socket.messageAccepted = true
     },
     LOG_NOTIFICATION (state, log) {
-      log.id = Number(log.id)
+      log.id = Number(log.id);
       state.logEntries.push(new LogEntry(log))
     },
     UPDATE_SOLUTION (state, payload) {
@@ -124,47 +137,47 @@ export const store = new Vuex.Store({
       state.gateways.splice(index, 1, new Gateway(payload));
     },
     SET_SOLUTIONS (state, solutions) {
-      state.solutions = []
+      state.solutions = [];
       solutions.forEach(solution => {
-        state.solutions.push(new Solution(solution))
+        state.solutions.push(new Solution(solution));
         eventBus.$emit(EventName.ADD_SOLUTION_ID, solution.clientId)
       })
     },
     ADD_SOLUTION (state, solution) {
-      state.solutions.push(new Solution(solution))
+      state.solutions.push(new Solution(solution));
       eventBus.$emit(EventName.ADD_SOLUTION_ID, solution.clientId)
     },
     REMOVE_SOLUTION (state, solution) {
-      const id = solution.id
-      state.solutions = [...state.solutions.filter(s => s.id !== id)]
+      const id = solution.id;
+      state.solutions = [...state.solutions.filter(s => s.id !== id)];
       eventBus.$emit(EventName.REMOVE_SOLUTION_ID, solution.clientId)
     },
     SET_TOPICS (state, topics) {
-      state.topics = []
+      state.topics = [];
       topics.forEach(topic => state.topics.push(new Topic(topic)))
     },
     ADD_TOPIC (state, topic) {
       state.topics.push(new Topic(topic))
     },
     REMOVE_TOPIC (state, topic) {
-      const id = topic.id
+      const id = topic.id;
       state.topics = [...state.topics.filter(s => s.id !== id)]
     },
     SET_GATEWAYS (state, gateways) {
-      state.gateways = []
+      state.gateways = [];
       gateways.forEach(gateway => state.gateways.push(new Gateway(gateway)))
     },
     ADD_GATEWAY (state, gateway) {
       state.gateways.push(new Gateway(gateway))
     },
     REMOVE_GATEWAY (state, gateway) {
-      const id = gateway.id
+      const id = gateway.id;
       state.gateways = [...state.gateways.filter(s => s.id !== id)]
     },
     GET_LOGS (state, data) {
-      state.logEntries = []
+      state.logEntries = [];
       data.logs.forEach(logEntry => {
-        logEntry.sendDate = moment.utc(logEntry.sendDate).format('YYYY-MM-DD HH:mm:ss.SSS')
+        logEntry.sendDate = moment.utc(logEntry.sendDate).format('YYYY-MM-DD HH:mm:ss.SSS');
         state.logEntries.push(new LogEntry(logEntry))
       })
     },
@@ -200,10 +213,10 @@ export const store = new Vuex.Store({
       state.solutionCertificates = solutionCertificates
     },
     ADD_SOLUTION_CERTIFICATE (state, payload) {
-      const solution = payload.solution
-      const fileName = payload.fileName
-      const additionalItems = {}
-      additionalItems[solution] = fileName
+      const solution = payload.solution;
+      const fileName = payload.fileName;
+      const additionalItems = {};
+      additionalItems[solution] = fileName;
       state.solutionCertificates = {...state.solutionCertificates, ...additionalItems}
     },
   },
@@ -230,10 +243,10 @@ export const store = new Vuex.Store({
       })
     },
     getLogs (context, payload) {
-      const page = payload ? payload.page : null
-      const url = page ? 'getAllLogs?size=' + Settings.PAGE_SIZE + '&page=' + page : 'getAllLogs'
+      const page = payload ? payload.page : null;
+      const url = page ? 'getAllLogs?size=' + Settings.PAGE_SIZE + '&page=' + page : 'getAllLogs';
       fetchService.performGet(url).then(response => {
-        console.log('/getAllLogs returned count', response.data.logs.length)
+        console.log('/getAllLogs returned count', response.data.logs.length);
         context.commit('GET_LOGS', (response.data))
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
@@ -262,7 +275,7 @@ export const store = new Vuex.Store({
     },
     addSolution (context, solution) {
       fetchService.performPost('addSolution', solution).then(response => {
-        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
         context.commit('ADD_SOLUTION', (response.data))
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
@@ -270,7 +283,7 @@ export const store = new Vuex.Store({
     },
     addGateway (context, gateway) {
       fetchService.performPost('addGateway', gateway).then(response => {
-        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
         context.commit('ADD_GATEWAY', (response.data))
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
@@ -278,7 +291,7 @@ export const store = new Vuex.Store({
     },
     addTopic (context, topic) {
       fetchService.performPost('addTopic', topic).then(response => {
-        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
         context.commit('ADD_TOPIC', (response.data))
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
@@ -286,7 +299,7 @@ export const store = new Vuex.Store({
     },
     updateSolution (context, solution) {
       fetchService.performPut('updateSolution', solution).then(response => {
-        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
         context.commit('UPDATE_SOLUTION', response.data);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
@@ -294,7 +307,7 @@ export const store = new Vuex.Store({
     },
     updateGateway (context, gateway) {
       fetchService.performPut('updateGateway', gateway).then(response => {
-        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
         context.commit('UPDATE_GATEWAY', response.data);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
@@ -302,34 +315,34 @@ export const store = new Vuex.Store({
     },
     updateTopic (context, topic) {
       fetchService.performPut('updateTopic', topic).then(response => {
-        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success')
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
         context.commit('UPDATE_TOPIC', response.data);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
     },
     removeSolution (context, payload) {
-      const item = payload.item
+      const item = payload.item;
       fetchService.performDelete('removeSolution/' + item.id).then(response => {
-        eventBus.$emit('showSnackbar', 'Solution was deleted.', 'success')
+        eventBus.$emit('showSnackbar', 'Solution was deleted.', 'success');
         context.commit('REMOVE_SOLUTION', item)
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Solution was not deleted. (' + e + ')', 'error')
       })
     },
     removeGateway (context, payload) {
-      const item = payload.item
+      const item = payload.item;
       fetchService.performDelete('removeGateway/' + item.id).then(response => {
-        eventBus.$emit('showSnackbar', 'Gateway was deleted.', 'success')
+        eventBus.$emit('showSnackbar', 'Gateway was deleted.', 'success');
         context.commit('REMOVE_GATEWAY', item)
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Gateway was not deleted. (' + e + ')', 'error')
       })
     },
     removeTopic (context, payload) {
-      const item = payload.item
+      const item = payload.item;
       fetchService.performDelete('removeTopic/' + item.id).then(response => {
-        eventBus.$emit('showSnackbar', 'Topic was deleted.', 'success')
+        eventBus.$emit('showSnackbar', 'Topic was deleted.', 'success');
         context.commit('REMOVE_TOPIC', item)
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Topic was not deleted. (' + e + ')', 'error')
@@ -374,4 +387,4 @@ export const store = new Vuex.Store({
       context.commit('ADD_SOLUTION_CERTIFICATE', payload);
     },
   }
-})
+});
