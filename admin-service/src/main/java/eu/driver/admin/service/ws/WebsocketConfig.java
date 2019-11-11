@@ -10,15 +10,14 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @Configuration
 @EnableWebSocket
 public class WebsocketConfig implements WebSocketConfigurer {
- 
-    @Bean
-    public WebSocketHandler myMessageHandler() {
-        return new WebSocketServer();
-    }
- 
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(myMessageHandler(), "/AdminServiceWSEndpoint").setAllowedOrigins("*");
-    }
- 
+
+   @Bean
+   public WebSocketHandler myMessageHandler() {
+      return new WebSocketServer();
+   }
+
+   @Override
+   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+      registry.addHandler(myMessageHandler(), "/AdminServiceWSEndpoint").setAllowedOrigins("*").withSockJS();
+   }
 }
