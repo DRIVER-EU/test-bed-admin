@@ -3,6 +3,8 @@
 		"id": "core.topic.admin.hb",
 		"type": "core.topic",
 		"name": "system_admin_heartbeat",
+		"msgType": "admin_hb",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"TB-AdminTool"
@@ -16,6 +18,8 @@
 		"id": "core.topic.hb",
 		"type": "core.topic",
 		"name": "system_heartbeat",
+		"msgType": "hb",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"all"
@@ -29,6 +33,8 @@
 		"id": "core.topic.log",
 		"type": "core.topic",
 		"name": "system_logging",
+		"msgType": "log",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"all"
@@ -42,6 +48,8 @@
 		"id": "core.topic.eval.log",
 		"type": "core.topic",
 		"name": "system_evaluation_logging",
+		"msgType": "log",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"all"
@@ -55,6 +63,8 @@
 		"id": "core.topic.access.invite",
 		"type": "core.topic",
 		"name": "system_topic_access_invite",
+		"msgType": "topic_invite",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"TB-AdminTool"
@@ -68,6 +78,8 @@
 		"id": "core.topic.create.request",
 		"type": "core.topic",
 		"name": "system_topic_create_request",
+		"msgType": "topic_create_request",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"all"
@@ -81,6 +93,8 @@
 		"id": "core.topic.time",
 		"type": "core.topic",
 		"name": "system_timing",
+		"msgType": "timing",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"TB-TimeService"
@@ -94,6 +108,8 @@
 		"id": "core.topic.time.control",
 		"type": "core.topic",
 		"name": "system_timing_control",
+		"msgType": "timing_control",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"TB-TimeService"
@@ -107,6 +123,8 @@
 		"id": "core.topic.tm.phasemessage",
 		"type": "core.topic",
 		"name": "system_tm_phase_message",
+		"msgType": "phase_msg",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"TB-TrialMgmt"
@@ -120,6 +138,8 @@
 		"id": "core.topic.tm.roleplayer",
 		"type": "core.topic",
 		"name": "system_tm_role_player",
+		"msgType": "role_player",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"TB-TrialMgmt"
@@ -133,6 +153,8 @@
 		"id": "core.topic.tm.sessionmgmt",
 		"type": "core.topic",
 		"name": "system_tm_session_mgmt",
+		"msgType": "session",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"TB-TrialMgmt"
@@ -146,6 +168,8 @@
 		"id": "core.topic.ost.answer",
 		"type": "core.topic",
 		"name": "system_observer_tool_answer",
+		"msgType": "ost",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"TB-Ost"
@@ -159,6 +183,8 @@
 		"id": "core.topic.trial.stage.change",
 		"type": "core.topic",
 		"name": "system_request_change_of_trial_stage",
+		"msgType": "trial_stage",
+		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
 			"TB-TrialMgmt"

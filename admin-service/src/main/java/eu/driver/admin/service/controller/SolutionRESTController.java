@@ -69,6 +69,8 @@ public class SolutionRESTController implements IAdaptorCallback {
 	
 	@Autowired
 	OrganisationRepository orgRepo;
+	
+	public MgmtController mgmtController;
 
 	public SolutionRESTController() {
 		log.info("-->SolutionRESTController");
@@ -122,6 +124,9 @@ public class SolutionRESTController implements IAdaptorCallback {
 					}
 					WSSolutionStateChange notification = new WSSolutionStateChange(solution.getClientId(), solution.getState());
 					WSController.getInstance().sendMessage(mapper.objectToJSONString(notification));
+					
+					// send topic invites if solution state is up (again)
+					mgmtController.sendTopicInvitesForClient(solution.getClientId());
 				}
 				this.solutionRepo.saveAndFlush(solution);
 			}

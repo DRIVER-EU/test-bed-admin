@@ -100,6 +100,9 @@ public class MgmtController {
 	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
+	private Map<String, List<TopicInvite>> clientInviteMsgMap = new HashMap<String, List<TopicInvite>>();
+	private Boolean firstInvites = false;
+	
 	private HTTPUtils httpUtils = new HTTPUtils();
 	
 	@Autowired
@@ -163,6 +166,10 @@ public class MgmtController {
 		} else {
 			secureMode = TestbedSecurityMode.valueOf(clientProp.getProperty("testbed.secure.mode", "DEVELOP"));
 		}
+		
+		if (solutionController != null) {
+			solutionController.mgmtController = this;
+		}
 	}
 	
 	@Transactional
@@ -221,6 +228,19 @@ public class MgmtController {
 			loadStandards();
 			logController.addLog(LogLevels.LOG_LEVEL_INFO, "Loading Testbed Configurations!", true);
 			loadConfigurations();
+			// set default configuration if no config is found
+			TestbedConfig tbConfig = testbedConfigRepo.findActiveConfig(true);
+			if (tbConfig == null) {
+				String defaultConfName = ClientProperties.getInstance().getProperty("testbed.default.configuration", "Local Develop");
+				String defaultTBMode = ClientProperties.getInstance().getProperty("testbed.secure.mode", "DEVELOP");
+				if (defaultConfName != null && defaultTBMode != null) {
+					tbConfig = new TestbedConfig();
+					tbConfig.setConfigName(defaultConfName);
+					tbConfig.setIsActive(true);
+					tbConfig.setTestbedMode(defaultTBMode);
+					testbedConfigRepo.saveAndFlush(tbConfig);	
+				}
+			}
 		} catch (Exception e) {
 			log.error("Error initializing the AdminTool Database!", e);
 			logController.addLog(LogLevels.LOG_LEVEL_SEVER, "The Testbed wasn't initialized successful: " + e.getMessage(), true);
@@ -556,10 +576,74 @@ public class MgmtController {
 		return new ResponseEntity<List<String>>(testbedModes, HttpStatus.OK);
 	}
 	
+	public void sendTopicInvitesForClient(String clientId) {
+		if (firstInvites) {
+			logController.addLog(LogLevels.LOG_LEVEL_INFO, "Sending TopicInvites for solution: " + clientId, true);
+			List<TopicInvite> invites = clientInviteMsgMap.get(clientId);
+			
+			if (invites != null) {
+				invites.forEach((inviteMsg) -> {
+					try {
+						AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
+					} catch (Exception e) {
+						log.error("Error storing client invites!", e);
+					}
+				});
+			}
+		}
+	}
+	
 	private void createAllCoreTopics() throws Exception {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!", true);
 		
-		adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat(), 300000L, 1);
+		List<Topic> topics = topicController.getAllCoreTopic();
+		topics.forEach((topic) -> {
+			try {
+				if (topic.getMsgType() != null) {
+					SpecificRecord schema = null;
+					if (topic.getMsgType().equalsIgnoreCase("admin_hb")) {
+						schema = new AdminHeartbeat();
+					} else if (topic.getMsgType().equalsIgnoreCase("hb")) {
+						schema = new Heartbeat();
+					} else if (topic.getMsgType().equalsIgnoreCase("log")) {
+						schema = new Log();
+					} else if (topic.getMsgType().equalsIgnoreCase("topic_invite")) {
+						schema = new TopicInvite();
+					} else if (topic.getMsgType().equalsIgnoreCase("topic_create_request")) {
+						schema = new TopicCreate();
+					} else if (topic.getMsgType().equalsIgnoreCase("timing")) {
+						schema = new Timing();
+					} else if (topic.getMsgType().equalsIgnoreCase("timing_control")) {
+						schema = new TimingControl();
+					} else if (topic.getMsgType().equalsIgnoreCase("phase_msg")) {
+						schema = new PhaseMessage();
+					} else if (topic.getMsgType().equalsIgnoreCase("role_player")) {
+						schema = new RolePlayerMessage();
+					} else if (topic.getMsgType().equalsIgnoreCase("session")) {
+						schema = new SessionMgmt();
+					} else if (topic.getMsgType().equalsIgnoreCase("ost")) {
+						schema = new ObserverToolAnswer();
+					} else if (topic.getMsgType().equalsIgnoreCase("trial_stage")) {
+						schema = new RequestChangeOfTrialStage();
+					}
+					
+					if (schema != null) {
+						adminController.createTopic(topic.getName(), new EDXLDistribution(), schema , 300000L, 1);
+						logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
+						topicController.updateTopicState(topic.getName(), true);
+						sendTopicStateChange(topic.getClientId(), true);
+						if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+							this.grantCoreTopicGroupAccess(TopicConstants.ADMIN_HEARTBEAT_TOPIC);
+						}
+					}
+				}
+			} catch(Exception e) {
+				logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Could not create all core topics!", true);
+			}
+		});
+		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!", true);
+		
+		/*adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat(), 300000L, 1);
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + " created.", true);
 		topicController.updateTopicState(TopicConstants.ADMIN_HEARTBEAT_TOPIC, true);
 		sendTopicStateChange("core.topic.admin.hb", true);
@@ -661,9 +745,9 @@ public class MgmtController {
 		sendTopicStateChange("core.topic.tm.sessionmgmt", true);
 		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 			this.grantCoreTopicGroupAccess(TopicConstants.SESSION_MGMT_TOPIC);
-		}
+		}*/
 		
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!", true);
+		
 	}
 	
 	private void createTrialTopics() throws Exception {
@@ -823,11 +907,24 @@ public class MgmtController {
 							
 							if (sendInvite) {
 								AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
+								try {
+									List<TopicInvite> invites = clientInviteMsgMap.get(inviteMsg.getId().toString());
+									if (invites == null) {
+										invites = new ArrayList<TopicInvite>();
+									}
+									invites.add(inviteMsg);
+									clientInviteMsgMap.put(inviteMsg.getId().toString(), invites);
+								} catch (Exception e) {
+									log.error("Error storing client invites!", e);
+								}
 							}
 						} catch (CommunicationException cEx) {
 							logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString(), true);
 						}
 					}
+					//first invites send
+					firstInvites = true;
+					
 				} else {
 					logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Trial specific Topic: " + topic.getName() + " could not be created, unknown schema: " + topic.getMsgType(), true);
 				}

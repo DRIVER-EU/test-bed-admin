@@ -66,6 +66,7 @@
 		"subscribedSolutionIDs": [
 			"view-terra-m1",
 			"view-terra-m2",
+			"view-terra-staff",
 			"socrates",
 			"TB-AARTool",
 			"TB-AARTool-Backup"
@@ -121,7 +122,8 @@
 			"TB-AARTool-Backup",
 			"crisissuite",
 			"view-terra-m1",
-			"view-terra-m2"
+			"view-terra-m2",
+			"view-terra-staff"
 		],
 		"description": "This is the topic for Staff map information."
 	},{
@@ -139,7 +141,8 @@
 			"TB-AARTool-Backup",
 			"crisissuite",
 			"view-terra-m1",
-			"view-terra-m2"
+			"view-terra-m2",
+			"view-terra-staff"
 		],
 		"description": "This is the topic for Staff map information."
 	},{
@@ -158,7 +161,8 @@
 			"crisissuite",
 			"socrates",
 			"view-terra-m1",
-			"view-terra-m2"
+			"view-terra-m2",
+			"view-terra-staff"
 		],
 		"description": "This is the topic for Staff map information."
 	},{

@@ -178,6 +178,14 @@
  		"orgName":"VWorld",
  		"description":"vieWTerra application at Module 2!"
 	},{
+		"id":"view-terra-staff",
+ 		"name":"vieWTerra staff",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"orgName":"VWorld",
+ 		"description":"vieWTerra application at staff room!"
+	},{
 		"id":"crisissuite",
  		"name":"CrisisSuit",
  		"isTestbed":false,
