@@ -150,6 +150,7 @@ public class MgmtController {
 	private Boolean initDone = false;
 	private Boolean startDone = false;
 	private TestbedSecurityMode secureMode = TestbedSecurityMode.DEVELOP;
+	private String testbedActiveConfig = "Local Develop";
 	
 	private String organisationsJson = "config/organisations.json";
 	private String tbSolConfigJson = "config/testbed-solutions.json";
@@ -165,6 +166,12 @@ public class MgmtController {
 			secureMode = TestbedSecurityMode.valueOf(System.getenv().get("testbed_secure_mode"));
 		} else {
 			secureMode = TestbedSecurityMode.valueOf(clientProp.getProperty("testbed.secure.mode", "DEVELOP"));
+		}
+		
+		if (System.getenv().get("testbed_default_configuration") != null) {
+			testbedActiveConfig = System.getenv().get("testbed_default_configuration");
+		} else {
+			testbedActiveConfig = clientProp.getProperty("testbed.default.configuration", "Local Develop");
 		}
 		
 		if (solutionController != null) {
@@ -231,13 +238,11 @@ public class MgmtController {
 			// set default configuration if no config is found
 			TestbedConfig tbConfig = testbedConfigRepo.findActiveConfig(true);
 			if (tbConfig == null) {
-				String defaultConfName = ClientProperties.getInstance().getProperty("testbed.default.configuration", "Local Develop");
-				String defaultTBMode = ClientProperties.getInstance().getProperty("testbed.secure.mode", "DEVELOP");
-				if (defaultConfName != null && defaultTBMode != null) {
+				if (testbedActiveConfig != null && this.secureMode != null) {
 					tbConfig = new TestbedConfig();
-					tbConfig.setConfigName(defaultConfName);
+					tbConfig.setConfigName(testbedActiveConfig);
 					tbConfig.setIsActive(true);
-					tbConfig.setTestbedMode(defaultTBMode);
+					tbConfig.setTestbedMode(this.secureMode.toString());
 					testbedConfigRepo.saveAndFlush(tbConfig);	
 				}
 			}
@@ -424,11 +429,11 @@ public class MgmtController {
 				source += "!pragma graphviz_dot jdot\n";
 				
 				for (Topic topic : topics) {
+					source += "node \"Technical infratrucure\" {\n";
 					if (topic.getClientId().indexOf("core.topic") < 0) {
-						source += "node \"Technical infratrucure\" {\n";
 						source += "() " + topic.getName().replaceAll("-", "") + "\n";
-						source += "}\n";
 					}
+					source += "}\n";
 				}
 				
 				for (Topic topic : topics) {
