@@ -123,18 +123,21 @@ export const store = new Vuex.Store({
     },
     UPDATE_SOLUTION (state, payload) {
       const obj = state.solutions.find(obj => obj.clientId === payload.id);
-      const index = state.solutions.indexOf(obj);
-      state.solutions.splice(index, 1, new Solution(payload));
+      if (obj) {
+        obj.state = payload.state
+      }
     },
     UPDATE_TOPIC (state, payload) {
       const obj = state.topics.find(obj => obj.clientId === payload.id);
-      const index = state.topics.indexOf(obj);
-      state.topics.splice(index, 1, new Topic(payload));
+      if (obj) {
+        obj.state = payload.state
+      }
     },
     UPDATE_GATEWAY (state, payload) {
       const obj = state.gateways.find(obj => obj.clientId === payload.id);
-      const index = state.gateways.indexOf(obj);
-      state.gateways.splice(index, 1, new Gateway(payload));
+      if (obj) {
+        obj.state = payload.state
+      }
     },
     SET_SOLUTIONS (state, solutions) {
       state.solutions = [];
