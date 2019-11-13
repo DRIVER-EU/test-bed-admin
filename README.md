@@ -98,8 +98,19 @@ After calling the Admin tool, it displays all information configured for the tri
 In the client.properties the parameter init.auto defines if the topic creation is done by invoking (either by clicking on the button, or invoking the Rest Endpoint by e.g.: Trial Manager), or if the Admin tool should create all core topics on startup automatically. Be aware, the Kafka has to be up and running before the Admin Service is started.
 
 ## reset DB mode
-In the client.properties the parameter reset.db defines, if the DB tables should be cleaned during startup. If this is set to true, all tables (also the logs) are cleaned and the configuration defined in the json files is stored. 
+In the client.properties the parameter reset.db defines, if the DB tables should be cleaned during startup. If this is set to true, all tables (also the logs) are cleaned and the configuration defined in the json files is stored.
 
+## Drow overview
+To draw an overview picture how the solution are connected to the testbed and on which topics they are subscribe or are allowed to publish
+messages, press the Overview button in the menu. The image is opened in a seperate tab and can also be downloaded
+
+## Choose the active configuration
+In the menu you can find a Configuration button. Pressing the button opens the menu with all availbable configurations. Selecting one will activate the configuration. Solutions, Topics and Gateways are automatically reloaded.
+
+## Choose Testbed mode
+The default Testbed mode is Develop. Meaning the testbed is open, everybody can connect and register for message and can also publish messages. Topics are created on the fly when they are needed. Switching to Authentication means that only those solutions can connect
+that have a valid certificate to connect. Authentication and Authorization means, additionaly to connect via certificate also access to
+topics is granted by the admin tool. Only solutions that are allowed to publish or subscribe can publish or subscribe.
 
 ## Create all topics
 By pressing the "INITIALIZE TESTBED" button (right top in the header) the Admin tool creates all needed core topics and registers the corresponding schemas on them. The status of the topic creation can be seen in the log and by the indicator in the topic.
