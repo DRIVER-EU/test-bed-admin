@@ -264,6 +264,10 @@ public class MgmtController {
 		log.info("--> initTestbed");
 		Boolean send = true;
 		
+		if (solutionController != null) {
+			solutionController.mgmtController = this;
+		}
+		
 		try {
 			createAllCoreTopics();
 			adminAdapter = AdminAdapter.getInstance();
@@ -542,6 +546,8 @@ public class MgmtController {
 		}
 		configuration.setIsActive(true);
 		testbedConfigRepo.saveAndFlush(configuration);
+		
+		adminAdapter.closeAdapter();
 		
 		// delete all topics and set the testbed init to false
 		List<Topic> topicList = topicRepo.findAll();

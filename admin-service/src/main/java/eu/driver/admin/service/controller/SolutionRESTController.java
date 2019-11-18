@@ -126,7 +126,10 @@ public class SolutionRESTController implements IAdaptorCallback {
 					WSController.getInstance().sendMessage(mapper.objectToJSONString(notification));
 					
 					// send topic invites if solution state is up (again)
-					mgmtController.sendTopicInvitesForClient(solution.getClientId());
+					if(mgmtController != null && solution.getClientId() != null) {
+						mgmtController.sendTopicInvitesForClient(solution.getClientId());	
+					}
+					
 				}
 				this.solutionRepo.saveAndFlush(solution);
 			}
