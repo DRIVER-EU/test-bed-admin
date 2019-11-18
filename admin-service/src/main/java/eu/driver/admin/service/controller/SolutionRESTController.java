@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.driver.adapter.core.AdminAdapter;
+import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.controller.heartbeat.HeartbeatTimerTask;
 import eu.driver.admin.service.dto.SolutionList;
@@ -52,6 +53,8 @@ public class SolutionRESTController implements IAdaptorCallback {
 	private Timer hbTimer = null;
 	private HeartbeatTimerTask hbTimerTask = null;
 	private StringJSONMapper mapper = new StringJSONMapper();
+	
+	private String clientId = ClientProperties.getInstance().getProperty("client.id");
 	
 	private String fileStorageLocation = "./config/cert/";
 	
@@ -107,21 +110,16 @@ public class SolutionRESTController implements IAdaptorCallback {
 				
 				if (solution.getState() != state) {
 					solution.setState(state);
-					if (logController != null) {
-						Log dbLog = logController.addLog(LogLevels.LOG_LEVEL_INFO,
-							"The Solution: " + solution.getName() + " changed its state to: " + solution.getState(),
-							true);
-						eu.driver.model.core.Log logEntry = new eu.driver.model.core.Log();
-						logEntry.setId(dbLog.getId().toString());
-						logEntry.setDateTimeSent(dbLog.getSendDate().getTime());
-						if (state) {
-							logEntry.setLevel(Level.INFO);
-						} else {
-							logEntry.setLevel(Level.ERROR);
-						}
-						logEntry.setLog(dbLog.getMessage());
-						AdminAdapter.getInstance().addLogEntry(logEntry);
+					eu.driver.model.core.Log logEntry = new eu.driver.model.core.Log();
+					logEntry.setId(clientId);
+					logEntry.setDateTimeSent(new Date().getTime());
+					if (state) {
+						logEntry.setLevel(Level.INFO);
+					} else {
+						logEntry.setLevel(Level.ERROR);
 					}
+					logEntry.setLog("The Solution: " + solution.getName() + " changed its state to: " + solution.getState());
+					AdminAdapter.getInstance().addLogEntry(logEntry);
 					WSSolutionStateChange notification = new WSSolutionStateChange(solution.getClientId(), solution.getState());
 					WSController.getInstance().sendMessage(mapper.objectToJSONString(notification));
 					

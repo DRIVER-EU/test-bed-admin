@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -100,7 +101,7 @@ public class MgmtController {
 	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
-	private Map<String, List<TopicInvite>> clientInviteMsgMap = new HashMap<String, List<TopicInvite>>();
+	private Map<String, List<TopicInvite>> clientInviteMsgMap = new ConcurrentHashMap<String, List<TopicInvite>>();
 	private Boolean firstInvites = false;
 	
 	private HTTPUtils httpUtils = new HTTPUtils();
@@ -546,8 +547,9 @@ public class MgmtController {
 		}
 		configuration.setIsActive(true);
 		testbedConfigRepo.saveAndFlush(configuration);
-		
-		adminAdapter.closeAdapter();
+		if (adminAdapter != null) {
+			adminAdapter.closeAdapter();	
+		}
 		
 		// delete all topics and set the testbed init to false
 		List<Topic> topicList = topicRepo.findAll();
@@ -595,6 +597,7 @@ public class MgmtController {
 			if (invites != null) {
 				invites.forEach((inviteMsg) -> {
 					try {
+						logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg, true);
 						AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
 					} catch (Exception e) {
 						log.error("Error storing client invites!", e);
@@ -653,112 +656,6 @@ public class MgmtController {
 			}
 		});
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Core Topics created!", true);
-		
-		/*adminController.createTopic(TopicConstants.ADMIN_HEARTBEAT_TOPIC, new EDXLDistribution(), new AdminHeartbeat(), 300000L, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ADMIN_HEARTBEAT_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.ADMIN_HEARTBEAT_TOPIC, true);
-		sendTopicStateChange("core.topic.admin.hb", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.ADMIN_HEARTBEAT_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.HEARTBEAT_TOPIC, new EDXLDistribution(), new Heartbeat(), 300000L, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.HEARTBEAT_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.HEARTBEAT_TOPIC, true);
-		sendTopicStateChange("core.topic.hb", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.HEARTBEAT_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.LOGGING_TOPIC, new EDXLDistribution(), new Log(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.LOGGING_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.LOGGING_TOPIC, true);
-		sendTopicStateChange("core.topic.log", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.LOGGING_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.EVALUATION_LOGGING_TOPIC, new EDXLDistribution(), new Log(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.EVALUATION_LOGGING_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.EVALUATION_LOGGING_TOPIC, true);
-		sendTopicStateChange("core.topic.eval.log", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.EVALUATION_LOGGING_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.TIMING_TOPIC, new EDXLDistribution(), new Timing(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.TIMING_TOPIC, true);
-		sendTopicStateChange("core.topic.time", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.TIMING_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.TIMING_CONTROL_TOPIC, new EDXLDistribution(), new TimingControl(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TIMING_CONTROL_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.TIMING_CONTROL_TOPIC, true);
-		sendTopicStateChange("core.topic.time.control", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.TIMING_CONTROL_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.TOPIC_INVITE_TOPIC, new EDXLDistribution(), new TopicInvite(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_INVITE_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.TOPIC_INVITE_TOPIC, true);
-		sendTopicStateChange("core.topic.access.invite", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_INVITE_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, new EDXLDistribution(), new TopicCreate(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TOPIC_CREATE_REQUEST_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC, true);
-		sendTopicStateChange("core.topic.create.request", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.TOPIC_CREATE_REQUEST_TOPIC);
-		}
-				
-		adminController.createTopic(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, new EDXLDistribution(), new RequestChangeOfTrialStage(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.TRIAL_STATE_CHANGE_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.TRIAL_STATE_CHANGE_TOPIC, true);
-		sendTopicStateChange("core.topic.trial.stage.change", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.TRIAL_STATE_CHANGE_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.OST_ANSWER_TOPIC, new EDXLDistribution(), new ObserverToolAnswer(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.OST_ANSWER_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.OST_ANSWER_TOPIC, true);
-		sendTopicStateChange("core.topic.ost.answer", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.OST_ANSWER_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.PHASE_MESSAGE_TOPIC, new EDXLDistribution(), new PhaseMessage(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.PHASE_MESSAGE_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.PHASE_MESSAGE_TOPIC, true);
-		sendTopicStateChange("core.topic.tm.phasemessage", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.PHASE_MESSAGE_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.ROLE_PLAYER_TOPIC, new EDXLDistribution(), new RolePlayerMessage(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.ROLE_PLAYER_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.ROLE_PLAYER_TOPIC, true);
-		sendTopicStateChange("core.topic.tm.roleplayer", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.ROLE_PLAYER_TOPIC);
-		}
-		
-		adminController.createTopic(TopicConstants.SESSION_MGMT_TOPIC, new EDXLDistribution(), new SessionMgmt(), null, 1);
-		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + TopicConstants.SESSION_MGMT_TOPIC + " created.", true);
-		topicController.updateTopicState(TopicConstants.SESSION_MGMT_TOPIC, true);
-		sendTopicStateChange("core.topic.tm.sessionmgmt", true);
-		if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-			this.grantCoreTopicGroupAccess(TopicConstants.SESSION_MGMT_TOPIC);
-		}*/
-		
-		
 	}
 	
 	private void createTrialTopics() throws Exception {
@@ -768,176 +665,178 @@ public class MgmtController {
 		List<Topic> topics = topicController.getAllTrialTopicList();
 		
 		for (Topic topic : topics) {
-			int noOfPartitions = 1;
-			SpecificRecord schema = null;
-			if (topic.getMsgType() != null) {
-				if (topic.getMsgType().equalsIgnoreCase("cap")) {
-					schema = new Alert();
-				} else if (topic.getMsgType().equalsIgnoreCase("geojson")) {
-					schema = new FeatureCollection();
-				} else if (topic.getMsgType().equalsIgnoreCase("geojson-sim")) {
-					schema = new eu.driver.model.geojson.sim.FeatureCollection();
-				} else if (topic.getMsgType().equalsIgnoreCase("mlp")) {
-					schema = new SlRep();
-				} else if (topic.getMsgType().equalsIgnoreCase("emsi")) {
-					schema = new TSO_2_0();
-				} else if (topic.getMsgType().equalsIgnoreCase("largedata")) {
-					schema = new LargeDataUpdate();
-					noOfPartitions = 2;
-				} else if (topic.getMsgType().equalsIgnoreCase("maplayer")) {
-					schema = new MapLayerUpdate();
-				} else if (topic.getMsgType().equalsIgnoreCase("named-geojson")) {
-					schema = new GeoJSONEnvelope();
-				} else if (topic.getMsgType().equalsIgnoreCase("photo-geojson")) {
-					schema = new eu.driver.model.geojson.photo.FeatureCollection();
-				} else if (topic.getMsgType().equalsIgnoreCase("sim-post")) {
-					schema = new eu.driver.model.sim.entity.Post();
-				} else if (topic.getMsgType().equalsIgnoreCase("sim-startinject")) {
-					schema = new eu.driver.model.sim.request.RequestStartInject();
-				}
-				
-				if (schema != null) {
-					adminController.createTopic(topic.getName(), new EDXLDistribution(), schema, null, noOfPartitions);
-					logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
-					topicController.updateTopicState(topic.getName(), true);
-					sendTopicStateChange(topic.getClientId(), true);
-					// send invite message
-					
-					boolean allSolutionsPublish = false;
-					boolean allSolutionsSubscribe = false;
-					
-					List<String> publishClientIDs = topic.getPublishSolutionIDs();
-					List<String> subscribeClientIDs = topic.getSubscribedSolutionIDs();
-					
-					if (publishClientIDs.size() > 0) {
-						if (publishClientIDs.get(0).equalsIgnoreCase("all")) {
-							allSolutionsPublish = true;
-						}
+			if (!topic.getType().equalsIgnoreCase("core.topic")) {
+				int noOfPartitions = 1;
+				SpecificRecord schema = null;
+				if (topic.getMsgType() != null) {
+					if (topic.getMsgType().equalsIgnoreCase("cap")) {
+						schema = new Alert();
+					} else if (topic.getMsgType().equalsIgnoreCase("geojson")) {
+						schema = new FeatureCollection();
+					} else if (topic.getMsgType().equalsIgnoreCase("geojson-sim")) {
+						schema = new eu.driver.model.geojson.sim.FeatureCollection();
+					} else if (topic.getMsgType().equalsIgnoreCase("mlp")) {
+						schema = new SlRep();
+					} else if (topic.getMsgType().equalsIgnoreCase("emsi")) {
+						schema = new TSO_2_0();
+					} else if (topic.getMsgType().equalsIgnoreCase("largedata")) {
+						schema = new LargeDataUpdate();
+						noOfPartitions = 2;
+					} else if (topic.getMsgType().equalsIgnoreCase("maplayer")) {
+						schema = new MapLayerUpdate();
+					} else if (topic.getMsgType().equalsIgnoreCase("named-geojson")) {
+						schema = new GeoJSONEnvelope();
+					} else if (topic.getMsgType().equalsIgnoreCase("photo-geojson")) {
+						schema = new eu.driver.model.geojson.photo.FeatureCollection();
+					} else if (topic.getMsgType().equalsIgnoreCase("sim-post")) {
+						schema = new eu.driver.model.sim.entity.Post();
+					} else if (topic.getMsgType().equalsIgnoreCase("sim-startinject")) {
+						schema = new eu.driver.model.sim.request.RequestStartInject();
 					}
 					
-					if (subscribeClientIDs.size() > 0) {
-						if (subscribeClientIDs.get(0).equalsIgnoreCase("all")) {
-							allSolutionsSubscribe = true;
-						}
-					}
-					
-					List<TopicInvite> inviteMsgs = new ArrayList<TopicInvite>();
-
-					if (allSolutionsPublish && allSolutionsSubscribe) {
-						for (Solution solution: solutionList) {
-							if (!solution.getIsAdmin()) {
-								TopicInvite inviteMsg = new TopicInvite();
-								inviteMsg.setId(solution.getClientId());
-								inviteMsg.setTopicName(topic.getName());
-								inviteMsg.setPublishAllowed(true);
-								inviteMsg.setSubscribeAllowed(true);
-								
-								inviteMsgs.add(inviteMsg);
-							}
-						}
-					} else if (allSolutionsPublish && !allSolutionsSubscribe) {
-						for (Solution solution: solutionList) {
-							if (!solution.getIsAdmin()) {
-								TopicInvite inviteMsg = new TopicInvite();
-								inviteMsg.setId(solution.getClientId());
-								inviteMsg.setTopicName(topic.getName());
-								inviteMsg.setPublishAllowed(true);
-								inviteMsg.setSubscribeAllowed(false);
-								
-								// find the client ID in the list of subscribers
-								for (String clientID : subscribeClientIDs) {
-									if (clientID.equalsIgnoreCase(solution.getClientId())) {
-										inviteMsg.setSubscribeAllowed(true);
-										return;	
-									}
-								}
-								
-								inviteMsgs.add(inviteMsg);
-							}
-						}
-					} else if (!allSolutionsPublish && allSolutionsSubscribe) {
-						for (Solution solution: solutionList) {
-							if (!solution.getIsAdmin()) {
-								TopicInvite inviteMsg = new TopicInvite();
-								inviteMsg.setId(solution.getClientId());
-								inviteMsg.setTopicName(topic.getName());
-								inviteMsg.setSubscribeAllowed(true);
-								inviteMsg.setPublishAllowed(false);
-								// find the client ID in the list of subscribers
-								for (String clientID : publishClientIDs) {
-									if (clientID.equalsIgnoreCase(solution.getClientId())) {
-										inviteMsg.setPublishAllowed(true);
-										return;	
-									}
-								}
-								inviteMsgs.add(inviteMsg);
-							}
-						}
-					} else {
-						Map<String, Map<String, Boolean>> solutionMap = new HashMap<String, Map<String, Boolean>>();
+					if (schema != null) {
+						adminController.createTopic(topic.getName(), new EDXLDistribution(), schema, null, noOfPartitions);
+						logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
+						topicController.updateTopicState(topic.getName(), true);
+						sendTopicStateChange(topic.getClientId(), true);
+						// send invite message
 						
-						for (String clientID : publishClientIDs) {
-							Map<String, Boolean> flags = new HashMap<String, Boolean>();
-							flags.put("publishAllowed", true);
-							flags.put("subscribeAllowed", false);
-							solutionMap.put(clientID, flags);
-						}
-						for (String clientID : subscribeClientIDs) {
-							Map<String, Boolean> flags = solutionMap.get(clientID);
-							if (flags == null) {
-								flags = new HashMap<String, Boolean>();
-								flags.put("publishAllowed", false);
-								flags.put("subscribeAllowed", true);
-								solutionMap.put(clientID, flags);
-							} else {
-								flags.put("subscribeAllowed", true);
-								solutionMap.put(clientID, flags);
+						boolean allSolutionsPublish = false;
+						boolean allSolutionsSubscribe = false;
+						
+						List<String> publishClientIDs = topic.getPublishSolutionIDs();
+						List<String> subscribeClientIDs = topic.getSubscribedSolutionIDs();
+						
+						if (publishClientIDs.size() > 0) {
+							if (publishClientIDs.get(0).equalsIgnoreCase("all")) {
+								allSolutionsPublish = true;
 							}
 						}
 						
-						for (Map.Entry<String, Map<String, Boolean>> entry : solutionMap.entrySet())
-						{
-							Map<String, Boolean> flags = entry.getValue();
-							TopicInvite inviteMsg = new TopicInvite();
-							inviteMsg.setId(entry.getKey());
-							inviteMsg.setTopicName(topic.getName());
-							inviteMsg.setPublishAllowed(flags.get("publishAllowed"));
-							inviteMsg.setSubscribeAllowed(flags.get("subscribeAllowed"));
-							inviteMsgs.add(inviteMsg);
+						if (subscribeClientIDs.size() > 0) {
+							if (subscribeClientIDs.get(0).equalsIgnoreCase("all")) {
+								allSolutionsSubscribe = true;
+							}
 						}
-					}
-					for (TopicInvite inviteMsg : inviteMsgs) {
-						try {
-							logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg, true);
-							// grant the access to the topics vie the Security REST API
-							boolean sendInvite = true;
-							// check if adapter is in secure mode
-							if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-								sendInvite = grantTopicAccess(inviteMsg);
+						
+						List<TopicInvite> inviteMsgs = new ArrayList<TopicInvite>();
+	
+						if (allSolutionsPublish && allSolutionsSubscribe) {
+							for (Solution solution: solutionList) {
+								if (!solution.getIsAdmin()) {
+									TopicInvite inviteMsg = new TopicInvite();
+									inviteMsg.setId(solution.getClientId());
+									inviteMsg.setTopicName(topic.getName());
+									inviteMsg.setPublishAllowed(true);
+									inviteMsg.setSubscribeAllowed(true);
+									
+									inviteMsgs.add(inviteMsg);
+								}
+							}
+						} else if (allSolutionsPublish && !allSolutionsSubscribe) {
+							for (Solution solution: solutionList) {
+								if (!solution.getIsAdmin()) {
+									TopicInvite inviteMsg = new TopicInvite();
+									inviteMsg.setId(solution.getClientId());
+									inviteMsg.setTopicName(topic.getName());
+									inviteMsg.setPublishAllowed(true);
+									inviteMsg.setSubscribeAllowed(false);
+									
+									// find the client ID in the list of subscribers
+									for (String clientID : subscribeClientIDs) {
+										if (clientID.equalsIgnoreCase(solution.getClientId())) {
+											inviteMsg.setSubscribeAllowed(true);
+											return;	
+										}
+									}
+									
+									inviteMsgs.add(inviteMsg);
+								}
+							}
+						} else if (!allSolutionsPublish && allSolutionsSubscribe) {
+							for (Solution solution: solutionList) {
+								if (!solution.getIsAdmin()) {
+									TopicInvite inviteMsg = new TopicInvite();
+									inviteMsg.setId(solution.getClientId());
+									inviteMsg.setTopicName(topic.getName());
+									inviteMsg.setSubscribeAllowed(true);
+									inviteMsg.setPublishAllowed(false);
+									// find the client ID in the list of subscribers
+									for (String clientID : publishClientIDs) {
+										if (clientID.equalsIgnoreCase(solution.getClientId())) {
+											inviteMsg.setPublishAllowed(true);
+											return;	
+										}
+									}
+									inviteMsgs.add(inviteMsg);
+								}
+							}
+						} else {
+							Map<String, Map<String, Boolean>> solutionMap = new HashMap<String, Map<String, Boolean>>();
+							
+							for (String clientID : publishClientIDs) {
+								Map<String, Boolean> flags = new HashMap<String, Boolean>();
+								flags.put("publishAllowed", true);
+								flags.put("subscribeAllowed", false);
+								solutionMap.put(clientID, flags);
+							}
+							for (String clientID : subscribeClientIDs) {
+								Map<String, Boolean> flags = solutionMap.get(clientID);
+								if (flags == null) {
+									flags = new HashMap<String, Boolean>();
+									flags.put("publishAllowed", false);
+									flags.put("subscribeAllowed", true);
+									solutionMap.put(clientID, flags);
+								} else {
+									flags.put("subscribeAllowed", true);
+									solutionMap.put(clientID, flags);
+								}
 							}
 							
-							if (sendInvite) {
-								AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
-								try {
-									List<TopicInvite> invites = clientInviteMsgMap.get(inviteMsg.getId().toString());
-									if (invites == null) {
-										invites = new ArrayList<TopicInvite>();
-									}
-									invites.add(inviteMsg);
-									clientInviteMsgMap.put(inviteMsg.getId().toString(), invites);
-								} catch (Exception e) {
-									log.error("Error storing client invites!", e);
-								}
+							for (Map.Entry<String, Map<String, Boolean>> entry : solutionMap.entrySet())
+							{
+								Map<String, Boolean> flags = entry.getValue();
+								TopicInvite inviteMsg = new TopicInvite();
+								inviteMsg.setId(entry.getKey());
+								inviteMsg.setTopicName(topic.getName());
+								inviteMsg.setPublishAllowed(flags.get("publishAllowed"));
+								inviteMsg.setSubscribeAllowed(flags.get("subscribeAllowed"));
+								inviteMsgs.add(inviteMsg);
 							}
-						} catch (CommunicationException cEx) {
-							logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString(), true);
 						}
+						for (TopicInvite inviteMsg : inviteMsgs) {
+							try {
+								logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg, true);
+								// grant the access to the topics vie the Security REST API
+								boolean sendInvite = true;
+								// check if adapter is in secure mode
+								if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+									sendInvite = grantTopicAccess(inviteMsg);
+								}
+								
+								if (sendInvite) {
+									AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
+									try {
+										List<TopicInvite> invites = clientInviteMsgMap.get(inviteMsg.getId().toString());
+										if (invites == null) {
+											invites = new ArrayList<TopicInvite>();
+										}
+										invites.add(inviteMsg);
+										clientInviteMsgMap.put(inviteMsg.getId().toString(), invites);
+									} catch (Exception e) {
+										log.error("Error storing client invites!", e);
+									}
+								}
+							} catch (CommunicationException cEx) {
+								logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString(), true);
+							}
+						}
+						//first invites send
+						firstInvites = true;
+						
+					} else {
+						logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Trial specific Topic: " + topic.getName() + " could not be created, unknown schema: " + topic.getMsgType(), true);
 					}
-					//first invites send
-					firstInvites = true;
-					
-				} else {
-					logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Trial specific Topic: " + topic.getName() + " could not be created, unknown schema: " + topic.getMsgType(), true);
 				}
 			}
 		}

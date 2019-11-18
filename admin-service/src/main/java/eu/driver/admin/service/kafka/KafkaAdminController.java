@@ -79,6 +79,9 @@ public class KafkaAdminController {
             boolean topicExist = AdminUtils.topicExists(zkUtils, topicName);
             if (topicExist) {
             	AdminUtils.deleteTopic(zkUtils, topicName);
+            	while (AdminUtils.topicExists(zkUtils, topicName)) {
+                    //wait for topic to die
+                }
                 log.info("topic deleted: " + topicName);	
             }
         } catch (Exception ex) {
