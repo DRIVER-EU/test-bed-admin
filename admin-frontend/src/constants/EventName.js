@@ -4,4 +4,5 @@ export default {
   OPEN_SOLUTION_FORM: "openConfigureSolutionForm",
   OPEN_TOPIC_FORM: "'openConfigureTopicForm'",
   OPEN_GATEWAY_FORM: "openConfigureGatewayForm",
+  ORGANISATION_POPUP: "organisationPopup",
 }
