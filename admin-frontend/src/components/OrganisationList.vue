@@ -15,10 +15,10 @@
         <td style="white-space: nowrap;text-overflow: ellipsis;max-width: 200px;overflow: hidden;">{{props.item.orgName}}
         </td>
         <td class="text-xs-center">
-          <v-btn icon @click.native="editOrganisation(props.item.id)">
+          <v-btn icon @click.native="editOrganisation(props.item)">
             <v-icon>text_format</v-icon>
           </v-btn>
-          <v-btn icon @click.native="deleteOrganisation(props.item.id)">
+          <v-btn icon @click.native="deleteOrganisation(props.item)">
             <v-icon>delete_outline</v-icon>
           </v-btn>
         </td>
@@ -40,14 +40,14 @@
       },
     },
     methods: {
-      editOrganisation: function(id) {
+      editOrganisation: function(entity) {
         if (this.onEdit) {
-          this.onEdit(id);
+          this.onEdit(entity);
         }
       },
-      deleteOrganisation: function(id) {
+      deleteOrganisation: function(entity) {
         if (this.onDelete) {
-          this.onDelete(id);
+          this.onDelete(entity);
         }
       }
     },

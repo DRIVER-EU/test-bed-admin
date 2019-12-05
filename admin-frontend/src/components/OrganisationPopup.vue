@@ -10,13 +10,15 @@
         </v-card-title>
         <v-card-text>
           <div style="overflow-y:scroll;position:absolute;top:70px;bottom:60px;left:0px;right:0px;">
-            <organisation-list :on-edit="this.edit" :on-delete="this.delete"/>
+            <organisation-form v-if="this.isEditMode" :organisation="this.editedOrganisation" ref="form" />
+            <organisation-list v-else :on-edit="this.edit" :on-delete="this.delete"/>
           </div>
         </v-card-text>
         <v-card-actions style="position:absolute;bottom:0px;height:60px;left:0px;right:0px;">
-          <v-btn flat="flat" @click.native="dialog = false">Close</v-btn> <!-- color="green darken-1" -->
           <v-spacer></v-spacer>
+          <v-btn v-if="this.isEditMode" flat="flat" @click="cancel">Cancel</v-btn>
           <v-btn v-if="this.isEditMode" flat="flat" @click="save">Save</v-btn>
+          <v-btn v-if="!this.isEditMode" flat="flat" @click.native="dialog = false">Close</v-btn> <!-- color="green darken-1" -->
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -26,13 +28,15 @@
   import {eventBus} from '../main';
   import EventName from '../constants/EventName';
   import OrganisationList from './OrganisationList';
+  import OrganisationForm from './OrganisationForm';
 
   export default {
-    components: {OrganisationList},
+    components: {OrganisationList, OrganisationForm},
     data () {
       return {
         dialog: false,
         isEditMode: false,
+        editedOrganisation: null,
       };
     },
     computed: {
@@ -41,14 +45,23 @@
       create: function () {
         console.log("### CREATE ");
       },
-      edit: function (id) {
-        console.log("### EDIT ", id);
+      edit: function (entity) {
+        console.log("### EDIT ", entity.id);
+        this.isEditMode = true;
+        this.editedOrganisation = entity;
       },
-      delete: function (id) {
-        console.log("### DELETE ", id);
+      delete: function (entity) {
+        console.log("### DELETE ", entity.id);
       },
       save: function () {
-        console.log("### SAVE");
+        if (this.$refs.form.save()) {
+          this.isEditMode = false;
+          this.editedOrganisation = null;
+        }
+      },
+      cancel: function () {
+        this.isEditMode = false;
+        this.editedOrganisation = null;
       },
   },
     created () {
@@ -56,6 +69,7 @@
       eventBus.$on(EventName.ORGANISATION_POPUP, function (value) {
         vm.dialog = value.open;
         vm.isEditMode = false;
+        vm.editedOrganisation = null;
       });
     }
   };
