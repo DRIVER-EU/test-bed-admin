@@ -29,6 +29,7 @@
   import EventName from '../constants/EventName';
   import OrganisationList from './OrganisationList';
   import OrganisationForm from './OrganisationForm';
+  import {store} from '../store';
 
   export default {
     components: {OrganisationList, OrganisationForm},
@@ -43,15 +44,15 @@
     },
     methods: {
       create: function () {
-        console.log("### CREATE ");
+        this.editedOrganisation = null;
+        this.isEditMode = true;
       },
       edit: function (entity) {
-        console.log("### EDIT ", entity.id);
-        this.isEditMode = true;
         this.editedOrganisation = entity;
+        this.isEditMode = true;
       },
       delete: function (entity) {
-        console.log("### DELETE ", entity.id);
+        store.dispatch('removeOrganisation', entity);
       },
       save: function () {
         if (this.$refs.form.save()) {
