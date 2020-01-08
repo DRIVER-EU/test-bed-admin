@@ -16,15 +16,16 @@ import Urls from './constants/Urls'
 import Toolbar from './components/Toolbar'
 import DiagramPage from './pages/DiagramPage'
 import {webSocketConnection} from './service/WebSocketConnection'
+import OrganisationPopup from './components/OrganisationPopup';
 
-export const eventBus = new Vue()
+export const eventBus = new Vue();
 
-Vue.use(underscore)
+Vue.use(underscore);
 
 Vue.use(VueAxios, axios.create({
   baseURL: Urls.HTTP_BASE
-}))
-store.axios = Vue.prototype.axios
+}));
+store.axios = Vue.prototype.axios;
 
 webSocketConnection.connect();
 
@@ -36,17 +37,18 @@ Vue.use(Vuetify, {
     accent: '#8c9eff',
     error: '#b71c1c'
   }
-})
+});
 
-Vue.component('list-component', ListComponent)
-Vue.component('logs-table', LogsTable)
-Vue.component('configure-solution-form',ConfigureSolutionForm)
-Vue.component('configure-topic-form',ConfigureTopicForm)
-Vue.component('configure-gateway-form',ConfigureGatewayForm)
+Vue.component('list-component', ListComponent);
+Vue.component('logs-table', LogsTable);
+Vue.component('configure-solution-form',ConfigureSolutionForm);
+Vue.component('configure-topic-form',ConfigureTopicForm);
+Vue.component('configure-gateway-form',ConfigureGatewayForm);
 Vue.component('toolbar', Toolbar);
 Vue.component('diagram-page', DiagramPage);
+Vue.component('organisation-popup', OrganisationPopup);
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({
@@ -65,4 +67,4 @@ new Vue({
     this.$store.dispatch('getAllTopicTypes');
     this.$store.dispatch('getAllOrganisations');
   }
-})
+});

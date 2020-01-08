@@ -69,7 +69,7 @@
       description: ''
     }),
     created() {
-      const me = this
+      const me = this;
       this.clear = this.clear.bind(this);
       eventBus.$on(EventName.OPEN_GATEWAY_FORM, (item) => {
         me.editedItem = item;
@@ -98,16 +98,13 @@
             name: me.name,
             managingType: me.managingType,
             description: me.description
-          }
-
-          console.log("### X", gateway);
-
+          };
           if (this.editedItem) {
             store.dispatch('updateGateway', gateway);
           } else {
             store.dispatch('addGateway', gateway);
           }
-          me.clear()
+          me.clear();
           me.open = false
         }
       },

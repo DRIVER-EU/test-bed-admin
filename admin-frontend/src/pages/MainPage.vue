@@ -1,6 +1,10 @@
 <template>
   <v-app>
     <toolbar class="primary">
+      <v-btn @click="editOrganisations()">
+        <v-icon left>business_center</v-icon>
+        Organisations
+      </v-btn>
       <v-btn @click="openOverviewDiagramPage()">
         <v-icon left>insert_chart_outlined</v-icon>
         Overview
@@ -45,6 +49,7 @@
     <main>
       <Overview></Overview>
     </main>
+    <organisation-popup/>
   </v-app>
 </template>
 <script>
@@ -53,12 +58,16 @@
   import {configurationService} from '../service/ConfigurationService'
   import FetchButton from '../components/FetchButton'
   import {eventBus} from "../main"
+  import EventName from '../constants/EventName';
 
   export default {
     name: 'App',
     components: {Overview, FetchButton},
     methods:
       {
+        editOrganisations: function() {
+          eventBus.$emit(EventName.ORGANISATION_POPUP, {open: true});
+        },
         handleInitTestbedSuccess: function() {
           eventBus.$emit('showSnackbar', 'Testbed initialized.', 'success')
           this.$store.dispatch('initTestbedSuccess')

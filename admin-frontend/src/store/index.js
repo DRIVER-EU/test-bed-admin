@@ -139,6 +139,11 @@ export const store = new Vuex.Store({
         obj.state = payload.state
       }
     },
+    UPDATE_ORGANISATION (state, payload) {
+      const obj = state.organisations.find(obj => obj.id === payload.id);
+      const index = state.organisations.indexOf(obj);
+      state.organisations.splice(index, 1, payload);
+    },
     SET_SOLUTIONS (state, solutions) {
       state.solutions = [];
       solutions.forEach(solution => {
@@ -177,6 +182,16 @@ export const store = new Vuex.Store({
       const id = gateway.id;
       state.gateways = [...state.gateways.filter(s => s.id !== id)]
     },
+    SET_ORGANISATIONS (state, organisations) {
+      state.organisations = organisations;
+    },
+    ADD_ORGANISATION (state, entity) {
+      state.organisations.push(entity);
+    },
+    REMOVE_ORGANISATION (state, entity) {
+      const id = entity.id;
+      state.organisations = [...state.organisations.filter(s => s.id !== id)];
+    },
     GET_LOGS (state, data) {
       state.logEntries = [];
       data.logs.forEach(logEntry => {
@@ -208,9 +223,6 @@ export const store = new Vuex.Store({
     },
     SET_CURRENT_CONFIGURATION (state, currentConfiguration) {
       state.currentConfiguration = currentConfiguration
-    },
-    SET_ORGANISATIONS (state, organisations) {
-      state.organisations = organisations
     },
     SET_SOLUTION_CERTIFICATES (state, solutionCertificates) {
       state.solutionCertificates = solutionCertificates
@@ -300,6 +312,14 @@ export const store = new Vuex.Store({
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
     },
+    addOrganisation (context, solution) {
+      fetchService.performPost('addOrganisation', solution).then(response => {
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
+        context.commit('ADD_ORGANISATION', (response.data))
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
+      })
+    },
     updateSolution (context, solution) {
       fetchService.performPut('updateSolution', solution).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
@@ -320,6 +340,14 @@ export const store = new Vuex.Store({
       fetchService.performPut('updateTopic', topic).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
         context.commit('UPDATE_TOPIC', response.data);
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
+      })
+    },
+    updateOrganisation (context, solution) {
+      fetchService.performPut('updateOrganisation', solution).then(response => {
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
+        context.commit('UPDATE_ORGANISATION', response.data);
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
@@ -349,6 +377,15 @@ export const store = new Vuex.Store({
         context.commit('REMOVE_TOPIC', item)
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Topic was not deleted. (' + e + ')', 'error')
+      })
+    },
+    removeOrganisation (context, payload) {
+      const item = payload;
+      fetchService.performDelete('removeOrganisation/' + item.id).then(response => {
+        eventBus.$emit('showSnackbar', 'Organisation was deleted.', 'success');
+        context.commit('REMOVE_ORGANISATION', item)
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Organisation was not deleted. (' + e + ')', 'error')
       })
     },
     getAllStandards (context) {
