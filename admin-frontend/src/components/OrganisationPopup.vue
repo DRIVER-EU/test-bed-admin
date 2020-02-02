@@ -6,7 +6,7 @@
         <v-card-title class="headline">
           Organisations
           <v-spacer></v-spacer>
-          <v-btn flat="flat" @click="create">Create</v-btn>
+          <v-btn v-if="!this.isEditMode" flat="flat" @click="create">Create</v-btn>
         </v-card-title>
         <v-card-text>
           <div style="overflow-y:scroll;position:absolute;top:70px;bottom:60px;left:0px;right:0px;">
