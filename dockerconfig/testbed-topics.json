@@ -3,7 +3,8 @@
 		"id": "core.topic.admin.hb",
 		"type": "core.topic",
 		"name": "system_admin_heartbeat",
-		"msgType": "admin_hb",
+		"msgType": "AdminHeartbeat",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -18,7 +19,8 @@
 		"id": "core.topic.hb",
 		"type": "core.topic",
 		"name": "system_heartbeat",
-		"msgType": "hb",
+		"msgTypeNamespace": "eu.driver.model.core",
+		"msgType": "Hearbeat",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -32,7 +34,8 @@
 	{
 		"id": "core.topic.log",
 		"type": "core.topic",
-		"name": "system_logging",
+		"name": "Log",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgType": "log",
 		"msgTypeVersion":"1.0",
 		"state": false,
@@ -48,7 +51,8 @@
 		"id": "core.topic.eval.log",
 		"type": "core.topic",
 		"name": "system_evaluation_logging",
-		"msgType": "log",
+		"msgType": "Log",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -63,7 +67,8 @@
 		"id": "core.topic.access.invite",
 		"type": "core.topic",
 		"name": "system_topic_access_invite",
-		"msgType": "topic_invite",
+		"msgType": "TopicInvite",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -78,7 +83,8 @@
 		"id": "core.topic.create.request",
 		"type": "core.topic",
 		"name": "system_topic_create_request",
-		"msgType": "topic_create_request",
+		"msgType": "TopicCreate",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -93,7 +99,8 @@
 		"id": "core.topic.time",
 		"type": "core.topic",
 		"name": "system_timing",
-		"msgType": "timing",
+		"msgType": "Timing",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -108,7 +115,8 @@
 		"id": "core.topic.time.control",
 		"type": "core.topic",
 		"name": "system_timing_control",
-		"msgType": "timing_control",
+		"msgType": "TimingControl",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -123,7 +131,8 @@
 		"id": "core.topic.tm.phasemessage",
 		"type": "core.topic",
 		"name": "system_tm_phase_message",
-		"msgType": "phase_msg",
+		"msgType": "PhaseMessage",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -138,7 +147,8 @@
 		"id": "core.topic.tm.roleplayer",
 		"type": "core.topic",
 		"name": "system_tm_role_player",
-		"msgType": "role_player",
+		"msgType": "RolePlayerMessage",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -153,7 +163,8 @@
 		"id": "core.topic.tm.sessionmgmt",
 		"type": "core.topic",
 		"name": "system_tm_session_mgmt",
-		"msgType": "session",
+		"msgType": "SessionMessage",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -168,7 +179,8 @@
 		"id": "core.topic.ost.answer",
 		"type": "core.topic",
 		"name": "system_observer_tool_answer",
-		"msgType": "ost",
+		"msgType": "ObserverToolAnswer",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -183,7 +195,8 @@
 		"id": "core.topic.trial.stage.change",
 		"type": "core.topic",
 		"name": "system_request_change_of_trial_stage",
-		"msgType": "trial_stage",
+		"msgType": "RequestChangeOfTrialStage",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
