@@ -6,13 +6,20 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -23,6 +30,10 @@ import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 
+import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
+import org.apache.avro.Schema.Parser;
+import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -47,6 +58,7 @@ import eu.driver.adapter.excpetion.CommunicationException;
 import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
 import eu.driver.admin.service.constants.TestbedSecurityMode;
+import eu.driver.admin.service.dto.UploadedSchemaRecord;
 import eu.driver.admin.service.dto.configuration.Configuration;
 import eu.driver.admin.service.dto.configuration.TestbedConfig;
 import eu.driver.admin.service.dto.gateway.Gateway;
@@ -65,6 +77,7 @@ import eu.driver.admin.service.repository.SolutionRepository;
 import eu.driver.admin.service.repository.StandardRepository;
 import eu.driver.admin.service.repository.TestbedConfigRepository;
 import eu.driver.admin.service.repository.TopicRepository;
+import eu.driver.admin.service.util.TopicInviteUtil;
 import eu.driver.admin.service.ws.WSController;
 import eu.driver.admin.service.ws.mapper.StringJSONMapper;
 import eu.driver.admin.service.ws.object.WSTopicCreationNotification;
@@ -105,6 +118,7 @@ public class MgmtController {
 	private Boolean firstInvites = false;
 	
 	private HTTPUtils httpUtils = new HTTPUtils();
+	private TopicInviteUtil topicUtil = new TopicInviteUtil();
 	
 	@Autowired
 	LogRESTController logController;
@@ -114,6 +128,9 @@ public class MgmtController {
 	
 	@Autowired
 	OrganisationRESTController organisationController;
+	
+	@Autowired
+	HeartbeatController heartbeatController;
 	
 	@Autowired
 	SolutionRESTController solutionController;
@@ -159,7 +176,6 @@ public class MgmtController {
 	private String tbTopicConfigJson = "config/testbed-topics.json";
 	private String topicConfigJson = "config/topics.json";
 	private String gwConfigJson = "config/gateways.json";
-	private String stConfigJson = "config/standards.json";
 	private String configurationsJson = "config/configurations.json";
 	
 	public MgmtController() {
@@ -177,6 +193,14 @@ public class MgmtController {
 		
 		if (solutionController != null) {
 			solutionController.mgmtController = this;
+		}
+		
+		if (topicController != null) {
+			topicController.mgmtController = this;
+		}
+		
+		if (gatewayController != null) {
+			gatewayController.mgmtController = this;
 		}
 	}
 	
@@ -268,12 +292,17 @@ public class MgmtController {
 		if (solutionController != null) {
 			solutionController.mgmtController = this;
 		}
+		if (gatewayController != null) {
+			gatewayController.mgmtController = this;
+		}
 		
 		try {
 			createAllCoreTopics();
 			adminAdapter = AdminAdapter.getInstance();
-			adminAdapter.addCallback(solutionController, TopicConstants.HEARTBEAT_TOPIC);
+			adminAdapter.addCallback(heartbeatController, TopicConstants.HEARTBEAT_TOPIC);
 			adminAdapter.addCallback(logController, TopicConstants.LOGGING_TOPIC);
+			adminAdapter.addCallback(topicController, TopicConstants.TOPIC_CREATE_REQUEST_TOPIC);
+			adminAdapter.addCallback(topicController, TopicConstants.TOPIC_REMOVE_REQUEST_TOPIC);
 			initDone = true;
 		} catch (Exception e) {
 			log.error("Error creating the Core Topics!", e);
@@ -497,22 +526,6 @@ public class MgmtController {
 		
 	}
 	
-	@ApiOperation(value = "getAllConfigurations", nickname = "getAllConfigurations")
-	@RequestMapping(value = "/AdminService/getAllConfigurations", method = RequestMethod.GET)
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Success", response = List.class),
-			@ApiResponse(code = 400, message = "Bad Request", response = List.class),
-			@ApiResponse(code = 500, message = "Failure", response = List.class) })
-	public ResponseEntity<List<Configuration>> getAllConfigurations() {
-		log.info("-->getAllConfigurations");
-		List<Configuration> configurations =  null;
-		
-		configurations = configRepo.findAll();
-		
-		log.info("getAllConfigurations-->");
-		return new ResponseEntity<List<Configuration>>(configurations, HttpStatus.OK);
-	}
-	
 	@ApiOperation(value = "getActTestbedConfig", nickname = "getActTestbedConfig")
 	@RequestMapping(value = "/AdminService/getActTestbedConfig", method = RequestMethod.GET)
 	@ApiResponses(value = {
@@ -607,6 +620,36 @@ public class MgmtController {
 		}
 	}
 	
+	public void sendTopicInvites(String topicName, List<TopicInvite> inviteMsgs) {
+		for (TopicInvite inviteMsg : inviteMsgs) {
+			try {
+				logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg, true);
+				// grant the access to the topics vie the Security REST API
+				boolean sendInvite = true;
+				// check if adapter is in secure mode
+				if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
+					sendInvite = grantTopicAccess(inviteMsg);
+				}
+				
+				if (sendInvite) {
+					AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
+					try {
+						List<TopicInvite> invites = clientInviteMsgMap.get(inviteMsg.getId().toString());
+						if (invites == null) {
+							invites = new ArrayList<TopicInvite>();
+						}
+						invites.add(inviteMsg);
+						clientInviteMsgMap.put(inviteMsg.getId().toString(), invites);
+					} catch (Exception e) {
+						log.error("Error storing client invites!", e);
+					}
+				}
+			} catch (CommunicationException cEx) {
+				logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topicName + " could not be send to client: " + inviteMsg.getId().toString(), true);
+			}
+		}
+	}
+	
 	private void createAllCoreTopics() throws Exception {
 		logController.addLog(LogLevels.LOG_LEVEL_INFO, "Creating core Topics!", true);
 		
@@ -615,29 +658,29 @@ public class MgmtController {
 			try {
 				if (topic.getMsgType() != null) {
 					SpecificRecord schema = null;
-					if (topic.getMsgType().equalsIgnoreCase("admin_hb")) {
+					if (topic.getMsgType().equalsIgnoreCase("AdminHeartbeat")) {
 						schema = new AdminHeartbeat();
-					} else if (topic.getMsgType().equalsIgnoreCase("hb")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("Heartbeat")) {
 						schema = new Heartbeat();
-					} else if (topic.getMsgType().equalsIgnoreCase("log")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("Log")) {
 						schema = new Log();
-					} else if (topic.getMsgType().equalsIgnoreCase("topic_invite")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("TopicInvite")) {
 						schema = new TopicInvite();
-					} else if (topic.getMsgType().equalsIgnoreCase("topic_create_request")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("TopicCreate")) {
 						schema = new TopicCreate();
-					} else if (topic.getMsgType().equalsIgnoreCase("timing")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("Timing")) {
 						schema = new Timing();
-					} else if (topic.getMsgType().equalsIgnoreCase("timing_control")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("TimingControl")) {
 						schema = new TimingControl();
-					} else if (topic.getMsgType().equalsIgnoreCase("phase_msg")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("PhaseMessage")) {
 						schema = new PhaseMessage();
-					} else if (topic.getMsgType().equalsIgnoreCase("role_player")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("RolePlayerMessage")) {
 						schema = new RolePlayerMessage();
-					} else if (topic.getMsgType().equalsIgnoreCase("session")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("SessionMgmt")) {
 						schema = new SessionMgmt();
-					} else if (topic.getMsgType().equalsIgnoreCase("ost")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("ObserverToolAnswer")) {
 						schema = new ObserverToolAnswer();
-					} else if (topic.getMsgType().equalsIgnoreCase("trial_stage")) {
+					} else if (topic.getMsgType().equalsIgnoreCase("RequestChangeOfTrialStage")) {
 						schema = new RequestChangeOfTrialStage();
 					}
 					
@@ -667,31 +710,19 @@ public class MgmtController {
 		for (Topic topic : topics) {
 			if (!topic.getType().equalsIgnoreCase("core.topic")) {
 				int noOfPartitions = 1;
-				SpecificRecord schema = null;
+				IndexedRecord schema = null;
 				if (topic.getMsgType() != null) {
-					if (topic.getMsgType().equalsIgnoreCase("cap")) {
-						schema = new Alert();
-					} else if (topic.getMsgType().equalsIgnoreCase("geojson")) {
-						schema = new FeatureCollection();
-					} else if (topic.getMsgType().equalsIgnoreCase("geojson-sim")) {
-						schema = new eu.driver.model.geojson.sim.FeatureCollection();
-					} else if (topic.getMsgType().equalsIgnoreCase("mlp")) {
-						schema = new SlRep();
-					} else if (topic.getMsgType().equalsIgnoreCase("emsi")) {
-						schema = new TSO_2_0();
-					} else if (topic.getMsgType().equalsIgnoreCase("largedata")) {
-						schema = new LargeDataUpdate();
-						noOfPartitions = 2;
-					} else if (topic.getMsgType().equalsIgnoreCase("maplayer")) {
-						schema = new MapLayerUpdate();
-					} else if (topic.getMsgType().equalsIgnoreCase("named-geojson")) {
-						schema = new GeoJSONEnvelope();
-					} else if (topic.getMsgType().equalsIgnoreCase("photo-geojson")) {
-						schema = new eu.driver.model.geojson.photo.FeatureCollection();
-					} else if (topic.getMsgType().equalsIgnoreCase("sim-post")) {
-						schema = new eu.driver.model.sim.entity.Post();
-					} else if (topic.getMsgType().equalsIgnoreCase("sim-startinject")) {
-						schema = new eu.driver.model.sim.request.RequestStartInject();
+					try {
+						Standard standard = standardRepo.findObjectByNameAndNamespace(topic.getMsgType(), topic.getMsgTypeNamespace());
+						if (this.standardRepo.findObjectByNameAndNamespace(topic.getMsgType(), standard.getNamespace()) == null) {
+							Parser parser = new Parser();
+							schema = new UploadedSchemaRecord(parser.parse(
+									this.getClass().getResourceAsStream(standard.getFileName())));	
+						}	
+					} catch (Exception e) {
+						logController.addLog(LogLevels.LOG_LEVEL_ERROR, 
+								"Error loading schema for: " + topic.getMsgType() + " for topic: " + topic.getName(), 
+								true);
 					}
 					
 					if (schema != null) {
@@ -701,138 +732,15 @@ public class MgmtController {
 						sendTopicStateChange(topic.getClientId(), true);
 						// send invite message
 						
-						boolean allSolutionsPublish = false;
-						boolean allSolutionsSubscribe = false;
 						
-						List<String> publishClientIDs = topic.getPublishSolutionIDs();
-						List<String> subscribeClientIDs = topic.getSubscribedSolutionIDs();
+						List<TopicInvite> inviteMsgs = topicUtil.createTopicInviteMessages(topic.getName(),
+									solutionList, topic.getPublishSolutionIDs(), topic.getSubscribedSolutionIDs());
 						
-						if (publishClientIDs.size() > 0) {
-							if (publishClientIDs.get(0).equalsIgnoreCase("all")) {
-								allSolutionsPublish = true;
-							}
-						}
-						
-						if (subscribeClientIDs.size() > 0) {
-							if (subscribeClientIDs.get(0).equalsIgnoreCase("all")) {
-								allSolutionsSubscribe = true;
-							}
-						}
-						
-						List<TopicInvite> inviteMsgs = new ArrayList<TopicInvite>();
-	
-						if (allSolutionsPublish && allSolutionsSubscribe) {
-							for (Solution solution: solutionList) {
-								if (!solution.getIsAdmin()) {
-									TopicInvite inviteMsg = new TopicInvite();
-									inviteMsg.setId(solution.getClientId());
-									inviteMsg.setTopicName(topic.getName());
-									inviteMsg.setPublishAllowed(true);
-									inviteMsg.setSubscribeAllowed(true);
-									
-									inviteMsgs.add(inviteMsg);
-								}
-							}
-						} else if (allSolutionsPublish && !allSolutionsSubscribe) {
-							for (Solution solution: solutionList) {
-								if (!solution.getIsAdmin()) {
-									TopicInvite inviteMsg = new TopicInvite();
-									inviteMsg.setId(solution.getClientId());
-									inviteMsg.setTopicName(topic.getName());
-									inviteMsg.setPublishAllowed(true);
-									inviteMsg.setSubscribeAllowed(false);
-									
-									// find the client ID in the list of subscribers
-									for (String clientID : subscribeClientIDs) {
-										if (clientID.equalsIgnoreCase(solution.getClientId())) {
-											inviteMsg.setSubscribeAllowed(true);
-											return;	
-										}
-									}
-									
-									inviteMsgs.add(inviteMsg);
-								}
-							}
-						} else if (!allSolutionsPublish && allSolutionsSubscribe) {
-							for (Solution solution: solutionList) {
-								if (!solution.getIsAdmin()) {
-									TopicInvite inviteMsg = new TopicInvite();
-									inviteMsg.setId(solution.getClientId());
-									inviteMsg.setTopicName(topic.getName());
-									inviteMsg.setSubscribeAllowed(true);
-									inviteMsg.setPublishAllowed(false);
-									// find the client ID in the list of subscribers
-									for (String clientID : publishClientIDs) {
-										if (clientID.equalsIgnoreCase(solution.getClientId())) {
-											inviteMsg.setPublishAllowed(true);
-											return;	
-										}
-									}
-									inviteMsgs.add(inviteMsg);
-								}
-							}
-						} else {
-							Map<String, Map<String, Boolean>> solutionMap = new HashMap<String, Map<String, Boolean>>();
-							
-							for (String clientID : publishClientIDs) {
-								Map<String, Boolean> flags = new HashMap<String, Boolean>();
-								flags.put("publishAllowed", true);
-								flags.put("subscribeAllowed", false);
-								solutionMap.put(clientID, flags);
-							}
-							for (String clientID : subscribeClientIDs) {
-								Map<String, Boolean> flags = solutionMap.get(clientID);
-								if (flags == null) {
-									flags = new HashMap<String, Boolean>();
-									flags.put("publishAllowed", false);
-									flags.put("subscribeAllowed", true);
-									solutionMap.put(clientID, flags);
-								} else {
-									flags.put("subscribeAllowed", true);
-									solutionMap.put(clientID, flags);
-								}
-							}
-							
-							for (Map.Entry<String, Map<String, Boolean>> entry : solutionMap.entrySet())
-							{
-								Map<String, Boolean> flags = entry.getValue();
-								TopicInvite inviteMsg = new TopicInvite();
-								inviteMsg.setId(entry.getKey());
-								inviteMsg.setTopicName(topic.getName());
-								inviteMsg.setPublishAllowed(flags.get("publishAllowed"));
-								inviteMsg.setSubscribeAllowed(flags.get("subscribeAllowed"));
-								inviteMsgs.add(inviteMsg);
-							}
-						}
-						for (TopicInvite inviteMsg : inviteMsgs) {
-							try {
-								logController.addLog("INFO", "Send Topic InviteMsg: " + inviteMsg, true);
-								// grant the access to the topics vie the Security REST API
-								boolean sendInvite = true;
-								// check if adapter is in secure mode
-								if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
-									sendInvite = grantTopicAccess(inviteMsg);
-								}
-								
-								if (sendInvite) {
-									AdminAdapter.getInstance().sendTopicInviteMessage(inviteMsg);
-									try {
-										List<TopicInvite> invites = clientInviteMsgMap.get(inviteMsg.getId().toString());
-										if (invites == null) {
-											invites = new ArrayList<TopicInvite>();
-										}
-										invites.add(inviteMsg);
-										clientInviteMsgMap.put(inviteMsg.getId().toString(), invites);
-									} catch (Exception e) {
-										log.error("Error storing client invites!", e);
-									}
-								}
-							} catch (CommunicationException cEx) {
-								logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Topic invite for topic: " + topic.getName() + " could not be send to client: " + inviteMsg.getId().toString(), true);
-							}
-						}
+						this.sendTopicInvites(topic.getName(), inviteMsgs);
+
 						//first invites send
 						firstInvites = true;
+						topicController.setInvitesSend(true);
 						
 					} else {
 						logController.addLog(LogLevels.LOG_LEVEL_ERROR, "Trial specific Topic: " + topic.getName() + " could not be created, unknown schema: " + topic.getMsgType(), true);
@@ -921,7 +829,8 @@ public class MgmtController {
 				topic.setType(jsonobject.getString("type"));
 				topic.setName(jsonobject.getString("name"));
 				
-				if (jsonobject.has("msgType")) {
+				if (jsonobject.has("msgType") && jsonobject.has("msgTypeNamespace")) {
+					topic.setMsgTypeNamespace(jsonobject.getString("msgTypeNamespace"));
 					topic.setMsgType(jsonobject.getString("msgType"));
 					topic.setMsgTypeVersion(jsonobject.getString("msgTypeVersion"));
 				}
@@ -1009,7 +918,7 @@ public class MgmtController {
 	
 	private void loadStandards() {
 		log.info("--> loadStandards");
-		String standardJson = fileReader.readFile(this.stConfigJson);
+		/*String standardJson = fileReader.readFile(this.stConfigJson);
 		if (standardJson != null) {
 			try {
 				JSONArray jsonarray = new JSONArray(standardJson);
@@ -1023,7 +932,43 @@ public class MgmtController {
 			} catch (JSONException | IOException e) {
 				log.error("Error parsind the JSON Standard response", e);
 			}
+		}*/
+		
+		try {
+			List<Path> fileWithName = Files.walk(Paths.get("./config/schema"))
+		            .filter(s -> s.toAbsolutePath().normalize().toString().endsWith("-value.avsc"))
+		            .sorted().collect(Collectors.toList());
+	
+		    for (Path name : fileWithName) {
+		    	try {
+		    		Parser parser = new Parser();
+			    	Standard standard = new Standard();
+			    	
+			    	Schema mSchema = parser.parse(new BufferedInputStream(new FileInputStream(name.toAbsolutePath().normalize().toString())));
+				    standard.setName(mSchema.getName());
+				    String version = mSchema.getProp("version");
+				    if (version == null) {
+				    	version = "1.0";
+				    }
+				    standard.setNamespace(mSchema.getNamespace());
+				    standard.setFileName(name.toString());
+				    List<String> versions = new ArrayList<String>();
+				    versions.add(version);
+				    standard.setVersions(versions);
+				    if (this.standardRepo.findObjectByNameAndNamespace(standard.getName(), standard.getNamespace()) == null) {
+						this.standardRepo.saveAndFlush(standard);
+						log.info("add standard: " + standard.getNamespace() + "." + standard.getName());
+					} else {
+						log.info("standard already available: " + standard.getNamespace() + "." + standard.getName());
+					}
+		    	} catch (Exception e) {
+		    		log.error("Error loading schema file: " + name.toAbsolutePath().normalize().toString());
+		    	}
+		    }
+		} catch (Exception e) {
+			log.error("Error parsing schema directory", e);
 		}
+		
 		log.info("loadStandards -->");
 	}
 	

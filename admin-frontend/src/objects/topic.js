@@ -5,6 +5,7 @@ export function Topic(topic) {
     this.name= topic.name,
     this.state = topic.state || false,
     this.msgType = topic.msgType,
+    this.msgTypeNamespace = topic.msgTypeNamespace,
     this.msgTypeVersion = topic.msgTypeVersion,
     this.description = topic.description,
     this.publishSolutionIDs = topic.publishSolutionIDs,

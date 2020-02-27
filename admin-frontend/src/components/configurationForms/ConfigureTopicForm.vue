@@ -30,6 +30,7 @@
             :items=standardNames
             v-model="standard"
             label="Select standard"
+            :disabled=!type
           ></v-select>
           <v-select
             :items=items.standardVersions
@@ -83,15 +84,17 @@
       clientId: '',
       clientIdRules: [
         v => !!v || 'ID is required',
-        v => (v && v.length <= 25) || 'Max. 25 characters allowed.'
+        v => (v && v.length <= 255) || 'Max. 255 characters allowed.'
       ],
       name: '',
       nameRules: [
         v => !!v || 'Name is required',
-        v => (v && v.length <= 25) || 'Max. 25 characters allowed.'
+        v => (v && v.length <= 255) || 'Max. 255 characters allowed.'
       ],
       type: null,
       standard: null,
+      standardName: null,
+      standardNamespace: null,
       standardVersion: null,
       publishSolutionIDs: [],
       subscribedSolutionIDs: [],
@@ -102,18 +105,14 @@
       description: ''
     }),
     computed: {
-      standards: function () {
-        return this.$store.getters.standards
-      },
-      standardNames: function () {
-        return this.$store.getters.standardNames
-      },
       topicTypes: function () {
         return this.$store.getters.topicTypes
       },
     },
     created() {
       const me = this;
+      this.standardNames = [];
+      this.allStandards = [];
       this.clear = this.clear.bind(this);
       eventBus.$on(EventName.OPEN_TOPIC_FORM, (item) => {
         me.editedItem = item;
@@ -122,7 +121,9 @@
           me.clientId = item.clientId;
           me.name = item.name;
           me.type = item.type;
-          me.standard = item.msgType;
+          me.standard = item.msgTypeNamespace + '/' + item.msgType;
+          me.standardName = item.msgType;
+          me.standardNamespace = item.msgTypeNamespace;
           me.standardVersion = item.msgTypeVersion;
           me.publishSolutionIDs = item.publishSolutionIDs;
           me.subscribedSolutionIDs = item.subscribedSolutionIDs;
@@ -147,7 +148,8 @@
             clientId: me.clientId,
             name: me.name,
             type: me.type,
-            msgType: me.standard,
+            msgType: me.standardName,
+            msgTypeNamespace: me.standardNamespace,
             msgTypeVersion: me.standardVersion,
             publishSolutionIDs: me.publishSolutionIDs,
             subscribedSolutionIDs: me.subscribedSolutionIDs,
@@ -170,6 +172,8 @@
         me.name = "";
         me.type = null;
         me.standard = null;
+        me.standardName = null;
+        me.standardNamespace  = null;
         me.standardVersion = null;
         me.publishSolutionIDs = [];
         me.subscribedSolutionIDs = [];
@@ -177,9 +181,19 @@
       }
     },
     watch: {
+      type: function (selectedType) {
+        this.standardNames = [];
+        this.allStandards = this.$store.getters.standards;
+        this.allStandards.forEach(function(obj) {
+        	this.standardNames.push(obj.namespace + '/' + obj.name)
+        }, this)
+      },
       standard: function (selectedStandardName) {
-        var obj = this.standards.find(obj => {
-          return obj.name === selectedStandardName
+        var fields = selectedStandardName.split('/');
+        this.standardNamespace = fields[0];
+        this.standardName = fields[1];
+        var obj = this.allStandards.find(obj => {
+          return obj.name === fields[1] && obj.namespace === fields[0]
         })
         if (obj && obj.versions)
           this.items.standardVersions = obj.versions

@@ -53,9 +53,13 @@ public class Topic {
 	@Column(name="state")
 	private Boolean state = false;
 	
-	@Column(name="msgType", length=25)
-	@Size(min = 1, max = 25)
+	@Column(name="msgType", length=255)
+	@Size(min = 1, max = 255)
 	private String msgType = null;
+	
+	@Column(name="msgTypeNamespace", length=1024)
+	@Size(min = 1, max = 1024)
+	private String msgTypeNamespace = null;
 	
 	@Column(name="msgTypeVersion", length=25)
 	@Size(min = 1, max = 25)
@@ -132,6 +136,14 @@ public class Topic {
 
 	public void setMsgType(String msgType) {
 		this.msgType = msgType;
+	}
+
+	public String getMsgTypeNamespace() {
+		return msgTypeNamespace;
+	}
+
+	public void setMsgTypeNamespace(String msgTypeNamespace) {
+		this.msgTypeNamespace = msgTypeNamespace;
 	}
 
 	public String getMsgTypeVersion() {

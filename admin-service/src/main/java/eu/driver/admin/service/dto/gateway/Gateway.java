@@ -1,6 +1,7 @@
 package eu.driver.admin.service.dto.gateway;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CollectionTable;
@@ -40,12 +41,17 @@ public class Gateway {
 	@Size(min = 4, max = 255)
 	private String name = null;
 	
+	@Column(name="origin", columnDefinition="text")
+	private String origin = null;
+	
 	@Column(name="state")
 	private Boolean state = false;
 	
 	@Column(name="description", columnDefinition="text")
 	private String description = null;
 	
+	@Column(name="lastHeartBeatReceived")
+	private Date lastHeartBeatReceived = null;
 	
 	@ElementCollection
 	@CollectionTable(name="managingTypes", schema="admin_service", joinColumns=@JoinColumn(name="id"))
@@ -79,6 +85,14 @@ public class Gateway {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
 
 	public Boolean getState() {
 		return state;
@@ -94,6 +108,14 @@ public class Gateway {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public Date getLastHeartBeatReceived() {
+		return lastHeartBeatReceived;
+	}
+
+	public void setLastHeartBeatReceived(Date lastHeartBeatReceived) {
+		this.lastHeartBeatReceived = lastHeartBeatReceived;
 	}
 
 	public List<String> getManagingType() {

@@ -8,10 +8,10 @@
 	<parent>
 		<groupId>driver.eu</groupId>
 		<artifactId>admin-tool</artifactId>
-		<version>1.2.48</version>
+		<version>2.0.0</version>
 	</parent>
 
-	<name>DRIVER Admin Tool REST Backend</name>
+	<name>DRIVER+ Admin Tool REST Backend</name>
 	<url>http://www.driverproject.eu</url>
 
 	<repositories>
@@ -36,8 +36,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<testbed.adaptor.version>1.2.27</testbed.adaptor.version>
+		<testbed.adaptor.version>2.0.0</testbed.adaptor.version>
 		<maven.shade.version>3.1.0</maven.shade.version>
+		<springfox.version>2.8.0</springfox.version>
 		<maven.compiler.version>3.7.0</maven.compiler.version>
 		<docker.image.prefix>springio</docker.image.prefix>
 		<project.build.finalName>AdminTool</project.build.finalName>
@@ -92,7 +93,7 @@
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
-			<version>2.8.0</version>
+			<version>${springfox.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-api</artifactId>
@@ -103,7 +104,7 @@
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
-			<version>2.8.0</version>
+			<version>${springfox.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-api</artifactId>
@@ -128,8 +129,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_2.11</artifactId>
-			<version>2.0.0</version>
+			<artifactId>kafka_2.13</artifactId>
+			<version>2.4.0</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-log4j12</artifactId>

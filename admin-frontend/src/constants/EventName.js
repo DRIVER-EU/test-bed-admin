@@ -5,4 +5,6 @@ export default {
   OPEN_TOPIC_FORM: "'openConfigureTopicForm'",
   OPEN_GATEWAY_FORM: "openConfigureGatewayForm",
   ORGANISATION_POPUP: "organisationPopup",
+  CONFIGURATION_POPUP: "configurationPopup",
+  SCHEMA_POPUP: "schemaPopup",
 }

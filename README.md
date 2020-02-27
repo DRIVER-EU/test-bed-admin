@@ -83,10 +83,33 @@ Corrently the AdminTool supports following msgTypes:
 * mlp
 * geojson
 * geojson-sim
+* geojson-photo
 * named-geojson
 
 ## Gateway configuration
 Gateways are more or less solutions in the testbed but they have additional configuration properties and therefor they are handled seperately. Like solutions gateways send heartbeat messages and are marked as up or down in the Admin tool.
+
+## TTI Configurations
+The TTI configuration can be created via json file that is loaded on admintool startup, or on the fly via the admintool gui. All
+configurations that are available can be displayed by clicking the Configurations button in the top menu. 
+![AdminTool TTI configurations](images/Configurations.PNG)
+
+For creating a new configuration, a click on the Create button opens the create configuration form.
+![AdminTool creation of TTI configuration](images/NewConfiguration.PNG)
+
+## Organisations
+For grantig the access to the TTI and to topics a known organisation needs be be available. By clicking on the Organisations button,
+the list of current configured organisations is displayed.
+![AdminTool organisations](images/Organisations.PNG)
+
+Organistion can be edited and removed by clicking the corresponding icons.
+
+For creating a new organisation, a click on the Create button opens the create organisation form.
+![AdminTool creation of organisation](images/NewOrganisation.PNG)
+
+## Schema File Upload
+If you want to use your own created schema or any other that is not supported, you have the possibility to upload the schema file
+so that you can register this to specific topics.
 
 # Initialize the testbed
 After calling the Admin tool, it displays all information configured for the trial

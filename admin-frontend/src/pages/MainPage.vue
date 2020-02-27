@@ -1,6 +1,14 @@
 <template>
   <v-app>
     <toolbar class="primary">
+      <v-btn @click="uploadSchema()">
+        <v-icon left>business_center</v-icon>
+        Upload Schema
+      </v-btn>
+      <v-btn @click="editConfigurations()">
+        <v-icon left>business_center</v-icon>
+        Configurations
+      </v-btn>
       <v-btn @click="editOrganisations()">
         <v-icon left>business_center</v-icon>
         Organisations
@@ -49,7 +57,9 @@
     <main>
       <Overview></Overview>
     </main>
+    <configuration-popup/>
     <organisation-popup/>
+    <schema-popup/>
   </v-app>
 </template>
 <script>
@@ -65,6 +75,12 @@
     components: {Overview, FetchButton},
     methods:
       {
+        uploadSchema: function() {
+          eventBus.$emit(EventName.SCHEMA_POPUP, {open: true});
+        },
+        editConfigurations: function() {
+          eventBus.$emit(EventName.CONFIGURATION_POPUP, {open: true});
+        },
         editOrganisations: function() {
           eventBus.$emit(EventName.ORGANISATION_POPUP, {open: true});
         },

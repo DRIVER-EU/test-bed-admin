@@ -23,7 +23,9 @@ export const store = new Vuex.Store({
       pingTimeOutTimer: null,
       messageAccepted: false
     },
+    allSolutions: [],
     solutions: [],
+    allTopics: [],
     topics: [],
     gateways: [],
     logEntries: [],
@@ -39,8 +41,14 @@ export const store = new Vuex.Store({
     solutionCertificates: {},
   },
   getters: {
-    solutions (state) {
+	allSolutions (state) {
+	  return state.allSolutions
+	},
+	solutions (state) {
       return state.solutions
+    },
+    allTopics (state) {
+      return state.allTopics
     },
     topics (state) {
       return state.topics
@@ -144,6 +152,18 @@ export const store = new Vuex.Store({
       const index = state.organisations.indexOf(obj);
       state.organisations.splice(index, 1, payload);
     },
+    UPDATE_CONFIGURATION (state, payload) {
+      const obj = state.configurations.find(obj => obj.id === payload.id);
+      const index = state.configurations.indexOf(obj);
+      state.configurations.splice(index, 1, payload);
+    },
+    SET_ALL_SOLUTIONS (state, solutions) {
+      state.allSolutions = [];
+      solutions.forEach(solution => {
+        state.allSolutions.push(new Solution(solution));
+        eventBus.$emit(EventName.ADD_SOLUTION_ID, solution.clientId)
+      })
+    },
     SET_SOLUTIONS (state, solutions) {
       state.solutions = [];
       solutions.forEach(solution => {
@@ -159,6 +179,10 @@ export const store = new Vuex.Store({
       const id = solution.id;
       state.solutions = [...state.solutions.filter(s => s.id !== id)];
       eventBus.$emit(EventName.REMOVE_SOLUTION_ID, solution.clientId)
+    },
+    SET_ALL_TOPICS (state, topics) {
+      state.allTopics = [];
+      topics.forEach(topic => state.allTopics.push(new Topic(topic)))
     },
     SET_TOPICS (state, topics) {
       state.topics = [];
@@ -188,9 +212,16 @@ export const store = new Vuex.Store({
     ADD_ORGANISATION (state, entity) {
       state.organisations.push(entity);
     },
+    ADD_CONFIGURATION (state, entity) {
+      state.configurations.push(entity);
+    },
     REMOVE_ORGANISATION (state, entity) {
       const id = entity.id;
       state.organisations = [...state.organisations.filter(s => s.id !== id)];
+    },
+    REMOVE_CONFIGURATION (state, entity) {
+      const id = entity.id;
+      state.configurations = [...state.configurations.filter(s => s.id !== id)];
     },
     GET_LOGS (state, data) {
       state.logEntries = [];
@@ -233,10 +264,24 @@ export const store = new Vuex.Store({
       const additionalItems = {};
       additionalItems[solution] = fileName;
       state.solutionCertificates = {...state.solutionCertificates, ...additionalItems}
-    },
+    }
   },
   actions: {
-    getSolutions (context) {
+    getAllSolutions (context) {
+      fetchService.performGet('getAllSolutions').then(response => {
+        context.commit('SET_ALL_SOLUTIONS', response.data.solutions)
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
+      })
+    },
+    getAllTopics (context) {
+      fetchService.performGet('getAllTopics').then(response => {
+        context.commit('SET_ALL_TOPICS', response.data.topics)
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
+      })
+    },
+	getSolutions (context) {
       fetchService.performGet('getAllTrialSolutions').then(response => {
         context.commit('SET_SOLUTIONS', response.data.solutions)
       }).catch(e => {
@@ -320,6 +365,14 @@ export const store = new Vuex.Store({
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
     },
+    addConfiguration (context, configuration) {
+      fetchService.performPost('addConfiguration', configuration).then(response => {
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
+        context.commit('ADD_CONFIGURATION', (response.data))
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
+      })
+    },
     updateSolution (context, solution) {
       fetchService.performPut('updateSolution', solution).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
@@ -348,6 +401,14 @@ export const store = new Vuex.Store({
       fetchService.performPut('updateOrganisation', solution).then(response => {
         eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
         context.commit('UPDATE_ORGANISATION', response.data);
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
+      })
+    },
+    updateConfiguration (context, configuration) {
+      fetchService.performPut('updateConfiguration', configuration).then(response => {
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
+        context.commit('UPDATE_CONFIGURATION', (response.data))
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
       })
@@ -386,6 +447,15 @@ export const store = new Vuex.Store({
         context.commit('REMOVE_ORGANISATION', item)
       }).catch(e => {
         eventBus.$emit('showSnackbar', 'Organisation was not deleted. (' + e + ')', 'error')
+      })
+    },
+    removeConfiguration (context, payload) {
+      const item = payload;
+      fetchService.performDelete('removeConfiguration/' + item.id).then(response => {
+        eventBus.$emit('showSnackbar', 'Configuration was deleted.', 'success');
+        context.commit('REMOVE_CONFIGURATION', item)
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Configuration was not deleted. (' + e + ')', 'error')
       })
     },
     getAllStandards (context) {

@@ -3,7 +3,8 @@
 		"id": "standart.topic.asign.info",
 		"type": "standard.topic",
 		"name": "asign_info",
-		"msgType": "geojson",
+		"msgType": "FeatureCollection",
+		"msgTypeNamespace": "eu.driver.model.geojson",
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -22,7 +23,8 @@
 		"id": "standart.topic.crowd.tasker.info",
 		"type": "standard.topic",
 		"name": "crowd-tasker_info",
-		"msgType": "geojson",
+		"msgType": "FeatureCollection",
+		"msgTypeNamespace": "eu.driver.model.geojson",
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -40,7 +42,8 @@
 		"id": "standart.topic.large.data.update",
 		"type": "standard.topic",
 		"name": "large_data_update",
-		"msgType": "largedata",
+		"msgType": "LargeDataUpdate",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -57,7 +60,8 @@
 		"id": "standart.topic.map.layer.update",
 		"type": "standard.topic",
 		"name": "map_layer_update",
-		"msgType": "maplayer",
+		"msgType": "MapLayerUpdate",
+		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -77,7 +81,8 @@
 		"id": "standart.topic.photo.data",
 		"type": "standard.topic",
 		"name": "photo_geojson",
-		"msgType": "photo-geojson",
+		"msgType": "FeatureCollection",
+		"msgTypeNamespace": "eu.driver.model.geojson.photo",
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -94,7 +99,8 @@
 		"id": "standart.topic.cs_internal",
 		"type": "standard.topic",
 		"name": "cs_internal",
-		"msgType": "cap",
+		"msgType": "Alert",
+		"msgTypeNamespace": "eu.driver.model.cap",
 		"msgTypeVersion": "1.2",
 		"state": false,
 		"publishSolutionIDs": [
@@ -110,7 +116,8 @@
 		"id": "standart.topic.staff_map",
 		"type": "standard.topic",
 		"name": "staff_map",
-		"msgType": "cap",
+		"msgType": "Alert",
+		"msgTypeNamespace": "eu.driver.model.cap",
 		"msgTypeVersion": "1.2",
 		"state": false,
 		"publishSolutionIDs": [
@@ -130,7 +137,8 @@
 		"id": "standart.topic.socrates_map",
 		"type": "standard.topic",
 		"name": "socrates_map",
-		"msgType": "cap",
+		"msgType": "Alert",
+		"msgTypeNamespace": "eu.driver.model.cap",
 		"msgTypeVersion": "1.2",
 		"state": false,
 		"publishSolutionIDs": [
@@ -149,7 +157,8 @@
 		"id": "standart.topic.frt_map",
 		"type": "standard.topic",
 		"name": "frt_map",
-		"msgType": "cap",
+		"msgType": "Alert",
+		"msgTypeNamespace": "eu.driver.model.cap",
 		"msgTypeVersion": "1.2",
 		"state": false,
 		"publishSolutionIDs": [
@@ -169,7 +178,8 @@
 		"id": "standart.topic.staff_info",
 		"type": "standard.topic",
 		"name": "staff_info",
-		"msgType": "cap",
+		"msgType": "Alert",
+		"msgTypeNamespace": "eu.driver.model.cap",
 		"msgTypeVersion": "1.2",
 		"state": false,
 		"publishSolutionIDs": [
@@ -185,7 +195,8 @@
 		"id": "standart.topic.simulation_entity_post",
 		"type": "standard.topic",
 		"name": "simulation_entity_post",
-		"msgType": "sim-post",
+		"msgType": "Post",
+		"msgTypeNamespace": "eu.driver.model.sim.entity",
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -200,7 +211,8 @@
 		"id": "standart.topic.simulation_request_startinject",
 		"type": "standard.topic",
 		"name": "simulation_request_startinject",
-		"msgType": "sim-startinject",
+		"msgType": "RequestStartInject",
+		"msgTypeNamespace": "eu.driver.model.sim.request",
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [

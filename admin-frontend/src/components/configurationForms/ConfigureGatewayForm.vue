@@ -9,14 +9,14 @@
             v-model=clientId
             :rules=clientIdRules
             label="ID"
-            :counter="25"
+            :counter="255"
             required
           ></v-text-field>
           <v-text-field
             v-model=name
             :rules=nameRules
             label="Name"
-            :counter="25"
+            :counter="255"
             required
           ></v-text-field>
           <v-select
@@ -58,12 +58,12 @@
       clientId: '',
       clientIdRules: [
         v => !!v || 'ID is required',
-        v => (v && v.length <= 25) || 'Max. 25 characters allowed.'
+        v => (v && v.length <= 255) || 'Max. 255 characters allowed.'
       ],
       name: '',
       nameRules: [
         v => !!v || 'Name is required',
-        v => (v && v.length <= 25) || 'Max. 25 characters allowed.'
+        v => (v && v.length <= 255) || 'Max. 255 characters allowed.'
       ],
       managingType:[],
       description: ''

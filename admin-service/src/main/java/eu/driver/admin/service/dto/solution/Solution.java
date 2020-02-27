@@ -52,6 +52,9 @@ public class Solution {
 	@Size(min = 4, max = 255)
 	private String name = null;
 	
+	@Column(name="origin", columnDefinition="text")
+	private String origin = null;
+	
 	@Column(name="isAdmin")
 	private Boolean isAdmin = false;
 	
@@ -113,6 +116,14 @@ public class Solution {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
 	}
 
 	public Boolean getIsAdmin() {

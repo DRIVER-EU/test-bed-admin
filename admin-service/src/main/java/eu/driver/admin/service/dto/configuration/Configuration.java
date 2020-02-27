@@ -17,6 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
 
+import scala.Array;
 import eu.driver.admin.service.dto.gateway.Gateway;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.dto.topic.Topic;
@@ -98,6 +99,13 @@ public class Configuration {
 
 	public void setTopics(List<Topic> topics) {
 		this.topics = topics;
+	}
+	
+	public void addTopic(Topic topic) {
+		if (this.topics == null) {
+			this.topics = new ArrayList<Topic>();
+		}
+		this.topics.add(topic);
 	}
 
 	public List<Gateway> getGateways() {

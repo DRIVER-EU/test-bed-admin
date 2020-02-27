@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.driver.adapter.core.AdminAdapter;
 import eu.driver.adapter.properties.ClientProperties;
 import eu.driver.admin.service.constants.LogLevels;
-import eu.driver.admin.service.controller.heartbeat.HeartbeatTimerTask;
+import eu.driver.admin.service.controller.heartbeat.SolutionHeartbeatTimerTask;
 import eu.driver.admin.service.dto.SolutionList;
 import eu.driver.admin.service.dto.configuration.Configuration;
 import eu.driver.admin.service.dto.configuration.TestbedConfig;
@@ -47,11 +47,11 @@ import eu.driver.api.IAdaptorCallback;
 import eu.driver.model.core.Level;
 
 @RestController
-public class SolutionRESTController implements IAdaptorCallback {
+public class SolutionRESTController {
 	private Logger log = Logger.getLogger(this.getClass());
 	
 	private Timer hbTimer = null;
-	private HeartbeatTimerTask hbTimerTask = null;
+	private SolutionHeartbeatTimerTask hbTimerTask = null;
 	private StringJSONMapper mapper = new StringJSONMapper();
 	
 	private String clientId = ClientProperties.getInstance().getProperty("client.id");
@@ -78,36 +78,21 @@ public class SolutionRESTController implements IAdaptorCallback {
 	public SolutionRESTController() {
 		log.info("-->SolutionRESTController");
 		
-		hbTimerTask = new HeartbeatTimerTask(this);
+		hbTimerTask = new SolutionHeartbeatTimerTask(this);
 		hbTimer = new Timer();
 		hbTimer.schedule(hbTimerTask, 3000, 3000);
 		log.info("-->SolutionRESTController");
 	}
 	
-	@Override
-	public void messageReceived(IndexedRecord key, IndexedRecord receivedMessage, String topicName) {
-		log.debug("SolutionRESTController-->");
-		
-		if (receivedMessage.getSchema().getName().equalsIgnoreCase("Heartbeat")) {
-			try {
-				eu.driver.model.core.Heartbeat hbMsg = (eu.driver.model.core.Heartbeat) SpecificData.get().deepCopy(eu.driver.model.core.Heartbeat.SCHEMA$, receivedMessage);
-				String clientID = hbMsg.getId().toString();
-				log.debug("HB From client received: " + clientID);
-				updateSolutionState(clientID, new Date(hbMsg.getAlive()), true);
-			} catch (Exception e) {
-				log.error("Error updating the solution!" , e);
-			}
-		}
-		log.debug("heartbeat message received-->");
-	}
-	
-	public void updateSolutionState(String clientID, Date isAliveDate, Boolean state) {
+	public void updateSolutionState(String clientID, Date isAliveDate, String origin, Boolean state) {
 		log.debug("-->updateSolutionState");
 		try {
 			Solution solution = this.solutionRepo.findObjectByClientId(clientID);
 			if (solution != null) {
 				solution.setLastHeartBeatReceived(new Date());
-				
+				if (origin != null) {
+					solution.setOrigin(origin);
+				}
 				if (solution.getState() != state) {
 					solution.setState(state);
 					eu.driver.model.core.Log logEntry = new eu.driver.model.core.Log();
@@ -259,6 +244,28 @@ public class SolutionRESTController implements IAdaptorCallback {
 		}
 		log.debug("removeSolution -->");
 		return true;
+	}
+	
+	@ApiOperation(value = "getAllSolutions", nickname = "getAllSolutions")
+	@RequestMapping(value = "/AdminService/getAllSolutions", method = RequestMethod.GET)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success", response = SolutionList.class),
+			@ApiResponse(code = 400, message = "Bad Request", response = SolutionList.class),
+			@ApiResponse(code = 500, message = "Failure", response = SolutionList.class) })
+	public ResponseEntity<SolutionList> getAllSolutions() {
+		log.info("--> getAllSolutions");
+		SolutionList solutionList = new SolutionList();
+		
+		List<Solution> solutions = this.solutionRepo.findAll();
+		try {
+			Collections.sort(solutions, (a, b) -> a.getId() < b.getId() ? -1 : 0);
+			solutionList.setSolutions(solutions);
+		} catch (Exception e) {
+			return new ResponseEntity<SolutionList>(solutionList, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		log.info("getAllSolutions -->");
+		return new ResponseEntity<SolutionList>(solutionList, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "getAllTrialSolutions", nickname = "getAllTrialSolutions")

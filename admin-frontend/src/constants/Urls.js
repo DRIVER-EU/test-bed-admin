@@ -9,6 +9,8 @@ function getHost() {
 
 export default {
   HTTP_BASE: 'http://' + getHost() + '/AdminService',
+  //HTTP_BASE: '/AdminService',
   WEBSOCKET: 'ws://'+ getHost() + '/AdminServiceWSEndpoint',
   SOCKJS: 'http://'+ getHost() + '/AdminServiceWSEndpoint'
+  //SOCKJS: '/AdminServiceWSEndpoint'
 }

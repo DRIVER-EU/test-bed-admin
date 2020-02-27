@@ -17,6 +17,8 @@ import Toolbar from './components/Toolbar'
 import DiagramPage from './pages/DiagramPage'
 import {webSocketConnection} from './service/WebSocketConnection'
 import OrganisationPopup from './components/OrganisationPopup';
+import ConfigurationPopup from './components/ConfigurationPopup';
+import SchemaPopup from './components/SchemaFileUploadPopup';
 
 export const eventBus = new Vue();
 
@@ -47,6 +49,8 @@ Vue.component('configure-gateway-form',ConfigureGatewayForm);
 Vue.component('toolbar', Toolbar);
 Vue.component('diagram-page', DiagramPage);
 Vue.component('organisation-popup', OrganisationPopup);
+Vue.component('configuration-popup', ConfigurationPopup);
+Vue.component('schema-popup', SchemaPopup);
 
 Vue.config.productionTip = false;
 
@@ -58,6 +62,8 @@ new Vue({
   render: h => h(App),
   created() {
     this.$store.dispatch('getSolutionCertificates');
+    this.$store.dispatch('getAllSolutions');
+    this.$store.dispatch('getAllTopics');
     this.$store.dispatch('getSolutions');
     this.$store.dispatch('getTopics');
     this.$store.dispatch('getGateways');

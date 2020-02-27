@@ -51,12 +51,10 @@ public class CertificateController {
 	
 	public CertificateController() {
 		certHostUrl = clientProp.getProperty("cert.handler.url", "https://localhost:8443/ejbca/ejbca-rest-api/v1/ees");
+		getPEMCertificateHOST = clientProp.getProperty("cert.pem.handler.url", "https://localhost:8443/ejbca/ejbca-rest-api/v1/certificate/enrollkeystore");
 		if (System.getenv().get("cert_handler_url") != null) {
 			certHostUrl = certHostUrl.replace("https://localhost:8443", System.getenv().get("cert_handler_url"));
-		}
-		getPEMCertificateHOST = clientProp.getProperty("cert.pem.handler.url", "https://localhost:8443/ejbca/ejbca-rest-api/v1/certificate/enrollkeystore");
-		if (System.getenv().get("cert_pem_handler_url") != null) {
-			getPEMCertificateHOST = getPEMCertificateHOST.replace("https://localhost:8443", System.getenv().get("cert_pem_handler_url"));
+			getPEMCertificateHOST = getPEMCertificateHOST.replace("https://localhost:8443", System.getenv().get("cert_handler_url"));
 		}
 	}
 	

@@ -36,10 +36,18 @@ public class Standard {
 	@Size(min = 1, max = 255)
 	private String name = null;
 	
+	@Column(name="namespace", length=1024)
+	@Size(min = 1, max = 1024)
+	private String namespace = null;
+	
 	@ElementCollection
 	@CollectionTable(name="version", schema="admin_service", joinColumns=@JoinColumn(name="id"))
 	@Column(name="versions")
 	private List<String> versions = new ArrayList<String>();
+	
+	@Column(name="fileName", length=1024)
+	@Size(min = 1, max = 1024)
+	private String fileName = null;
 	
 	public Standard() {
 		
@@ -60,6 +68,14 @@ public class Standard {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public String getNamespace() {
+		return namespace;
+	}
+
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
 
 	public List<String> getVersions() {
 		return versions;
@@ -67,5 +83,13 @@ public class Standard {
 
 	public void setVersions(List<String> versions) {
 		this.versions = versions;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 }
