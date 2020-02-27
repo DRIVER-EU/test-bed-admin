@@ -16,6 +16,8 @@
 			"core.topic.eval.log",
 			"core.topic.access.invite",
 			"core.topic.create.request",
+			"core.topic.remove.request",
+			"core.topic.remove",
 			"core.topic.time",
 			"core.topic.time.control",
 			"core.topic.tm.phasemessage",

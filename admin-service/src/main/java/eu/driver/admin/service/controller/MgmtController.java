@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -21,14 +23,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
+
+
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
+
+
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -50,7 +58,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+
 
 import eu.driver.adapter.constants.TopicConstants;
 import eu.driver.adapter.core.AdminAdapter;
@@ -96,6 +108,8 @@ import eu.driver.model.core.Timing;
 import eu.driver.model.core.TimingControl;
 import eu.driver.model.core.TopicCreate;
 import eu.driver.model.core.TopicInvite;
+import eu.driver.model.core.TopicRemove;
+import eu.driver.model.core.TopicRemoveRequest;
 import eu.driver.model.edxl.EDXLDistribution;
 import eu.driver.model.emsi.TSO_2_0;
 import eu.driver.model.geojson.FeatureCollection;
@@ -682,6 +696,10 @@ public class MgmtController {
 						schema = new ObserverToolAnswer();
 					} else if (topic.getMsgType().equalsIgnoreCase("RequestChangeOfTrialStage")) {
 						schema = new RequestChangeOfTrialStage();
+					} else if (topic.getMsgType().equalsIgnoreCase("TopicRemoveRequest")) {
+						schema = new TopicRemoveRequest();
+					} else if (topic.getMsgType().equalsIgnoreCase("TopicRemove")) {
+						schema = new TopicRemove();
 					}
 					
 					if (schema != null) {

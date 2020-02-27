@@ -20,7 +20,7 @@
 		"type": "core.topic",
 		"name": "system_heartbeat",
 		"msgTypeNamespace": "eu.driver.model.core",
-		"msgType": "Hearbeat",
+		"msgType": "Heartbeat",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
@@ -96,6 +96,38 @@
 		"description": "This is the topic where every solution can request topic creation and sending invite message."
 	},
 	{
+		"id": "core.topic.remove.request",
+		"type": "core.topic",
+		"name": "system_topic_remove_request",
+		"msgType": "TopicRemoveRequest",
+		"msgTypeNamespace": "eu.driver.model.core",
+		"msgTypeVersion":"1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"all"
+		],
+		"subscribedSolutionIDs": [
+			"TB-AdminTool"
+		],
+		"description": "This is the topic where every solution can request topic(s) to be remove."
+	},
+	{
+		"id": "core.topic.remove",
+		"type": "core.topic",
+		"name": "system_topic_remove",
+		"msgType": "TopicRemove",
+		"msgTypeNamespace": "eu.driver.model.core",
+		"msgTypeVersion":"1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"TB-AdminTool"
+		],
+		"subscribedSolutionIDs": [
+			"all"
+		],
+		"description": "This is the topic where every solution get informed that a topic is going to be removed!"
+	},
+	{
 		"id": "core.topic.time",
 		"type": "core.topic",
 		"name": "system_timing",
@@ -163,7 +195,7 @@
 		"id": "core.topic.tm.sessionmgmt",
 		"type": "core.topic",
 		"name": "system_tm_session_mgmt",
-		"msgType": "SessionMessage",
+		"msgType": "SessionMgmt",
 		"msgTypeNamespace": "eu.driver.model.core",
 		"msgTypeVersion":"1.0",
 		"state": false,
