@@ -9,7 +9,7 @@
 	<packaging>pom</packaging>
 
 	<name>DRIVER+ AdminTool</name>
-	<description>This is the DRIVER+ AdminTool</description>
+	<description>This is the DRIVER+ AdminTool </description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
