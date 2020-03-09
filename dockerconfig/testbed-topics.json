@@ -34,9 +34,9 @@
 	{
 		"id": "core.topic.log",
 		"type": "core.topic",
-		"name": "Log",
+		"name": "system_logging",
 		"msgTypeNamespace": "eu.driver.model.core",
-		"msgType": "log",
+		"msgType": "Log",
 		"msgTypeVersion":"1.0",
 		"state": false,
 		"publishSolutionIDs": [
