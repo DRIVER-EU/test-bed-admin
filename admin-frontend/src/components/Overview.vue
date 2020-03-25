@@ -8,7 +8,7 @@
           <img v-if="overallSolutionState===-1" src="../assets/lens-red.png" style="float:right">
           <img v-if="overallSolutionState===1" src="../assets/lens-green.png" style="float:right">
         </h3>
-        <v-btn @click="openConfigureSolutionForm" flat small block class="mx-auto">
+        <v-btn @click="openConfigureSolutionForm" flat small block class="mx-auto" :disabled="isSolutionCreateAllowed()">
           Configure new solution
           <v-icon>add</v-icon>
         </v-btn>
@@ -25,7 +25,7 @@
           <img v-if="overallTopicState===-1" src="../assets/lens-red.png" style="float:right">
           <img v-if="overallTopicState===1" src="../assets/lens-green.png" style="float:right">
         </h3>
-        <v-btn @click="openConfigureTopicForm" flat small block class="mx-auto">
+        <v-btn @click="openConfigureTopicForm" flat small block class="mx-auto" :disabled="isTopicCreateAllowed()">
           Configure new topic
           <v-icon>add</v-icon>
         </v-btn>
@@ -42,7 +42,7 @@
           <img v-if="overallGatewayState===-1" src="../assets/lens-red.png" style="float:right">
           <img v-if="overallGatewayState===1" src="../assets/lens-green.png" style="float:right">
         </h3>
-        <v-btn @click="openConfigureGatewayForm" flat small block class="mx-auto">
+        <v-btn @click="openConfigureGatewayForm" flat small block class="mx-auto" :disabled="isGatewayCreateAllowed()">
           Configure new gateway
           <v-icon>add</v-icon>
         </v-btn>
@@ -164,6 +164,15 @@
       }
     },
     methods: {
+      isSolutionCreateAllowed: function() {
+        return !this.$store.getters.rightsMatrix.createSolution;
+      },
+      isTopicCreateAllowed: function() {
+        return !this.$store.getters.rightsMatrix.createTopic;
+      },
+      isGatewayCreateAllowed: function() {
+        return !this.$store.getters.rightsMatrix.createGateway;
+      },
       openConfigureSolutionForm: function () {
         eventBus.$emit(EventName.OPEN_SOLUTION_FORM);
       },

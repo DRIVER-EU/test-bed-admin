@@ -85,8 +85,6 @@ public class AdminServiceApplication {
         		managementCAPath = managementCAPath.replace("http://localhost:9090", env.get(envName));
         	} else if (envName.equalsIgnoreCase("cert_handler_url")) {
         		log.info(envName + ": " + env.get(envName));
-        	} else if (envName.equalsIgnoreCase("cert_pem_handler_url")) {
-        		log.info(envName + ": " + env.get(envName));
         	} else if (envName.equalsIgnoreCase("security_rest_path_group")) {
         		log.info(envName + ": " + env.get(envName));
         	} else if (envName.equalsIgnoreCase("security_rest_path_topic")) {

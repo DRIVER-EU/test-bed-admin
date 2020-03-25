@@ -68,5 +68,15 @@
 		"state": false,
 		"orgName":"Frequentis",
 		"description": "This is the Testbed GeoServer"
+	},
+	{
+		"id": "TB-LargeFileService",
+		"subject.id": "O=DRIVER-PROJECT.EU,CN=LargeFileService",
+		"name": "LargeFileService",
+		"isTestbed": false,
+		"isService": true,
+		"state": false,
+		"orgName":"TNO",
+		"description": "This is the Testbed LargeFileService"
 	}
 ]

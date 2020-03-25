@@ -36,9 +36,12 @@ export const store = new Vuex.Store({
     isTrialStarted: false,
     configurations: [],
     modes: [],
+    roles: ['ADMINISTRATOR','MONITORING'],
     currentConfiguration: {},
+    currentRole: 'MONITORING',
     organisations: [],
     solutionCertificates: {},
+    rightsMatrix: {},
   },
   getters: {
 	allSolutions (state) {
@@ -84,14 +87,23 @@ export const store = new Vuex.Store({
     modes (state) {
       return state.modes
     },
+    roles (state) {
+      return state.roles
+    },
     currentConfiguration (state) {
       return state.currentConfiguration
+    },
+    currentRole (state) {
+      return state.currentRole
     },
     organisations (state) {
       return state.organisations
     },
     solutionCertificates (state) {
       return state.solutionCertificates
+    },
+    rightsMatrix (state) {
+      return state.rightsMatrix
     }
   },
   mutations: {
@@ -264,9 +276,28 @@ export const store = new Vuex.Store({
       const additionalItems = {};
       additionalItems[solution] = fileName;
       state.solutionCertificates = {...state.solutionCertificates, ...additionalItems}
+    },
+    SET_RIGHTS_MATRIX (state, rights) {
+      state.rightsMatrix = rights;
+      eventBus.$emit(EventName.RIGHTS_RELOADED, {});
     }
   },
   actions: {
+    setRole (context, name) {
+      fetchService.performPost('setActiveRole?activeRole=' + name).then(response => {
+        context.state.currentRole=name;
+        eventBus.$emit('showSnackbar', 'Data was successfully submitted.', 'success');
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data was not submitted. (' + e + ')', 'error')
+      })
+    },
+    getRightsMatrix (context) {
+      fetchService.performGet('getRightsMatrix').then(response => {
+        context.commit('SET_RIGHTS_MATRIX', response.data)
+      }).catch(e => {
+        eventBus.$emit('showSnackbar', 'Data could not be loaded. (' + e + ')', 'error')
+      })
+    },
     getAllSolutions (context) {
       fetchService.performGet('getAllSolutions').then(response => {
         context.commit('SET_ALL_SOLUTIONS', response.data.solutions)

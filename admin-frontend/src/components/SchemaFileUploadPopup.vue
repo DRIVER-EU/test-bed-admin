@@ -45,7 +45,8 @@
         dialog: false,
         uploadedFiles: [],
         currentStatus: null,
-        uploadFieldName: 'file'
+        uploadFieldName: 'file',
+        rightsMatrix: {},
       }
     },
     computed: {

@@ -1,23 +1,31 @@
 <template>
   <v-app>
     <toolbar class="primary">
-      <v-btn @click="uploadSchema()">
-        <v-icon left>business_center</v-icon>
-        Upload Schema
-      </v-btn>
-      <v-btn @click="editConfigurations()">
-        <v-icon left>business_center</v-icon>
-        Configurations
-      </v-btn>
-      <v-btn @click="editOrganisations()">
-        <v-icon left>business_center</v-icon>
-        Organisations
-      </v-btn>
+      <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition">
+        <v-btn slot="activator">
+          <v-icon left>bar_chart</v-icon>Administration</v-btn>
+        <v-card>
+          <v-list>
+            <v-list-tile @click="uploadSchema()" :disabled="isUploadAllowed()">
+              <v-icon left>business_center</v-icon>
+              Upload Schema
+            </v-list-tile>
+            <v-list-tile @click="editConfigurations()" :disabled="isConfigViewAllowed()">
+              <v-icon left>settings</v-icon>
+              Configurations
+            </v-list-tile>
+            <v-list-tile @click="editOrganisations()" :disabled="isOrgViewAllowed()">
+              <v-icon left>business_center</v-icon>
+              Organisations
+            </v-list-tile>
+          </v-list>
+        </v-card>
+      </v-menu>
       <v-btn @click="openOverviewDiagramPage()">
         <v-icon left>insert_chart_outlined</v-icon>
         Overview
       </v-btn>
-      <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition">
+      <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition" :disabled="isChangeConfigAllowed()">
         <v-btn slot="activator">
           <v-icon left>settings</v-icon>
           {{ currentConfiguration.configName ? currentConfiguration.configName : 'Configurations' }}
@@ -32,7 +40,7 @@
           </v-list>
         </v-card>
       </v-menu>
-      <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition">
+      <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition" :disabled="isChangeSecurityAllowed()">
         <v-btn slot="activator">
           <v-icon left>settings_ethernet</v-icon>
           {{ currentConfiguration.testbedMode ? currentConfiguration.testbedMode : 'Modes' }}
@@ -47,12 +55,27 @@
           </v-list>
         </v-card>
       </v-menu>
-      <fetch-button :disabled="isTestbedInitialized" icon="rotate_right" url="/initTestbed" method="POST" :onSuccess="handleInitTestbedSuccess" :onError="handleInitTestbedError">
+      <fetch-button :disabled="isTestbedInitialized || isInitAllowed()" icon="rotate_right" url="/initTestbed" method="POST" :onSuccess="handleInitTestbedSuccess" :onError="handleInitTestbedError" >
         Initialize test-bed
       </fetch-button>
-      <fetch-button :disabled="!isTestbedInitialized" icon="play_arrow" url="/startTrialConfig" method="POST" :onSuccess="handleStartTrialSuccess" :onError="handleStartTrialError">
+      <fetch-button :disabled="!isTestbedInitialized || isStartAllowed()" icon="play_arrow" url="/startTrialConfig" method="POST" :onSuccess="handleStartTrialSuccess" :onError="handleStartTrialError" >
         Start trial
       </fetch-button>
+      <v-menu offset-y content-class="dropdown-menu" transition="slide-y-transition">
+        <v-btn slot="activator">
+          <v-icon left>account_circle</v-icon>
+          {{ currentRole ? currentRole : 'Roles' }}
+        </v-btn>
+        <v-card>
+          <v-list>
+            <v-list-tile v-bind:key="name" v-for="name in roles" @click="switchToRole(name)">
+              <v-icon left v-if="name === currentRole">radio_button_checked</v-icon>
+              <v-icon left v-else>radio_button_unchecked</v-icon>
+              {{ name }}
+            </v-list-tile>
+          </v-list>
+        </v-card>
+      </v-menu>
     </toolbar>
     <main>
       <Overview></Overview>
@@ -75,6 +98,27 @@
     components: {Overview, FetchButton},
     methods:
       {
+        isUploadAllowed: function () {
+          return !this.$store.getters.rightsMatrix.uploadSchemaFile;
+        },
+        isOrgViewAllowed: function () {
+          return !this.$store.getters.rightsMatrix.viewOrganisations;
+        },
+        isConfigViewAllowed: function () {
+          return !this.$store.getters.rightsMatrix.viewConfigurations;
+        },
+        isChangeConfigAllowed: function () {
+          return !this.$store.getters.rightsMatrix.changeConfiguration;
+        },
+        isChangeSecurityAllowed: function () {
+          return !this.$store.getters.rightsMatrix.changesecurity;
+        },
+        isInitAllowed: function () {
+          return !this.$store.getters.rightsMatrix.initTestbed;
+        },
+        isStartAllowed: function () {
+          return !this.$store.getters.rightsMatrix.startTrial;
+        },
         uploadSchema: function() {
           eventBus.$emit(EventName.SCHEMA_POPUP, {open: true});
         },
@@ -104,18 +148,26 @@
         switchToMode: function (name) {
           configurationService.switchToMode(name, this.currentConfiguration, this.configurations);
         },
+        switchToRole: function (name) {
+          this.$store.dispatch('setRole',name);
+          this.$store.dispatch('getRightsMatrix');
+        },
         openOverviewDiagramPage() {
           console.log("Opening overview image");
           let routeData = this.$router.resolve({name: 'overviewDiagram'});
           window.open(routeData.href, '_blank');
         }
       },
-    computed: mapGetters(['isTestbedInitialized', 'isTrialStarted', 'loading', 'configurations', 'modes', 'currentConfiguration']),
+    computed: mapGetters(['isTestbedInitialized', 'isTrialStarted', 'loading', 'configurations', 'modes','roles', 'currentConfiguration', 'currentRole']),
     created: function () {
+      this.$store.dispatch('getRightsMatrix');
       this.$store.dispatch('getPageCount');
       this.$store.dispatch('getCurrentConfiguration');
       this.$store.dispatch('getConfigurations');
       this.$store.dispatch('getModes');
+      eventBus.$on(EventName.RIGHTS_RELOADED, (text, type) => {
+        this.$forceUpdate();
+      })
     }
   }
 </script>

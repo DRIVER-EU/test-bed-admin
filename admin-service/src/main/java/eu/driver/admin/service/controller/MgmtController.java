@@ -12,12 +12,10 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +37,6 @@ import net.sourceforge.plantuml.SourceStringReader;
 
 
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Parser;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.specific.SpecificRecord;
@@ -93,28 +90,21 @@ import eu.driver.admin.service.util.TopicInviteUtil;
 import eu.driver.admin.service.ws.WSController;
 import eu.driver.admin.service.ws.mapper.StringJSONMapper;
 import eu.driver.admin.service.ws.object.WSTopicCreationNotification;
-import eu.driver.model.cap.Alert;
 import eu.driver.model.core.AdminHeartbeat;
 import eu.driver.model.core.Heartbeat;
-import eu.driver.model.core.LargeDataUpdate;
 import eu.driver.model.core.Log;
-import eu.driver.model.core.MapLayerUpdate;
 import eu.driver.model.core.ObserverToolAnswer;
 import eu.driver.model.core.PhaseMessage;
 import eu.driver.model.core.RequestChangeOfTrialStage;
 import eu.driver.model.core.RolePlayerMessage;
-import eu.driver.model.core.SessionMgmt;
-import eu.driver.model.core.Timing;
-import eu.driver.model.core.TimingControl;
 import eu.driver.model.core.TopicCreate;
 import eu.driver.model.core.TopicInvite;
 import eu.driver.model.core.TopicRemove;
 import eu.driver.model.core.TopicRemoveRequest;
 import eu.driver.model.edxl.EDXLDistribution;
-import eu.driver.model.emsi.TSO_2_0;
-import eu.driver.model.geojson.FeatureCollection;
-import eu.driver.model.geojson.GeoJSONEnvelope;
-import eu.driver.model.mlp.SlRep;
+import eu.driver.model.sim.config.SessionManagement;
+import eu.driver.model.sim.config.TimeControl;
+import eu.driver.model.sim.config.TimeManagement;
 
 @RestController
 public class MgmtController {
@@ -292,6 +282,9 @@ public class MgmtController {
 		
 		log.info("loadInitData -->");
 	}
+	
+	
+	
 	
 	@ApiOperation(value = "initTestbed", nickname = "initTestbed")
 	@RequestMapping(value = "/AdminService/initTestbed", method = RequestMethod.POST )
@@ -683,15 +676,15 @@ public class MgmtController {
 					} else if (topic.getMsgType().equalsIgnoreCase("TopicCreate")) {
 						schema = new TopicCreate();
 					} else if (topic.getMsgType().equalsIgnoreCase("Timing")) {
-						schema = new Timing();
+						schema = new TimeManagement();
 					} else if (topic.getMsgType().equalsIgnoreCase("TimingControl")) {
-						schema = new TimingControl();
+						schema = new TimeControl();
 					} else if (topic.getMsgType().equalsIgnoreCase("PhaseMessage")) {
 						schema = new PhaseMessage();
 					} else if (topic.getMsgType().equalsIgnoreCase("RolePlayerMessage")) {
 						schema = new RolePlayerMessage();
 					} else if (topic.getMsgType().equalsIgnoreCase("SessionMgmt")) {
-						schema = new SessionMgmt();
+						schema = new SessionManagement();
 					} else if (topic.getMsgType().equalsIgnoreCase("ObserverToolAnswer")) {
 						schema = new ObserverToolAnswer();
 					} else if (topic.getMsgType().equalsIgnoreCase("RequestChangeOfTrialStage")) {
@@ -1110,7 +1103,7 @@ public class MgmtController {
 		}
 		
 		String url = clientProp.getProperty("testbed.admin.security.rest.path.group");
-		if (System.getenv().get("security_rest_path_group") != null) {
+		if (System.getenv().get("security_rest_path") != null) {
 			url = url.replace("https://localhost:9443", System.getenv().get("security_rest_path_group"));
 		}
 		url += clientID;
@@ -1155,7 +1148,7 @@ public class MgmtController {
 			}
 			
 			url = clientProp.getProperty("testbed.admin.security.rest.path.topic");
-			if (System.getenv().get("security_rest_path_topic") != null) {
+			if (System.getenv().get("security_rest_path") != null) {
 				url = url.replace("https://localhost:9443", System.getenv().get("security_rest_path_topics"));
 			}
 			url += topicName;

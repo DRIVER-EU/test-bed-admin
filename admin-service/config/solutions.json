@@ -1,6 +1,6 @@
 [
 	{
-		"id":"copper_gui",
+		"id":"copper-gui",
  		"name":"Copper GUI",
  		"isTestbed":false,
  		"isService":false,
@@ -8,7 +8,7 @@
  		"orgName":"TNO",
  		"description":"Copper GUI from TNO1"
 	},{
-		"id":"copper_server",
+		"id":"copper-server",
  		"name":"Copper Server",
  		"isTestbed":false,
  		"isService":false,
@@ -229,5 +229,23 @@
  		"state":false,
  		"orgName":"XVR",
  		"description":"XVR CM application!"
+	},{
+		"id":"chain-effect-simulator",
+		"subject.id":"O=TNO,CN=chain-effect-simulator",
+ 		"name":"Chain effect simlation",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"orgName":"TNO",
+ 		"description":"TNO Chain effect simulation solution!"
+	},{
+		"id":"sumo-connector",
+		"subject.id":"O=TNO,CN=sumo-connector",
+ 		"name":"SUMO Connector",
+ 		"isTestbed":false,
+ 		"isService":false,
+ 		"state":false,
+ 		"orgName":"TNO",
+ 		"description":"TNO SUMO Connector!"
 	}
 ]

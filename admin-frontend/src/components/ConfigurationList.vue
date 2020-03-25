@@ -15,10 +15,10 @@
         <td style="white-space: nowrap;text-overflow: ellipsis;max-width: 200px;overflow: hidden;">{{props.item.name}}
         </td>
         <td class="text-xs-center">
-          <v-btn icon @click.native="editConfiguration(props.item)">
+          <v-btn icon @click.native="editConfiguration(props.item)" :disabled="isEditAllowed()">
             <v-icon>text_format</v-icon>
           </v-btn>
-          <v-btn icon @click.native="deleteConfiguration(props.item)">
+          <v-btn icon @click.native="deleteConfiguration(props.item)" :disabled="isDeleteAllowed()">
             <v-icon>delete_outline</v-icon>
           </v-btn>
         </td>
@@ -40,6 +40,12 @@
       },
     },
     methods: {
+      isEditAllowed: function() {
+        return !this.$store.getters.rightsMatrix.editConfiguration;
+      },
+      isDeleteAllowed: function() {
+        return !this.$store.getters.rightsMatrix.removeConfiguration;
+      },
       editConfiguration: function(entity) {
         if (this.onEdit) {
           this.onEdit(entity);

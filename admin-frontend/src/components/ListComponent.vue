@@ -7,16 +7,16 @@
           {{ d.name }}
           <v-spacer></v-spacer>
           <v-card-actions>
-            <v-btn v-if="dataType === 'SOLUTION'" :disabled="!!solutionCertificates[d.clientId] || !d.orgName" icon @click.native="createCertificate(d)">
+            <v-btn v-if="dataType === 'SOLUTION'" :disabled="!!solutionCertificates[d.clientId] || !d.orgName || isCreateCertificateAllowed()" icon @click.native="createCertificate(d)">
               <v-icon>playlist_add_check</v-icon>
             </v-btn>
-            <v-btn v-if="dataType === 'SOLUTION'" :disabled="!solutionCertificates[d.clientId]" icon @click.native="downloadCertificate(d)">
+            <v-btn v-if="dataType === 'SOLUTION'" :disabled="!solutionCertificates[d.clientId] || isDownloadCertificateAllowed()" icon @click.native="downloadCertificate(d)" >
               <v-icon>playlist_play</v-icon>
             </v-btn>
-            <v-btn icon @click.native="editItem(d)">
+            <v-btn icon @click.native="editItem(d)" :disabled="isEditAllowed()">
               <v-icon>text_format</v-icon>
             </v-btn>
-            <v-btn icon @click.native="deleteItem(d)">
+            <v-btn icon @click.native="deleteItem(d)" :disabled="isDeleteAllowed()">
               <v-icon>delete_outline</v-icon>
             </v-btn>
           </v-card-actions>
@@ -54,6 +54,38 @@
       },
     },
     methods: {
+      isEditAllowed: function() {
+        const me = this;
+        switch (this.dataType) {
+          case "SOLUTION":
+            return !this.$store.getters.rightsMatrix.editSolution;
+          case "TOPIC":
+            return !this.$store.getters.rightsMatrix.editTopic;
+          case "GATEWAY":
+            return !this.$store.getters.rightsMatrix.editGateway;
+          default:
+            return false;
+        }
+      },
+      isDeleteAllowed: function() {
+        const me = this;
+        switch (this.dataType) {
+          case "SOLUTION":
+            return !this.$store.getters.rightsMatrix.removeSolution;
+          case "TOPIC":
+            return !this.$store.getters.rightsMatrix.removeTopic;
+          case "GATEWAY":
+            return !this.$store.getters.rightsMatrix.removeGateway;
+          default:
+            return false;
+        }
+      },
+      isCreateCertificateAllowed: function() {
+        return !this.$store.getters.rightsMatrix.createCertificate;
+      },
+      isDownloadCertificateAllowed: function() {
+        return !this.$store.getters.rightsMatrix.downloadCertificate;
+      },
       createCertificate(solution) {
         const me = this;
         fetchService.performGet('getAllOrganisations').then(response => {

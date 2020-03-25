@@ -200,11 +200,10 @@
 		"msgTypeVersion": "1.0",
 		"state": false,
 		"publishSolutionIDs": [
-			"xvr-cm"
+			"all"
 		],
 		"subscribedSolutionIDs": [
-			"TB-AARTool",
-			"TB-AARTool-Backup"
+			"all"
 		],
 		"description": "This is the topic for Staff map information."
 	},{
@@ -221,6 +220,21 @@
 		"subscribedSolutionIDs": [
 			"TB-AARTool",
 			"TB-AARTool-Backup"
+		],
+		"description": "This is the topic for Staff map information."
+	},{
+		"id": "standart.topic.simulation_request_transport",
+		"type": "standard.topic",
+		"name": "simulation_request_transport",
+		"msgType": "RequestMove",
+		"msgTypeNamespace": "eu.driver.model.sim.request",
+		"msgTypeVersion": "1.0",
+		"state": false,
+		"publishSolutionIDs": [
+			"all"
+		],
+		"subscribedSolutionIDs": [
+			"all"
 		],
 		"description": "This is the topic for Staff map information."
 	}

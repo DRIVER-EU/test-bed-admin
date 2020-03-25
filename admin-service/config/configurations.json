@@ -114,5 +114,53 @@
 		],
 		"gateways": [
 		]
+	},
+	{
+		"name": "TTI Final Test",
+		"discription": "The DRIVER+ TTI Final Test configuration",
+		"solutions": [
+			"TB-AdminTool",
+			"TB-AARTool",
+			"TB-TrialMgmt",
+			"TB-TimeService",
+			"TB-Ost",
+			"TB-LargeFileService",
+			"silent-producer",
+			"chain-effect-simulator",
+			"sumo-connector",
+			"copper-gui",
+			"copper-server"
+		],
+		"topics": [
+			"core.topic.admin.hb",
+			"core.topic.hb",
+			"core.topic.log",
+			"core.topic.eval.log",
+			"core.topic.access.invite",
+			"core.topic.create.request",
+			"core.topic.time",
+			"core.topic.time.control",
+			"core.topic.tm.phasemessage",
+			"core.topic.tm.roleplayer",
+			"core.topic.tm.sessionmgmt",
+			"core.topic.ost.answer",
+			"core.topic.trial.stage.change",
+			"standart.topic.simulation_request_transport",
+			"standart.topic.simulation_request_startinject",
+			"standart.topic.simulation_entity_item",
+			"standart.topic.simulation_entity_post",
+			"standart.topic.lcms_plots",
+			"standart.topic.simulation_affected_area",
+			"standart.topic.simulation_sumo_configuration",
+			"standart.topic.standard_cap",
+			"standart.topic.chain_power",
+			"standart.topic.chain_care",
+			"standart.topic.chain_flood",
+			"standart.topic.chain",
+			"standart.topic.flood_prediction_geojson",
+			"standart.topic.flood_actual"			
+		],
+		"gateways": [
+		]
 	}
 ]
