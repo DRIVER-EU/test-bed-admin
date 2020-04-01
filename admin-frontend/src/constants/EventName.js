@@ -7,5 +7,6 @@ export default {
   ORGANISATION_POPUP: "organisationPopup",
   CONFIGURATION_POPUP: "configurationPopup",
   SCHEMA_POPUP: "schemaPopup",
+  BACKUP_POPUP: "backupPopup",
   RIGHTS_RELOADED: "rightsReloaded",
 }

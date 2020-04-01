@@ -38,6 +38,7 @@ public class Solution {
 	@SequenceGenerator(sequenceName = "admin_service.solution_seq", name = "SolutionIdSequence", allocationSize=1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SolutionIdSequence")
 	@Column(unique=true, nullable=false)
+	@JsonIgnore
 	private Long id;
 	
 	@Column(name="clientId", length=255)
@@ -52,8 +53,7 @@ public class Solution {
 	@Size(min = 4, max = 255)
 	private String name = null;
 	
-	@Column(name="origin", columnDefinition="text")
-	private String origin = null;
+	private Origin origin = null;
 	
 	@Column(name="isAdmin")
 	private Boolean isAdmin = false;
@@ -118,11 +118,11 @@ public class Solution {
 		this.name = name;
 	}
 	
-	public String getOrigin() {
+	public Origin getOrigin() {
 		return origin;
 	}
 
-	public void setOrigin(String origin) {
+	public void setOrigin(Origin origin) {
 		this.origin = origin;
 	}
 

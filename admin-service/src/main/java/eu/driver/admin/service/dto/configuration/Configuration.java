@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import scala.Array;
 import eu.driver.admin.service.dto.gateway.Gateway;
 import eu.driver.admin.service.dto.solution.Solution;
@@ -31,6 +33,7 @@ public class Configuration {
 	@SequenceGenerator(sequenceName = "admin_service.configuration_seq", name = "ConfigurationIdSequence", allocationSize=1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ConfigurationIdSequence")
 	@Column(unique=true, nullable=false)
+	@JsonIgnore
 	private Long id;
 	
 	@Column(name="name", length=255)

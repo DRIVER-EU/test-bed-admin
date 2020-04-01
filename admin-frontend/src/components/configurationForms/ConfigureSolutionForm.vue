@@ -19,7 +19,7 @@
             :counter="255"
             required
           ></v-text-field>
-          <v-radio-group row v-model="isService" mandatory label="Testbed service:">
+          <v-radio-group row v-model="isService" mandatory label="TTI service:">
             <v-spacer></v-spacer>
             <v-radio
               label="Yes"

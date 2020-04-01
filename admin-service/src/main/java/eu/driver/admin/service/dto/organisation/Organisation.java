@@ -30,6 +30,7 @@ public class Organisation {
 	@SequenceGenerator(sequenceName = "admin_service.organisation_seq", name = "OrganisationIdSequence", allocationSize=1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "OrganisationIdSequence")
 	@Column(unique=true, nullable=false)
+	@JsonIgnore
 	private Long id;
 	
 	@Column(name="orgName", length=255)

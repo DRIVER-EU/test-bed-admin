@@ -14,7 +14,7 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
 	
 	public final static String ID_QUERY = "SELECT u FROM Topic u where u.id=:objectId ORDER BY u.id DESC";
 	
-	public final static String CLIENT_ID_QUERY = "SELECT u FROM Topic u where u.clientId=:clientId";
+	public final static String CLIENT_ID_QUERY = "SELECT u FROM Topic u where u.topicId=:topicId";
 	
 	public final static String NAME_QUERY = "SELECT u FROM Topic u where u.name=:name";
 	
@@ -24,7 +24,7 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     public Topic findObjectById(@Param("objectId") Long objectId);
 	
 	@Query(CLIENT_ID_QUERY)
-    public Topic findObjectByClientId(@Param("clientId") String clientId);
+    public Topic findObjectByTopicId(@Param("topicId") String topicId);
 	
 	@Query(NAME_QUERY)
     public Topic findObjectByName(@Param("name") String name);

@@ -1,241 +1,144 @@
-[
-	{
-		"id": "standart.topic.asign.info",
-		"type": "standard.topic",
-		"name": "asign_info",
-		"msgType": "FeatureCollection",
-		"msgTypeNamespace": "eu.driver.model.geojson",
-		"msgTypeVersion": "1.0",
-		"state": false,
-		"publishSolutionIDs": [
-			"asign-mission",
-			"TB-TrialMgmt"
-		],
-		"subscribedSolutionIDs": [
-			"CrowdTaskerProducer",
-			"view-terra-1",
-			"view-terra-2",
-			"TB-AARTool"
-		],
-		"description": "This is the standard asign geoJSON topic."
-	},
-	{
-		"id": "standart.topic.crowd.tasker.info",
-		"type": "standard.topic",
-		"name": "crowd-tasker_info",
-		"msgType": "FeatureCollection",
-		"msgTypeNamespace": "eu.driver.model.geojson",
-		"msgTypeVersion": "1.0",
-		"state": false,
-		"publishSolutionIDs": [
-			"CrowdTaskerProducer",
-			"TB-TrialMgmt"
-		],
-		"subscribedSolutionIDs": [
-			"view-terra-1",
-			"view-terra-2",
-			"TB-AARTool"
-		],
-		"description": "This is the standard CrowdTasker geoJSON topic."
-	},
-	{
-		"id": "standart.topic.large.data.update",
-		"type": "standard.topic",
-		"name": "large_data_update",
-		"msgType": "LargeDataUpdate",
-		"msgTypeNamespace": "eu.driver.model.core",
-		"msgTypeVersion": "1.0",
-		"state": false,
-		"publishSolutionIDs": [
-			"TB-TrialMgmt"
-		],
-		"subscribedSolutionIDs": [
-			"TB-GeoServer",
-			"TB-AARTool",
-			"TB-AARTool-Backup"
-		],
-		"description": "This is the standard Flightdata topic."
-	},
-	{
-		"id": "standart.topic.map.layer.update",
-		"type": "standard.topic",
-		"name": "map_layer_update",
-		"msgType": "MapLayerUpdate",
-		"msgTypeNamespace": "eu.driver.model.core",
-		"msgTypeVersion": "1.0",
-		"state": false,
-		"publishSolutionIDs": [
-			"TB-GeoServer"
-		],
-		"subscribedSolutionIDs": [
-			"view-terra-m1",
-			"view-terra-m2",
-			"view-terra-staff",
-			"socrates",
-			"TB-AARTool",
-			"TB-AARTool-Backup"
-		],
-		"description": "This is the standard MapLayer topic."
-	},
-	{
-		"id": "standart.topic.photo.data",
-		"type": "standard.topic",
-		"name": "photo_geojson",
-		"msgType": "FeatureCollection",
-		"msgTypeNamespace": "eu.driver.model.geojson.photo",
-		"msgTypeVersion": "1.0",
-		"state": false,
-		"publishSolutionIDs": [
-			"asign-photo",
-			"TB-TrialMgmt"
-		],
-		"subscribedSolutionIDs": [
-			"view-terra-1",
-			"view-terra-2",
-			"TB-AARTool"
-		],
-		"description": "This is the standard Photo geoJSON topic."
-	},{
-		"id": "standart.topic.cs_internal",
-		"type": "standard.topic",
-		"name": "cs_internal",
-		"msgType": "Alert",
-		"msgTypeNamespace": "eu.driver.model.cap",
-		"msgTypeVersion": "1.2",
-		"state": false,
-		"publishSolutionIDs": [
-			"crisissuite"
-		],
-		"subscribedSolutionIDs": [
-			"crisissuite",
-			"TB-AARTool",
-			"TB-AARTool-Backup"
-		],
-		"description": "This is the topic for crisisSuite internal communication."
-	},{
-		"id": "standart.topic.staff_map",
-		"type": "standard.topic",
-		"name": "staff_map",
-		"msgType": "Alert",
-		"msgTypeNamespace": "eu.driver.model.cap",
-		"msgTypeVersion": "1.2",
-		"state": false,
-		"publishSolutionIDs": [
-			"TB-TrialMgmt",
-			"crisissuite"
-		],
-		"subscribedSolutionIDs": [
-			"TB-AARTool",
-			"TB-AARTool-Backup",
-			"crisissuite",
-			"view-terra-m1",
-			"view-terra-m2",
-			"view-terra-staff"
-		],
-		"description": "This is the topic for Staff map information."
-	},{
-		"id": "standart.topic.socrates_map",
-		"type": "standard.topic",
-		"name": "socrates_map",
-		"msgType": "Alert",
-		"msgTypeNamespace": "eu.driver.model.cap",
-		"msgTypeVersion": "1.2",
-		"state": false,
-		"publishSolutionIDs": [
-			"socrates"
-		],
-		"subscribedSolutionIDs": [
-			"TB-AARTool",
-			"TB-AARTool-Backup",
-			"crisissuite",
-			"view-terra-m1",
-			"view-terra-m2",
-			"view-terra-staff"
-		],
-		"description": "This is the topic for Staff map information."
-	},{
-		"id": "standart.topic.frt_map",
-		"type": "standard.topic",
-		"name": "frt_map",
-		"msgType": "Alert",
-		"msgTypeNamespace": "eu.driver.model.cap",
-		"msgTypeVersion": "1.2",
-		"state": false,
-		"publishSolutionIDs": [
-			"frt"
-		],
-		"subscribedSolutionIDs": [
-			"TB-AARTool",
-			"TB-AARTool-Backup",
-			"crisissuite",
-			"socrates",
-			"view-terra-m1",
-			"view-terra-m2",
-			"view-terra-staff"
-		],
-		"description": "This is the topic for Staff map information."
-	},{
-		"id": "standart.topic.staff_info",
-		"type": "standard.topic",
-		"name": "staff_info",
-		"msgType": "Alert",
-		"msgTypeNamespace": "eu.driver.model.cap",
-		"msgTypeVersion": "1.2",
-		"state": false,
-		"publishSolutionIDs": [
-			"TB-TrialMgmt"
-		],
-		"subscribedSolutionIDs": [
-			"TB-AARTool",
-			"TB-AARTool-Backup",
-			"crisissuite"
-		],
-		"description": "This is the topic for Staff map information."
-	},{
-		"id": "standart.topic.simulation_entity_post",
-		"type": "standard.topic",
-		"name": "simulation_entity_post",
-		"msgType": "Post",
-		"msgTypeNamespace": "eu.driver.model.sim.entity",
-		"msgTypeVersion": "1.0",
-		"state": false,
-		"publishSolutionIDs": [
-			"all"
-		],
-		"subscribedSolutionIDs": [
-			"all"
-		],
-		"description": "This is the topic for Staff map information."
-	},{
-		"id": "standart.topic.simulation_request_startinject",
-		"type": "standard.topic",
-		"name": "simulation_request_startinject",
-		"msgType": "RequestStartInject",
-		"msgTypeNamespace": "eu.driver.model.sim.request",
-		"msgTypeVersion": "1.0",
-		"state": false,
-		"publishSolutionIDs": [
-			"xvr-cm"
-		],
-		"subscribedSolutionIDs": [
-			"TB-AARTool",
-			"TB-AARTool-Backup"
-		],
-		"description": "This is the topic for Staff map information."
-	},{
-		"id": "standart.topic.simulation_request_transport",
-		"type": "standard.topic",
-		"name": "simulation_request_transport",
-		"msgType": "RequestMove",
-		"msgTypeNamespace": "eu.driver.model.sim.request",
-		"msgTypeVersion": "1.0",
-		"state": false,
-		"publishSolutionIDs": [
-			"all"
-		],
-		"subscribedSolutionIDs": [
-			"all"
-		],
-		"description": "This is the topic for Staff map information."
-	}
-]
+[ {
+  "topicId" : "standart.topic.asign.info",
+  "type" : "standard.topic",
+  "name" : "asign_info",
+  "state" : false,
+  "msgType" : "FeatureCollection",
+  "msgTypeNamespace" : "eu.driver.model.geojson",
+  "msgTypeVersion" : "1.0",
+  "description" : "This is the standard asign geoJSON topic.",
+  "publishSolutionIDs" : [ "asign-mission", "TB-TrialMgmt" ],
+  "subscribedSolutionIDs" : [ "CrowdTaskerProducer", "view-terra-1", "view-terra-2", "TB-AARTool" ]
+}, {
+  "topicId" : "standart.topic.crowd.tasker.info",
+  "type" : "standard.topic",
+  "name" : "crowd-tasker_info",
+  "state" : false,
+  "msgType" : "FeatureCollection",
+  "msgTypeNamespace" : "eu.driver.model.geojson",
+  "msgTypeVersion" : "1.0",
+  "description" : "This is the standard CrowdTasker geoJSON topic.",
+  "publishSolutionIDs" : [ "CrowdTaskerProducer", "TB-TrialMgmt" ],
+  "subscribedSolutionIDs" : [ "view-terra-1", "view-terra-2", "TB-AARTool" ]
+}, {
+  "topicId" : "standart.topic.large.data.update",
+  "type" : "standard.topic",
+  "name" : "large_data_update",
+  "state" : false,
+  "msgType" : "LargeDataUpdate",
+  "msgTypeNamespace" : "eu.driver.model.core",
+  "msgTypeVersion" : "1.0",
+  "description" : "This is the standard Flightdata topic.",
+  "publishSolutionIDs" : [ "TB-TrialMgmt" ],
+  "subscribedSolutionIDs" : [ "TB-GeoServer", "TB-AARTool", "TB-AARTool-Backup" ]
+}, {
+  "topicId" : "standart.topic.map.layer.update",
+  "type" : "standard.topic",
+  "name" : "map_layer_update",
+  "state" : false,
+  "msgType" : "MapLayerUpdate",
+  "msgTypeNamespace" : "eu.driver.model.core",
+  "msgTypeVersion" : "1.0",
+  "description" : "This is the standard MapLayer topic.",
+  "publishSolutionIDs" : [ "TB-GeoServer" ],
+  "subscribedSolutionIDs" : [ "view-terra-m1", "view-terra-m2", "view-terra-staff", "socrates", "TB-AARTool", "TB-AARTool-Backup" ]
+}, {
+  "topicId" : "standart.topic.photo.data",
+  "type" : "standard.topic",
+  "name" : "photo_geojson",
+  "state" : false,
+  "msgType" : "FeatureCollection",
+  "msgTypeNamespace" : "eu.driver.model.geojson.photo",
+  "msgTypeVersion" : "1.0",
+  "description" : "This is the standard Photo geoJSON topic.",
+  "publishSolutionIDs" : [ "asign-photo", "TB-TrialMgmt" ],
+  "subscribedSolutionIDs" : [ "view-terra-1", "view-terra-2", "TB-AARTool" ]
+}, {
+  "topicId" : "standart.topic.cs_internal",
+  "type" : "standard.topic",
+  "name" : "cs_internal",
+  "state" : false,
+  "msgType" : "Alert",
+  "msgTypeNamespace" : "eu.driver.model.cap",
+  "msgTypeVersion" : "1.2",
+  "description" : "This is the topic for crisisSuite internal communication.",
+  "publishSolutionIDs" : [ "crisissuite" ],
+  "subscribedSolutionIDs" : [ "crisissuite", "TB-AARTool", "TB-AARTool-Backup" ]
+}, {
+  "topicId" : "standart.topic.staff_map",
+  "type" : "standard.topic",
+  "name" : "staff_map",
+  "state" : false,
+  "msgType" : "Alert",
+  "msgTypeNamespace" : "eu.driver.model.cap",
+  "msgTypeVersion" : "1.2",
+  "description" : "This is the topic for Staff map information.",
+  "publishSolutionIDs" : [ "TB-TrialMgmt", "crisissuite" ],
+  "subscribedSolutionIDs" : [ "TB-AARTool", "TB-AARTool-Backup", "crisissuite", "view-terra-m1", "view-terra-m2", "view-terra-staff" ]
+}, {
+  "topicId" : "standart.topic.socrates_map",
+  "type" : "standard.topic",
+  "name" : "socrates_map",
+  "state" : false,
+  "msgType" : "Alert",
+  "msgTypeNamespace" : "eu.driver.model.cap",
+  "msgTypeVersion" : "1.2",
+  "description" : "This is the topic for Staff map information.",
+  "publishSolutionIDs" : [ "socrates" ],
+  "subscribedSolutionIDs" : [ "TB-AARTool", "TB-AARTool-Backup", "crisissuite", "view-terra-m1", "view-terra-m2", "view-terra-staff" ]
+}, {
+  "topicId" : "standart.topic.frt_map",
+  "type" : "standard.topic",
+  "name" : "frt_map",
+  "state" : false,
+  "msgType" : "Alert",
+  "msgTypeNamespace" : "eu.driver.model.cap",
+  "msgTypeVersion" : "1.2",
+  "description" : "This is the topic for Staff map information.",
+  "publishSolutionIDs" : [ "frt" ],
+  "subscribedSolutionIDs" : [ "TB-AARTool", "TB-AARTool-Backup", "crisissuite", "socrates", "view-terra-m1", "view-terra-m2", "view-terra-staff" ]
+}, {
+  "topicId" : "standart.topic.staff_info",
+  "type" : "standard.topic",
+  "name" : "staff_info",
+  "state" : false,
+  "msgType" : "Alert",
+  "msgTypeNamespace" : "eu.driver.model.cap",
+  "msgTypeVersion" : "1.2",
+  "description" : "This is the topic for Staff map information.",
+  "publishSolutionIDs" : [ "TB-TrialMgmt" ],
+  "subscribedSolutionIDs" : [ "TB-AARTool", "TB-AARTool-Backup", "crisissuite" ]
+}, {
+  "topicId" : "standart.topic.simulation_entity_post",
+  "type" : "standard.topic",
+  "name" : "simulation_entity_post",
+  "state" : false,
+  "msgType" : "Post",
+  "msgTypeNamespace" : "eu.driver.model.sim.entity",
+  "msgTypeVersion" : "1.0",
+  "description" : "This is the topic for Staff map information.",
+  "publishSolutionIDs" : [ "all" ],
+  "subscribedSolutionIDs" : [ "all" ]
+}, {
+  "topicId" : "standart.topic.simulation_request_startinject",
+  "type" : "standard.topic",
+  "name" : "simulation_request_startinject",
+  "state" : false,
+  "msgType" : "RequestStartInject",
+  "msgTypeNamespace" : "eu.driver.model.sim.request",
+  "msgTypeVersion" : "1.0",
+  "description" : "This is the topic for Staff map information.",
+  "publishSolutionIDs" : [ "all" ],
+  "subscribedSolutionIDs" : [ "all" ]
+}, {
+  "topicId" : "standart.topic.simulation_request_transport",
+  "type" : "standard.topic",
+  "name" : "simulation_request_transport",
+  "state" : false,
+  "msgType" : "RequestMove",
+  "msgTypeNamespace" : "eu.driver.model.sim.request",
+  "msgTypeVersion" : "1.0",
+  "description" : "This is the topic for Staff map information.",
+  "publishSolutionIDs" : [ "all" ],
+  "subscribedSolutionIDs" : [ "all" ]
+} ]

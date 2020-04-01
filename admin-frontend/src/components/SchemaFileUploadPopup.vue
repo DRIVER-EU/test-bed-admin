@@ -2,11 +2,11 @@
   <v-layout row justify-center>
     <v-dialog v-model="dialog" max-width="600">
       <v-card class="schemaFileUploadPopup" style="height: 200px;">
-        <v-card-title class="headline">
+        <v-card-title class="upload_headline">
           Upload AVRO Schema Files
         </v-card-title>
         <form enctype="multipart/form-data" novalidate v-if="isInitial || isSaving">
-          <div class="dropbox">
+          <div class="dropbox dropbox_padding">
             <input type="file" multiple :name="uploadFieldName" :disabled="isSaving" @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
               accept=".avsc" class="input-file">
               <p v-if="isInitial">

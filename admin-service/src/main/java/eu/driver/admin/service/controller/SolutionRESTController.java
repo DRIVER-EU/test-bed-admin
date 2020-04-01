@@ -6,6 +6,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -18,6 +24,7 @@ import java.util.Timer;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.avro.specific.SpecificData;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +42,7 @@ import eu.driver.admin.service.dto.SolutionList;
 import eu.driver.admin.service.dto.configuration.Configuration;
 import eu.driver.admin.service.dto.configuration.TestbedConfig;
 import eu.driver.admin.service.dto.log.Log;
+import eu.driver.admin.service.dto.solution.Origin;
 import eu.driver.admin.service.dto.solution.Solution;
 import eu.driver.admin.service.repository.ConfigurationRepository;
 import eu.driver.admin.service.repository.OrganisationRepository;
@@ -74,6 +82,8 @@ public class SolutionRESTController {
 	OrganisationRepository orgRepo;
 	
 	public MgmtController mgmtController;
+	
+	private Origin origin = new Origin();
 
 	public SolutionRESTController() {
 		log.info("-->SolutionRESTController");
@@ -81,6 +91,24 @@ public class SolutionRESTController {
 		hbTimerTask = new SolutionHeartbeatTimerTask(this);
 		hbTimer = new Timer();
 		hbTimer.schedule(hbTimerTask, 3000, 3000);
+		
+		InetAddress ip;
+        try {
+            ip = InetAddress.getLocalHost();
+            if (ip != null && ip.getHostName() != null) {
+            	origin.setHosteName(ip.getHostName());
+            }
+            if (ip != null) {
+            	origin.setLocalIp(ip.getHostAddress());
+            }
+            
+            String remoteIP = this.getRemoteIP();
+            if (remoteIP != null) {
+            	origin.setRemoteIp(remoteIP);
+            }
+        } catch (UnknownHostException e) {
+        	log.error("Error optaining IP and Hostname!");
+        }
 		log.info("-->SolutionRESTController");
 	}
 	
@@ -90,8 +118,16 @@ public class SolutionRESTController {
 			Solution solution = this.solutionRepo.findObjectByClientId(clientID);
 			if (solution != null) {
 				solution.setLastHeartBeatReceived(new Date());
+				Origin solOrigin = solution.getOrigin();
+				if (solOrigin != null) {
+					solOrigin = new Origin();
+				}
 				if (origin != null) {
-					solution.setOrigin(origin);
+					JSONObject jsonOrigin = new JSONObject(origin);
+					solOrigin.setLocalIp(jsonOrigin.getString("local_IP"));
+					solOrigin.setHosteName(jsonOrigin.getString("hostname"));
+					solOrigin.setRemoteIp(jsonOrigin.getString("remote_IP"));
+					solution.setOrigin(solOrigin);
 				}
 				if (solution.getState() != state) {
 					solution.setState(state);
@@ -353,6 +389,43 @@ public class SolutionRESTController {
 
 		log.info("getSolutionsCertMap -->");
 		return new ResponseEntity<Map<String, String>>(certMap, HttpStatus.OK);
+	}
+	
+	private String getRemoteIP() {
+		String remoteIP = null;
+		
+		try {
+			remoteIP = getHTTPRequest("http://ipv4bot.whatismyipaddress.com", "text/html");
+		} catch (Exception e) {
+			remoteIP = null;
+		}
+		
+		return remoteIP;
+	}
+	
+	private String getHTTPRequest(String url, String contentType) throws Exception {
+		StringBuffer response = new StringBuffer();
+		try {
+			URL obj = new URL(url);
+			HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+	
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Content-Type", contentType);
+	
+			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			String inputLine;
+			
+	
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+		} catch (Exception e) {
+			throw new Exception("Error executing the GET request!");
+		}
+		
+		return response.toString();
+
 	}
 	
 	public LogRESTController getLogController() {

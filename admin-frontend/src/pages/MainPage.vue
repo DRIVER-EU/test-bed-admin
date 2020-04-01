@@ -10,6 +10,10 @@
               <v-icon left>business_center</v-icon>
               Upload Schema
             </v-list-tile>
+            <v-list-tile @click="uploadBackup()" :disabled="isUploadAllowed() || isTestbedInitialized">
+              <v-icon left>business_center</v-icon>
+              Upload TTI config backup
+            </v-list-tile>
             <v-list-tile @click="editConfigurations()" :disabled="isConfigViewAllowed()">
               <v-icon left>settings</v-icon>
               Configurations
@@ -83,6 +87,7 @@
     <configuration-popup/>
     <organisation-popup/>
     <schema-popup/>
+    <backup-popup/>
   </v-app>
 </template>
 <script>
@@ -121,6 +126,9 @@
         },
         uploadSchema: function() {
           eventBus.$emit(EventName.SCHEMA_POPUP, {open: true});
+        },
+        uploadBackup: function() {
+          eventBus.$emit(EventName.BACKUP_POPUP, {open: true});
         },
         editConfigurations: function() {
           eventBus.$emit(EventName.CONFIGURATION_POPUP, {open: true});

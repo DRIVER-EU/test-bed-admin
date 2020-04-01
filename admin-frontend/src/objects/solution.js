@@ -7,5 +7,7 @@ export function Solution(solution) {
     this.state = solution.state || false,
     this.name= solution.name,
     this.description = solution.description,
-    this.organisation = solution.organisation
+    this.organisation = solution.organisation,
+    this.origin = solution.origin,
+    this.showOrigin = false
 }

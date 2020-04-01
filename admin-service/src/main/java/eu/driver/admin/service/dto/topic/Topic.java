@@ -36,11 +36,12 @@ public class Topic {
 	@SequenceGenerator(sequenceName = "admin_service.gateway_seq", name = "TopicIdSequence", allocationSize=1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TopicIdSequence")
 	@Column(unique=true, nullable=false)
+	@JsonIgnore
 	private Long id;
 	
 	@Column(name="clientId", length=255)
 	@Size(min = 4, max = 255)
-	private String clientId = null;
+	private String topicId = null;
 	
 	@Column(name="type", length=255)
 	@Size(min = 4, max = 255)
@@ -98,12 +99,12 @@ public class Topic {
 		this.id = id;
 	}
 
-	public String getClientId() {
-		return clientId;
+	public String getTopicId() {
+		return topicId;
 	}
 
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
+	public void setTopicId(String topicId) {
+		this.topicId = topicId;
 	}
 
 	public String getType() {

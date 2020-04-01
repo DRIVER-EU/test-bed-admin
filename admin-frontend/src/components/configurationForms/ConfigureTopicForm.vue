@@ -9,14 +9,14 @@
             v-model="clientId"
             :rules="clientIdRules"
             label="ID"
-            :counter="25"
+            :counter="255"
             required
           ></v-text-field>
           <v-text-field
             v-model="name"
             :rules="nameRules"
             label="Name"
-            :counter="25"
+            :counter="255"
             required
           ></v-text-field>
           <v-select

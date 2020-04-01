@@ -19,6 +19,7 @@ import {webSocketConnection} from './service/WebSocketConnection'
 import OrganisationPopup from './components/OrganisationPopup';
 import ConfigurationPopup from './components/ConfigurationPopup';
 import SchemaPopup from './components/SchemaFileUploadPopup';
+import BackupPopup from './components/ConfigBackupUploadPopup';
 
 export const eventBus = new Vue();
 
@@ -51,6 +52,7 @@ Vue.component('diagram-page', DiagramPage);
 Vue.component('organisation-popup', OrganisationPopup);
 Vue.component('configuration-popup', ConfigurationPopup);
 Vue.component('schema-popup', SchemaPopup);
+Vue.component('backup-popup', BackupPopup);
 
 Vue.config.productionTip = false;
 

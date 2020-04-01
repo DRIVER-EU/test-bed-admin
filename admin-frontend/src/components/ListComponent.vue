@@ -14,7 +14,7 @@
               <v-icon>playlist_play</v-icon>
             </v-btn>
             <v-btn icon @click.native="editItem(d)" :disabled="isEditAllowed()">
-              <v-icon>text_format</v-icon>
+              <v-icon>edit</v-icon>
             </v-btn>
             <v-btn icon @click.native="deleteItem(d)" :disabled="isDeleteAllowed()">
               <v-icon>delete_outline</v-icon>
@@ -27,13 +27,13 @@
           </div>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn icon @click.native="d.showDescription = !d.showDescription">
-              <v-icon>{{ d.showDescription ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</v-icon>
+            <v-btn icon @click.native="d.showOrigin = !d.showOrigin">
+              <v-icon>{{ d.showOrigin ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</v-icon>
             </v-btn>
           </v-card-actions>
         </v-card-title>
-        <v-card-text v-show="d.showDescription">
-          {{d.description}}
+        <v-card-text v-show="d.origin">
+          {{d.origin}}
         </v-card-text>
       </v-card>
     </v-layout>

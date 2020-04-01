@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * The persistent class for the solution database table.
  * 
@@ -30,6 +32,7 @@ public class Standard {
 	@SequenceGenerator(sequenceName = "admin_service.standard_seq", name = "StandardIdSequence", allocationSize=1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "StandardIdSequence")
 	@Column(unique=true, nullable=false)
+	@JsonIgnore
 	private Long id;
 	
 	@Column(name="name", length=255)

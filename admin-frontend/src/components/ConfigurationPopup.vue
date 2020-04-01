@@ -3,7 +3,7 @@
     <!--<v-btn color="primary" dark @click.native.stop="dialog = true">Open Dialog</v-btn>-->
     <v-dialog v-model="dialog" max-width="600">
       <v-card class="configurationPopup" style="height: calc(100vh - 160px);">
-        <v-card-title class="headline">
+        <v-card-title class="upload_headline">
           Configurations
           <v-spacer></v-spacer>
           <v-btn v-if="!this.isEditMode" flat="flat" @click="create" :disabled="isCreateAllowed()">Create</v-btn>

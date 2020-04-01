@@ -1,82 +1,185 @@
-[
-	{
-		"id": "TB-AdminTool",
-		"subject.id": "CN=Admin Tool,OU=Authz Service Dev Project,OU=WP923,O=DRIVER-PROJECT.EU",
-		"name": "AdminTool",
-		"isTestbed": true,
-		"isService": true,
-		"state": false,
-		"orgName":"Frequentis",
-		"description": "This is the AdminTool"
-	},
-	{
-		"id": "TB-AARTool",
-		"subject.id": "O=DRIVER-PROJECT.EU,CN=AARTool",
-		"name": "AARTool",
-		"isTestbed": false,
-		"isService": true,
-		"state": false,
-		"orgName":"Frequentis",
-		"description": "This is the AfterActionReview Tool"
-	},
-	{
-		"id": "TB-AARTool-Backup",
-		"subject.id": "O=DRIVER-PROJECT.EU,CN=AARTool",
-		"name": "AARTool Backup",
-		"isTestbed": false,
-		"isService": true,
-		"state": false,
-		"orgName":"Frequentis",
-		"description": "This is the AfterActionReview Tool"
-	},
-	{
-		"id": "TB-TrialMgmt",
-		"subject.id": "O=DRIVER-PROJECT.EU,CN=TrialMgmt",
-		"name": "TrialManager",
-		"isTestbed": false,
-		"isService": true,
-		"state": false,
-		"orgName":"TNO",
-		"description": "This is the Trial Manager"
-	},
-	{
-		"id": "TB-TimeService",
-		"subject.id": "O=DRIVER-PROJECT.EU,CN=TimeService",
-		"name": "TimeService",
-		"isTestbed": false,
-		"isService": true,
-		"state": false,
-		"orgName":"TNO",
-		"description": "This is the Testbed TimeService"
-	},
-	{
-		"id": "TB-Ost",
-		"subject.id": "O=DRIVER-PROJECT.EU,CN=Ost",
-		"name": "ObserverTool",
-		"isTestbed": false,
-		"isService": true,
-		"state": false,
-		"orgName":"ITTI",
-		"description": "This is the Testbed ObserverTool"
-	},
-	{
-		"id": "TB-GeoServer",
-		"subject.id": "O=DRIVER-PROJECT.EU,CN=GeoServer",
-		"name": "GeoServer",
-		"isTestbed": false,
-		"isService": true,
-		"state": false,
-		"orgName":"Frequentis",
-		"description": "This is the Testbed GeoServer"
-	},
-	{
-		"id": "TB-LargeFileService",
-		"subject.id": "O=DRIVER-PROJECT.EU,CN=LargeFileService",
-		"name": "LargeFileService",
-		"isTestbed": false,
-		"isService": true,
-		"state": false,
-		"orgName":"TNO",
-		"description": "This is the Testbed LargeFileService"
-	}
-]
+[ {
+  "clientId" : "TB-AdminTool",
+  "subjectId" : "O=FREQUENTIS,CN=ADMINTOOL",
+  "name" : "AdminTool",
+  "origin" : null,
+  "isAdmin" : true,
+  "isService" : true,
+  "state" : true,
+  "description" : "This is the AdminTool",
+  "lastHeartBeatReceived" : null,
+  "organisation" : {
+    "orgName" : "Frequentis",
+    "userName" : "FrequentisUser",
+    "userPwd" : "changeit",
+    "certPwd" : "changeit",
+    "email" : "Frequentis@driver-project.eu",
+    "phone" : "",
+    "city" : "",
+    "postcode" : null,
+    "street" : "",
+    "nr" : null,
+    "description" : "Frequentis solution provider!"
+  }
+}, {
+  "clientId" : "TB-AARTool",
+  "subjectId" : "O=FREQUENTIS,CN=AARTOOL",
+  "name" : "AARTool",
+  "origin" : null,
+  "isAdmin" : false,
+  "isService" : true,
+  "state" : false,
+  "description" : "This is the AfterActionReview Tool",
+  "lastHeartBeatReceived" : null,
+  "organisation" : {
+    "orgName" : "Frequentis",
+    "userName" : "FrequentisUser",
+    "userPwd" : "changeit",
+    "certPwd" : "changeit",
+    "email" : "Frequentis@driver-project.eu",
+    "phone" : "",
+    "city" : "",
+    "postcode" : null,
+    "street" : "",
+    "nr" : null,
+    "description" : "Frequentis solution provider!"
+  }
+}, {
+  "clientId" : "TB-AARTool-Backup",
+  "subjectId" : "O=FREQUENTIS,CN=AARTOOL-BACKUP",
+  "name" : "AARTool Backup",
+  "origin" : null,
+  "isAdmin" : false,
+  "isService" : true,
+  "state" : false,
+  "description" : "This is the AfterActionReview Tool",
+  "lastHeartBeatReceived" : null,
+  "organisation" : {
+    "orgName" : "Frequentis",
+    "userName" : "FrequentisUser",
+    "userPwd" : "changeit",
+    "certPwd" : "changeit",
+    "email" : "Frequentis@driver-project.eu",
+    "phone" : "",
+    "city" : "",
+    "postcode" : null,
+    "street" : "",
+    "nr" : null,
+    "description" : "Frequentis solution provider!"
+  }
+}, {
+  "clientId" : "TB-TrialMgmt",
+  "subjectId" : "O=TNO,CN=TRIALMANAGER",
+  "name" : "TrialManager",
+  "origin" : null,
+  "isAdmin" : false,
+  "isService" : true,
+  "state" : false,
+  "description" : "This is the Trial Manager",
+  "lastHeartBeatReceived" : null,
+  "organisation" : {
+    "orgName" : "TNO",
+    "userName" : "TNOUser",
+    "userPwd" : "changeit",
+    "certPwd" : "changeit",
+    "email" : "tno@driver-project.eu",
+    "phone" : "",
+    "city" : "",
+    "postcode" : null,
+    "street" : "",
+    "nr" : null,
+    "description" : "TNO solution provider!"
+  }
+}, {
+  "clientId" : "TB-TimeService",
+  "subjectId" : "O=TNO,CN=TIMESERVICE",
+  "name" : "TimeService",
+  "origin" : null,
+  "isAdmin" : false,
+  "isService" : true,
+  "state" : false,
+  "description" : "This is the Testbed TimeService",
+  "lastHeartBeatReceived" : null,
+  "organisation" : {
+    "orgName" : "TNO",
+    "userName" : "TNOUser",
+    "userPwd" : "changeit",
+    "certPwd" : "changeit",
+    "email" : "tno@driver-project.eu",
+    "phone" : "",
+    "city" : "",
+    "postcode" : null,
+    "street" : "",
+    "nr" : null,
+    "description" : "TNO solution provider!"
+  }
+}, {
+  "clientId" : "TB-Ost",
+  "subjectId" : "O=ITTI,CN=OBSERVERTOOL",
+  "name" : "ObserverTool",
+  "origin" : null,
+  "isAdmin" : false,
+  "isService" : true,
+  "state" : false,
+  "description" : "This is the Testbed ObserverTool",
+  "lastHeartBeatReceived" : null,
+  "organisation" : {
+    "orgName" : "ITTI",
+    "userName" : "ITTIUser",
+    "userPwd" : "changeit",
+    "certPwd" : "changeit",
+    "email" : "ITTI@driver-project.eu",
+    "phone" : "",
+    "city" : "",
+    "postcode" : null,
+    "street" : "",
+    "nr" : null,
+    "description" : "ITTI solution provider!"
+  }
+}, {
+  "clientId" : "TB-GeoServer",
+  "subjectId" : "O=FREQUENTIS,CN=GEOSERVER",
+  "name" : "GeoServer",
+  "origin" : null,
+  "isAdmin" : false,
+  "isService" : true,
+  "state" : false,
+  "description" : "This is the Testbed GeoServer",
+  "lastHeartBeatReceived" : null,
+  "organisation" : {
+    "orgName" : "Frequentis",
+    "userName" : "FrequentisUser",
+    "userPwd" : "changeit",
+    "certPwd" : "changeit",
+    "email" : "Frequentis@driver-project.eu",
+    "phone" : "",
+    "city" : "",
+    "postcode" : null,
+    "street" : "",
+    "nr" : null,
+    "description" : "Frequentis solution provider!"
+  }
+}, {
+  "clientId" : "TB-LargeFileService",
+  "subjectId" : "O=TNO,CN=LARGEFILESERVICE",
+  "name" : "LargeFileService",
+  "origin" : null,
+  "isAdmin" : false,
+  "isService" : true,
+  "state" : false,
+  "description" : "This is the Testbed LargeFileService",
+  "lastHeartBeatReceived" : null,
+  "organisation" : {
+    "orgName" : "TNO",
+    "userName" : "TNOUser",
+    "userPwd" : "changeit",
+    "certPwd" : "changeit",
+    "email" : "tno@driver-project.eu",
+    "phone" : "",
+    "city" : "",
+    "postcode" : null,
+    "street" : "",
+    "nr" : null,
+    "description" : "TNO solution provider!"
+  }
+} ]

@@ -471,14 +471,14 @@ public class MgmtController {
 				
 				for (Topic topic : topics) {
 					source += "node \"Technical infratrucure\" {\n";
-					if (topic.getClientId().indexOf("core.topic") < 0) {
+					if (topic.getTopicId().indexOf("core.topic") < 0) {
 						source += "() " + topic.getName().replaceAll("-", "") + "\n";
 					}
 					source += "}\n";
 				}
 				
 				for (Topic topic : topics) {
-					if (topic.getClientId().indexOf("core.topic") < 0) {
+					if (topic.getTopicId().indexOf("core.topic") < 0) {
 						List<String> publishIDs = topic.getPublishSolutionIDs();
 						
 						
@@ -578,9 +578,9 @@ public class MgmtController {
 				adminController.removeTopic(topic.getName());
 				topic.setState(false);
 				topicRepo.saveAndFlush(topic);
-				sendTopicStateChange(topic.getClientId(), false);
+				sendTopicStateChange(topic.getTopicId(), false);
 			} catch(Exception e) {
-				log.error("Error removing the topic: " + topic.getClientId());
+				log.error("Error removing the topic: " + topic.getTopicId());
 			}
 		}
 		this.initDone = false;
@@ -699,7 +699,7 @@ public class MgmtController {
 						adminController.createTopic(topic.getName(), new EDXLDistribution(), schema , 300000L, 1);
 						logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
 						topicController.updateTopicState(topic.getName(), true);
-						sendTopicStateChange(topic.getClientId(), true);
+						sendTopicStateChange(topic.getTopicId(), true);
 						if (secureMode.equals(TestbedSecurityMode.AUTHENTICATION_AND_AUTHORIZATION)) {
 							this.grantCoreTopicGroupAccess(TopicConstants.ADMIN_HEARTBEAT_TOPIC);
 						}
@@ -740,7 +740,7 @@ public class MgmtController {
 						adminController.createTopic(topic.getName(), new EDXLDistribution(), schema, null, noOfPartitions);
 						logController.addLog(LogLevels.LOG_LEVEL_INFO, "Topic: " + topic.getName() + " created.", true);
 						topicController.updateTopicState(topic.getName(), true);
-						sendTopicStateChange(topic.getClientId(), true);
+						sendTopicStateChange(topic.getTopicId(), true);
 						// send invite message
 						
 						
@@ -782,12 +782,19 @@ public class MgmtController {
 					Solution solution = new Solution();
 					jsonobject = jsonarray.getJSONObject(i);
 
-					solution.setClientId(jsonobject.getString("id"));
+					solution.setClientId(jsonobject.getString("clientId"));
 					solution.setName(jsonobject.getString("name"));
-					solution.setIsAdmin(jsonobject.getBoolean("isTestbed"));
+					solution.setIsAdmin(jsonobject.getBoolean("isAdmin"));
 					solution.setIsService(jsonobject.getBoolean("isService"));
 					
-					String orgName = jsonobject.getString("orgName");
+					String orgName = null;
+					if (jsonobject.has("orgName")){
+						orgName = jsonobject.getString("orgName");
+						
+					} else {
+						JSONObject orgJson = jsonobject.getJSONObject("organisation");
+						orgName = orgJson.getString("orgName");
+					}
 					if (orgName != null) { 
 						Organisation organisation = organisationRepo.findObjectByOrgName(orgName);
 						solution.setOrganisation(organisation);
@@ -804,6 +811,7 @@ public class MgmtController {
 					} else {
 						solution.setState(jsonobject.getBoolean("state"));
 					}
+					
 					solution.setDescription(jsonobject.getString("description"));
 					
 					Solution dbSolution = this.solutionRepo.findObjectByClientId(solution.getClientId());
@@ -836,7 +844,7 @@ public class MgmtController {
 				Topic topic = new Topic();
 				jsonobject = jsonarray.getJSONObject(i);
 
-				topic.setClientId(jsonobject.getString("id"));
+				topic.setTopicId(jsonobject.getString("topicId"));
 				topic.setType(jsonobject.getString("type"));
 				topic.setName(jsonobject.getString("name"));
 				
@@ -866,7 +874,7 @@ public class MgmtController {
 				} 
 				topic.setSubscribedSolutionIDs(subscriber);
 				
-				Topic dbTopic = this.topicRepo.findObjectByClientId(topic.getClientId());
+				Topic dbTopic = this.topicRepo.findObjectByTopicId(topic.getTopicId());
 				if (dbTopic == null) {
 					this.topicRepo.saveAndFlush(topic);
 					log.info("add topic: " + topic.getName());
@@ -929,21 +937,6 @@ public class MgmtController {
 	
 	private void loadStandards() {
 		log.info("--> loadStandards");
-		/*String standardJson = fileReader.readFile(this.stConfigJson);
-		if (standardJson != null) {
-			try {
-				JSONArray jsonarray = new JSONArray(standardJson);
-				for (int i = 0; i < jsonarray.length(); i++) {
-					Standard standard = objectMapper.readValue(jsonarray.getJSONObject(i).toString(), Standard.class);  
-					if (this.standardRepo.findObjectByName(standard.getName()) == null) {
-						this.standardRepo.saveAndFlush(standard);
-						log.info("add standard: " + standard.getName());
-					}
-				}
-			} catch (JSONException | IOException e) {
-				log.error("Error parsind the JSON Standard response", e);
-			}
-		}*/
 		
 		try {
 			List<Path> fileWithName = Files.walk(Paths.get("./config/schema"))
@@ -1005,15 +998,22 @@ public class MgmtController {
 						JSONArray jsonSolutions = jsonobject.getJSONArray("solutions");
 						List<Solution> solutions = new ArrayList<Solution>();
 						if (jsonSolutions != null) { 
-						   for (int a=0;a<jsonSolutions.length();a++){ 
+						   for (int a=0;a<jsonSolutions.length();a++){
+							   String clientId = null;
 							   try {
-								   Solution sol = solutionRepo.findObjectByClientId(jsonSolutions.getString(a));
+								   Solution sol = null;
+								   if (jsonSolutions.get(a) instanceof JSONObject) {
+									   clientId = jsonSolutions.getJSONObject(a).getString("clientId");
+								   } else {
+									   clientId = jsonSolutions.getString(a);
+								   }
+								   sol = solutionRepo.findObjectByClientId(clientId);
 								   if (sol != null) {
 									   sol.addApplSolConfigurations(configuration);
 									   solutions.add(sol);
 								   }
 							   } catch (Exception  e) {
-								   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The solution: " + jsonSolutions.getString(a) + " defined in the configuration cannot be found!", true);
+								   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The solution: " + clientId + " defined in the configuration cannot be found!", true);
 							   }
 						   } 
 						} 
@@ -1023,34 +1023,25 @@ public class MgmtController {
 						List<Topic> topics = new ArrayList<Topic>();
 						if (jsonTopics != null) { 
 						   for (int a=0;a<jsonTopics.length();a++){ 
+							   String topicId = null;
 							   try {
-								   Topic top = topicRepo.findObjectByClientId(jsonTopics.getString(a));
+								   Topic top = null;
+								   if (jsonTopics.get(a) instanceof JSONObject) {
+									   topicId = jsonTopics.getJSONObject(a).getString("topicId");
+								   } else {
+									   topicId = jsonSolutions.getString(a);
+								   }
+								   top = topicRepo.findObjectByTopicId(topicId);
 								   top.addApplConfigurations(configuration);
 								   if (top != null) {
 									   topics.add(top);
 								   }
 							   } catch (Exception  e) {
-								   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The topic: " + jsonTopics.getString(a) + " defined in the configuration cannot be found!", true);
+								   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The topic: " + topicId + " defined in the configuration cannot be found!", true);
 							   }
 						   } 
 						} 
 						configuration.setTopics(topics);
-						
-						/*JSONArray jsonGateways = jsonobject.getJSONArray("gateways");
-						List<Gateway> gateways = new ArrayList<Gateway>();
-						if (jsonGateways != null) { 
-						   for (int a=0;a<jsonGateways.length();a++){ 
-							   try {
-								   Gateway gw = gatewayRepo.findObjectByClientId(jsonGateways.getString(a));
-								   if (gw != null) {
-									   gateways.add(gw);
-								   }
-							   } catch (Exception  e) {
-								   logController.addLog(LogLevels.LOG_LEVEL_ERROR, "The gateway: " + jsonGateways.getString(a) + " defined in the configuration cannot be found!", true);
-							   }
-						   } 
-						} 
-						configuration.setGateways(gateways);*/
 	
 						configRepo.saveAndFlush(configuration);
 					} else {
