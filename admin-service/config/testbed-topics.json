@@ -89,7 +89,7 @@
 }, {
   "topicId" : "core.topic.time",
   "type" : "core.topic",
-  "name" : "system_timing",
+  "name" : "simulation_time_mgmt",
   "state" : false,
   "msgType" : "Timing",
   "msgTypeNamespace" : "eu.driver.model.core",
@@ -100,7 +100,7 @@
 }, {
   "topicId" : "core.topic.time.control",
   "type" : "core.topic",
-  "name" : "system_timing_control",
+  "name" : "simulation_time_control",
   "state" : false,
   "msgType" : "TimingControl",
   "msgTypeNamespace" : "eu.driver.model.core",
