@@ -15,6 +15,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -53,6 +54,7 @@ public class Solution {
 	@Size(min = 4, max = 255)
 	private String name = null;
 	
+	@OneToOne(fetch=FetchType.EAGER)
 	private Origin origin = null;
 	
 	@Column(name="isAdmin")
